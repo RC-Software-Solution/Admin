@@ -1,0 +1,7 @@
+/* Optional CSS variables */
+:root {
+  --primary-color: #16a34a;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --neutral-color: #6b7280;
+}

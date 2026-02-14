@@ -1,0 +1,70 @@
+.user {
+  position: relative;
+  cursor: pointer;
+  margin-right: 60px;  
+}
+
+/* Dropdown menu */
+.user__dropdown {
+  position: absolute;
+  top: 110%; 
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  min-width: 150px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  overflow: hidden;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+  
+}
+
+/* Dropdown items */
+.dropdown__item {
+  padding: 0.6rem 1rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dropdown__item:hover {
+  background-color: #007bff; 
+  color: #ffffff;
+}
+
+.iconBtn {
+  position: relative;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  background-color: rgb(255, 58, 58);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 1px 1px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+}
+
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
