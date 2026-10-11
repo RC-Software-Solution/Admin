@@ -4,6 +4,7 @@ import Login from "../Pages/Auth/Login";
 import Users from "../Pages/Users/Users";
 import Admins from "../Pages/admins/Admins";
 import DeliveryAreas from "../Pages/deliveryareas/DeliveryAreas";
+import Notices from "../Pages/notices/Notices";
 
 import Layout from "../layouts/AdminLayout";
 
@@ -32,6 +33,7 @@ const Routes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
         <Route path="/users" element={<Users />} />
         <Route path="/admins" element={<Admins />} />
         <Route path="/delivery-areas" element={<DeliveryAreas />} />
+        <Route path="/notices" element={<Notices />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Switch>
     </Layout>

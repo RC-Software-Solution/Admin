@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Mock credentials - in a real app, this would use an API
-const DEFAULT_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
-const DEFAULT_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
+import { login } from "../services/auth.service";
 
 interface UseLoginReturn {
     email: string;
@@ -27,15 +25,13 @@ export const useLogin = (setIsLoggedIn: (value: boolean) => void): UseLoginRetur
         setLoading(true);
         setError("");
 
-        // Simulated delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        if (email === DEFAULT_EMAIL && password === DEFAULT_PASSWORD) {
+        try {
+            await login(email, password);
             setIsLoggedIn(true);
             localStorage.setItem("isLoggedIn", "true");
             navigate("/dashboard");
-        } else {
-            setError("Incorrect email or password");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Login failed");
         }
         setLoading(false);
     };

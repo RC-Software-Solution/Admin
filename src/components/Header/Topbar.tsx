@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { clearSession } from "../../services/apiClient";
 import "./topbar.css";
 
 interface TopbarProps {
@@ -16,8 +17,7 @@ const Topbar: React.FC<TopbarProps> = ({ setIsLoggedIn }) => {
 
   const handleLogout = () => {
     // Clear auth data
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user"); // if you store user info
+    clearSession();
 
     // Update state
     setIsLoggedIn(false);

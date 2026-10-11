@@ -9,6 +9,7 @@ import {
   MdFastfood,
   MdAccountBalanceWallet,
   MdHistory,
+  MdCampaign,
 } from "react-icons/md";
 
 import {
@@ -29,6 +30,7 @@ const SidebarLayout = () => {
     { name: "Users", icon: <FaUsers />, path: "/users" },
     { name: "Admins", icon: <FaUserShield />, path: "/admins" },
     { name: "Delivery Areas", icon: <MdLocationOn />, path: "/delivery-areas" },
+    { name: "Notices", icon: <MdCampaign />, path: "/notices" },
     { name: "Sessions", icon: <MdTimer />, path: "/sessions" },
     { name: "Food Items", icon: <MdFastfood />, path: "/food-items" },
     { name: "Orders", icon: <FaClipboardList />, path: "/orders" },
