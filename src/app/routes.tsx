@@ -15,14 +15,21 @@ interface RoutesProps {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Routes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
+// Public pages work whether or not a session exists: the emailed reset link must open even in a browser that's signed in.
+const Routes: React.FC<RoutesProps> = (props) => (
+  <Switch>
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="*" element={<AppRoutes {...props} />} />
+  </Switch>
+);
+
+const AppRoutes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
   if (!isLoggedIn) {
     return (
       <Switch>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Switch>
     );
