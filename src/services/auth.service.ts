@@ -1,4 +1,4 @@
-import { api, setToken, USER_API } from "./apiClient";
+import { api, clearSession, setToken, USER_API } from "./apiClient";
 
 const ADMIN_ROLES = ["admin", "super_admin"];
 
@@ -11,4 +11,10 @@ export async function login(email: string, password: string) {
   if (!ADMIN_ROLES.includes(res.user.role)) throw new Error("This account is not an admin");
   setToken(res.access_token);
   localStorage.setItem("user", JSON.stringify({ name: res.user.full_name, role: res.user.role }));
+}
+
+/** Revokes the refresh token server-side (best effort), then drops the local session. */
+export async function logout() {
+  await api(USER_API, "/users/logout", { method: "POST" }).catch(() => {});
+  clearSession();
 }

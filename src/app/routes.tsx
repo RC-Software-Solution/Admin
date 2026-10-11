@@ -6,6 +6,7 @@ import Admins from "../Pages/admins/Admins";
 import DeliveryAreas from "../Pages/deliveryareas/DeliveryAreas";
 import Notices from "../Pages/notices/Notices";
 
+import { getSession } from "../services/apiClient";
 import Layout from "../layouts/AdminLayout";
 
 interface RoutesProps {
@@ -14,9 +15,7 @@ interface RoutesProps {
 }
 
 const Routes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
-  const loggedIn = isLoggedIn || localStorage.getItem("isLoggedIn") === "true";
-
-  if (!loggedIn) {
+  if (!isLoggedIn) {
     return (
       <Switch>
         <Route path="/" element={<Navigate to="/login" />} />
@@ -31,7 +30,8 @@ const Routes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
       <Switch>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<Users />} />
-        <Route path="/admins" element={<Admins />} />
+        {/* managing admins is super_admin only */}
+        <Route path="/admins" element={getSession()?.role === "super_admin" ? <Admins /> : <Navigate to="/dashboard" />} />
         <Route path="/delivery-areas" element={<DeliveryAreas />} />
         <Route path="/notices" element={<Notices />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />

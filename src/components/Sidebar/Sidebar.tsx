@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./sidebar.css";
+import { getSession } from "../../services/apiClient";
 
 import {
   MdDashboard,
@@ -25,6 +26,7 @@ const SidebarLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isSuper = getSession()?.role === "super_admin";
   const navItems = [
     { name: "Dashboard", icon: <MdDashboard />, path: "/dashboard" },
     { name: "Users", icon: <FaUsers />, path: "/users" },
@@ -39,7 +41,7 @@ const SidebarLayout = () => {
     { name: "Reports", icon: <FaChartBar />, path: "/reports" },
     { name: "Settings", icon: <FaCog />, path: "/settings" },
     { name: "Audit Logs", icon: <MdHistory />, path: "/audit-logs" },
-  ];
+  ].filter((item) => isSuper || item.path !== "/admins");
 
   const [activeItem, setActiveItem] = useState("Dashboard");
 

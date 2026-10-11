@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearSession } from "../../services/apiClient";
+import { getSession } from "../../services/apiClient";
+import { logout } from "../../services/auth.service";
 import "./topbar.css";
 
 interface TopbarProps {
@@ -15,9 +16,8 @@ const Topbar: React.FC<TopbarProps> = ({ setIsLoggedIn }) => {
     setIsDropdownOpen(prev => !prev);
   };
 
-  const handleLogout = () => {
-    // Clear auth data
-    clearSession();
+  const handleLogout = async () => {
+    await logout();
 
     // Update state
     setIsLoggedIn(false);
@@ -38,7 +38,7 @@ const Topbar: React.FC<TopbarProps> = ({ setIsLoggedIn }) => {
         </button>
         <div className="user" onClick={handleToggleDropdown}>
           <div className="user__avatar">👤</div>
-          <div className="user__name">Admin User</div>
+          <div className="user__name">{getSession()?.name}</div>
           <div className="user__caret">▾</div>
           {isDropdownOpen && (
             <div className="user__dropdown">

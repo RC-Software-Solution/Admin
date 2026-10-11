@@ -28,7 +28,6 @@ export const useLogin = (setIsLoggedIn: (value: boolean) => void): UseLoginRetur
         try {
             await login(email, password);
             setIsLoggedIn(true);
-            localStorage.setItem("isLoggedIn", "true");
             navigate("/dashboard");
         } catch (err) {
             setError(err instanceof Error ? err.message : "Login failed");

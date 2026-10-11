@@ -1,29 +1,32 @@
-import { useState, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { DeliveryArea } from "../types/deliveryAreas";
-import { areasMock } from "../data/deliveryAreasData";
+import { createArea, deleteArea, listAreas, renameArea } from "../Pages/deliveryareas/deliveryareas.services";
 
 export const useDeliveryAreas = () => {
-    const [areas] = useState<DeliveryArea[]>(areasMock);
+    const [areas, setAreas] = useState<DeliveryArea[]>([]);
+    const [error, setError] = useState("");
 
-    // Derived state
-    const stats = useMemo(() => {
-        return {
-            totalAreas: areas.length,
-            totalUsers: areas.reduce((sum, a) => sum + a.assignedUsers, 0),
-            totalOrdersToday: areas.reduce((sum, a) => sum + a.ordersToday, 0),
-            activeAreas: areas.filter((a) => a.status === "active").length
-        };
-    }, [areas]);
+    const load = useCallback(() => listAreas().then(setAreas), []);
 
-    const onAddArea = () => alert("Add Area clicked");
-    const onEdit = (area: DeliveryArea) => alert(`Edit: ${area.name}`);
-    const onUsers = (area: DeliveryArea) => alert(`Users: ${area.name}`);
+    // Run a mutation, then reload; surface any failure in `error`
+    const run = (fn: () => Promise<unknown>) =>
+        fn().then(load).then(() => setError(""), (e: Error) => setError(e.message));
 
-    return {
-        areas,
-        stats,
-        onAddArea,
-        onEdit,
-        onUsers
+    useEffect(() => {
+        load().catch((e: Error) => setError(e.message));
+    }, [load]);
+
+    const onAddArea = () => {
+        const name = window.prompt("New area name")?.trim();
+        if (name) run(() => createArea(name));
     };
+    const onEdit = (a: DeliveryArea) => {
+        const name = window.prompt("Rename area", a.area_name)?.trim();
+        if (name && name !== a.area_name) run(() => renameArea(a.area_id, name));
+    };
+    const onDelete = (a: DeliveryArea) => {
+        if (window.confirm(`Delete "${a.area_name}"?`)) run(() => deleteArea(a.area_id));
+    };
+
+    return { areas, error, onAddArea, onEdit, onDelete };
 };

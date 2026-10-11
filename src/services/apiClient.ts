@@ -6,10 +6,20 @@ const TOKEN_KEY = "access_token";
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
 export const setToken = (token: string) => localStorage.setItem(TOKEN_KEY, token);
 
+/** Signed-in admin from the token itself (a hand-set localStorage flag can't fake this); null if missing or expired. UI gating only, the backend enforces roles. */
+export function getSession(): { name: string; role: string } | null {
+  try {
+    const payload = JSON.parse(atob(getToken()!.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    if (payload.exp * 1000 < Date.now()) return null;
+    return { role: payload.role, name: JSON.parse(localStorage.getItem("user") ?? "{}").name ?? "Admin" };
+  } catch {
+    return null;
+  }
+}
+
 /** Everything the app stores about the session; the Topbar logout and a 401 both use this. */
 export const clearSession = () => {
   localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem("isLoggedIn");
   localStorage.removeItem("user");
 };
 
