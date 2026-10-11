@@ -1,23 +1,37 @@
-export type SessionTab = "Breakfast" | "Lunch" | "Dinner";
-export type SessionStatus = "completed" | "pending" | "cancelled";
+export type MealType = "breakfast" | "lunch" | "dinner";
 
-export interface SessionRowData {
-    date: string;
-    orders: number;
-    amount: string;
-    status: SessionStatus;
+export interface SessionDay {
+    date: string; // YYYY-MM-DD, Sri Lanka calendar day
+    orderCount: number;
+    totalRevenue: number;
 }
 
 export interface TopItemData {
-    img: string;
-    name: string;
-    price: string;
-    sold: number;
+    food_name: string;
+    total_quantity: number;
+    total_revenue: number;
 }
 
 export interface AreaRow {
-    area: string;
-    orders: number;
-    revenue: string;
-    rate: number;
+    area_id: number | string;
+    area_name: string;
+    orderCount: number;
+    totalRevenue: number;
+    completedCount: number;
+}
+
+/** GET /analytics/dashboard. A section is null when its upstream failed (named in `errors`). */
+export interface DashboardData {
+    generatedAt: string;
+    stats: {
+        salesToday: number | null;
+        salesWeek: number | null;
+        ordersToday: { total: number; completed: number } | null;
+        blockedUsers: number | null;
+        unpaidOrders: number | null;
+    };
+    sessions: Record<MealType, SessionDay[] | null>;
+    topItems: TopItemData[] | null;
+    areas: AreaRow[] | null;
+    errors: string[];
 }

@@ -1,20 +1,13 @@
 import { useState } from "react";
-import type { SessionTab } from "../types/dashboard";
-import { sessionData, topItems, areaRows } from "../data/dashboardData";
+import type { MealType } from "../types/dashboard";
+import { getDashboard } from "../Pages/Dashboard/dashboard.service";
+import { usePolling } from "./usePolling";
+
+const POLL_MS = 30_000;
 
 export const useDashboard = () => {
-    const [activeTab, setActiveTab] = useState<SessionTab>("Breakfast");
+    const [activeTab, setActiveTab] = useState<MealType>("breakfast");
+    const { data, error, updatedAt, refresh } = usePolling(getDashboard, POLL_MS);
 
-    const tabs: SessionTab[] = ["Breakfast", "Lunch", "Dinner"];
-
-    return {
-        activeTab,
-        setActiveTab,
-        currentSessionData: sessionData[activeTab],
-        topItems,
-        areaRows,
-        tabs
-    };
+    return { data, error, updatedAt, refresh, activeTab, setActiveTab, tabs: ["breakfast", "lunch", "dinner"] as MealType[] };
 };
-
-

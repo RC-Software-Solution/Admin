@@ -220,3 +220,11 @@
   .sidebar{ display:none; }
   .searchWrap{ width: 55vw; }
 }
+
+/* Polling feedback */
+.statCard__value--flash{ animation: valueFlash 1.2s ease-out; }
+@keyframes valueFlash{ from{ background:#fef9c3; } to{ background:transparent; } }
+.liveBar{ display:flex; align-items:center; gap:10px; margin:6px 0 14px; font-size:13px; color:#6b7280; }
+.liveBar--stale{ color:#b45309; }
+.liveBar button{ border:1px solid #e5e7eb; background:#fff; border-radius:6px; padding:3px 10px; cursor:pointer; }
+.sectionNote{ color:#b45309; font-size:13px; padding:6px 0; }

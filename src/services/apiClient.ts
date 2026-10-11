@@ -1,4 +1,5 @@
 export const USER_API = import.meta.env.VITE_USER_API ?? "http://localhost:4001/api";
+export const ANALYTICS_API = import.meta.env.VITE_ANALYTICS_API ?? "http://localhost:4006/api";
 export const LOCATIONS_API = import.meta.env.VITE_LOCATIONS_API ?? "http://localhost:4004/api";
 
 const TOKEN_KEY = "access_token";
