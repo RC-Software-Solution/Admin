@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "../../styles/login.css";
 import { SpinnerIcon } from "../../components/common/Icons";
 import type { LoginProps } from "../../types/auth";
@@ -48,6 +49,8 @@ const Login: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
             "Login"
           )}
         </button>
+
+        <Link to="/forgot-password">Forgot password?</Link>
       </form>
     </div>
   );

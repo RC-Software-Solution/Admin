@@ -18,3 +18,12 @@ export async function logout() {
   await api(USER_API, "/users/logout", { method: "POST" }).catch(() => {});
   clearSession();
 }
+
+export const forgotPassword = (email: string) =>
+  api<{ message: string }>(USER_API, "/users/forgot-password", { method: "POST", body: JSON.stringify({ email }) });
+
+export const resetPassword = (token: string, newPassword: string) =>
+  api<{ message: string }>(USER_API, "/users/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ token, newPassword }),
+  });

@@ -7,6 +7,7 @@ import DeliveryAreas from "../Pages/deliveryareas/DeliveryAreas";
 import Notices from "../Pages/notices/Notices";
 
 import { getSession } from "../services/apiClient";
+import { ForgotPassword, ResetPassword } from "../Pages/Auth/PasswordReset";
 import Layout from "../layouts/AdminLayout";
 
 interface RoutesProps {
@@ -20,6 +21,8 @@ const Routes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
       <Switch>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Switch>
     );
