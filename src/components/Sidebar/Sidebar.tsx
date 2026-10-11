@@ -8,7 +8,6 @@ import {
   MdLocationOn,
   MdTimer,
   MdFastfood,
-  MdAccountBalanceWallet,
   MdHistory,
   MdCampaign,
 } from "react-icons/md";
@@ -37,7 +36,6 @@ const SidebarLayout = () => {
     { name: "Food Items", icon: <MdFastfood />, path: "/food-items" },
     { name: "Orders", icon: <FaClipboardList />, path: "/orders" },
     { name: "Delivery Persons", icon: <FaTruck />, path: "/delivery-persons" },
-    { name: "Deposits", icon: <MdAccountBalanceWallet />, path: "/deposits" },
     { name: "Reports", icon: <FaChartBar />, path: "/reports" },
     { name: "Settings", icon: <FaCog />, path: "/settings" },
     { name: "Audit Logs", icon: <MdHistory />, path: "/audit-logs" },

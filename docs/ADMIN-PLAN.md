@@ -9,7 +9,7 @@ Written for Claude agents. Each agent takes **one section** (or the foundation t
 | Done | Login / Forgot / Reset password, Dashboard, Notices | Wired to the real backend |
 | **P0 (launch)** | Users, Admins (finish), Delivery Areas (finish), Orders (minimal) | The playbook's launch scope |
 | P1 | Sessions, Food Items, Delivery Persons | In the requirements, not in the launch scope |
-| P2 (deferred) | Deposits, Reports, Settings, Audit Logs | No backend, and the requirements are unclear or absent |
+| P2 (deferred) | Reports, Settings, Audit Logs | No backend, and the requirements are unclear or absent |
 
 Until a page is built, **hide its sidebar entry**. Today every unbuilt entry just redirects to the dashboard (see foundation task F1).
 
@@ -38,6 +38,8 @@ Until a page is built, **hide its sidebar entry**. Today every unbuilt entry jus
 **Parallelism.** Pages are independent except through these shared files: `app/routes.tsx`, `components/Sidebar/Sidebar.tsx`, `services/apiClient.ts`. Agents working in parallel should add their line to those files and rebase carefully; use separate git worktrees.
 
 ---
+
+**Deposits is out of scope** (removed from the menu and the codebase by product decision). Ignore "deposits reconciliation" in the requirements doc.
 
 ## F1. Foundation (do first, one agent)
 
@@ -100,7 +102,6 @@ Done and polling. Remaining from the requirements: filters (date range, area, se
 
 ## P2 (deferred, don't start without a product decision)
 
-- **Deposits:** no backend and no section in the requirements (it appears only as "deposits reconciliation" in Reports). Launch is cash-on-delivery, so this is probably driver cash hand-over. Ask what a deposit is first.
 - **Reports:** the requirements mark it "not sure". Sales, orders, item and area reports could be built on `analytics-service` with date and area filters, plus CSV export. Needs a scoping decision.
 - **Settings:** not in the requirements. Candidates: ordering-window rules, auto-block threshold (currently 2 unpaid orders, hardcoded). Needs a decision on what is configurable.
 - **Audit Logs:** `UserStatusLog` records customer status changes only. A log page needs a list endpoint plus a wider log (admin actions, order status changes). Do this when a compliance need is stated.
