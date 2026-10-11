@@ -1,32 +1,25 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Admin } from "../types/admins";
-import { ADMINS } from "../data/adminsData";
+import { createAdmin, listAdmins } from "../Pages/admins/admins.service";
+
+type NewAdmin = Parameters<typeof createAdmin>[0];
 
 export const useAdmins = () => {
-    const [rows, setRows] = useState<Admin[]>(ADMINS);
+    const [rows, setRows] = useState<Admin[]>([]);
+    const [error, setError] = useState("");
 
-    const toggleStatus = (id: string) => {
-        setRows((prev) =>
-            prev.map((a) =>
-                a.id === id
-                    ? { ...a, status: a.status === "active" ? "suspended" : "active" }
-                    : a
-            )
+    const load = useCallback(() => listAdmins().then(setRows), []);
+
+    useEffect(() => {
+        load().catch((e: Error) => setError(e.message));
+    }, [load]);
+
+    // Resolves true on success so the form knows to close; failures show in `error`
+    const add = (a: NewAdmin) =>
+        createAdmin(a).then(load).then(
+            () => { setError(""); return true; },
+            (e: Error) => { setError(e.message); return false; },
         );
-    };
 
-    const onEdit = (admin: Admin) => {
-        alert(`Edit: ${admin.name}`);
-    };
-
-    const onAddAdmin = () => {
-        alert("Add Admin");
-    };
-
-    return {
-        rows,
-        toggleStatus,
-        onEdit,
-        onAddAdmin
-    };
+    return { rows, error, add };
 };

@@ -1,11 +1,11 @@
-export type AdminStatus = "active" | "suspended";
-export type AdminRole = "Super Admin" | "Admin";
+export type AdminRole = "admin" | "super_admin";
 
 export interface Admin {
     id: string;
-    name: string;
+    full_name: string;
     email: string;
+    phone: string | null;
     role: AdminRole;
-    status: AdminStatus;
-    createdDate: string;
+    status: "active" | "inactive";
+    created_at: string;
 }

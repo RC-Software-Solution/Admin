@@ -1,10 +1,22 @@
 
+import { useState } from "react";
 import "./admins.css";
 import { useAdmins } from "../../hooks/useAdmins";
-import { EditIcon, PlusIcon } from "../../components/common/Icons";
+import type { AdminRole } from "../../types/admins";
+import { PlusIcon } from "../../components/common/Icons";
 
 export default function AdminsPage() {
-  const { rows, toggleStatus, onEdit, onAddAdmin } = useAdmins();
+  const { rows, error, add } = useAdmins();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ full_name: "", email: "", password: "", role: "admin" as AdminRole });
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (await add(form)) {
+      setOpen(false);
+      setForm({ full_name: "", email: "", password: "", role: "admin" });
+    }
+  };
 
   return (
     <div className="admins-page">
@@ -15,13 +27,27 @@ export default function AdminsPage() {
             <p className="admins-subtitle">Manage administrative users</p>
           </div>
 
-          <button className="btn-add" onClick={onAddAdmin} type="button">
+          <button className="btn-add" onClick={() => setOpen((o) => !o)} type="button">
             <span className="btn-add-plus">
               <PlusIcon className="icon-sm" />
             </span>
             Add Admin
           </button>
         </div>
+
+        {open && (
+          <form onSubmit={submit} style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "12px 0" }}>
+            <input placeholder="Full name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required />
+            <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+            <input type="password" placeholder="Initial password (8+ chars)" minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+            <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as AdminRole })}>
+              <option value="admin">Admin</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+            <button className="btn-add" type="submit">Create</button>
+          </form>
+        )}
+        {error && <p role="alert">{error}</p>}
 
         <div className="table-wrap">
           <table className="admins-table" role="table">
@@ -32,25 +58,24 @@ export default function AdminsPage() {
                 <th className="col-role">Role</th>
                 <th className="col-status">Status</th>
                 <th className="col-date">Created Date</th>
-                <th className="col-actions">Actions</th>
               </tr>
             </thead>
 
             <tbody>
               {rows.map((a) => (
                 <tr key={a.id}>
-                  <td className="cell-strong">{a.name}</td>
+                  <td className="cell-strong">{a.full_name}</td>
                   <td className="cell-muted">{a.email}</td>
 
                   <td>
                     <span
                       className={
-                        a.role === "Super Admin"
+                        a.role === "super_admin"
                           ? "pill pill-green"
                           : "pill pill-blue"
                       }
                     >
-                      {a.role}
+                      {a.role === "super_admin" ? "Super Admin" : "Admin"}
                     </span>
                   </td>
 
@@ -59,40 +84,15 @@ export default function AdminsPage() {
                       className={
                         a.status === "active"
                           ? "pill pill-status-active"
-                          : "pill pill-status-suspended" // updated
+                          : "pill pill-status-suspended"
                       }
                     >
                       {a.status}
                     </span>
                   </td>
 
-                  <td className="cell-muted">{a.createdDate}</td>
+                  <td className="cell-muted">{new Date(a.created_at).toLocaleDateString()}</td>
 
-                  <td>
-                    <div className="actions">
-                      <button
-                        className="icon-btn"
-                        type="button"
-                        onClick={() => onEdit(a)}
-                        aria-label={`Edit ${a.name}`}
-                        title="Edit"
-                      >
-                        <EditIcon className="icon" />
-                      </button>
-
-                      <button
-                        className={
-                          a.status === "active"
-                            ? "btn-outline btn-outline-danger"
-                            : "btn-outline btn-outline-success"
-                        }
-                        type="button"
-                        onClick={() => toggleStatus(a.id)}
-                      >
-                        {a.status === "active" ? "Suspend" : "Enable"} {/* updated */}
-                      </button>
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
