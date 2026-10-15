@@ -1,35 +1,58 @@
-
-import "./users.css"; // We can rename this later if needed, but keeping for now
+import { useState } from "react";
+import "./users.css";
 import { useUsers } from "../../hooks/useUsers";
-import { DownloadIcon, FilterIcon, EyeIcon } from "../../components/common/Icons";
+import { DownloadIcon, EyeIcon } from "../../components/common/Icons";
+import Modal from "../../components/common/Modal";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
+import { getSession } from "../../services/apiClient";
+import { formatDate, formatDateTime } from "../../utils/formatDate";
+import { formatMoney } from "../../utils/formatMoney";
+import { statusOf, type Customer } from "../../types/users";
+
+type Dialog =
+  | { kind: "approve" | "reject"; user: Customer }
+  | { kind: "disable" | "enable" | "unlock"; user: Customer }
+  | null;
+
+const CONFIRM_COPY = {
+  disable: { title: "Disable customer", verb: "Disable", text: "can no longer log in or order" },
+  enable: { title: "Enable customer", verb: "Enable", text: "regains access" },
+  unlock: { title: "Unlock customer", verb: "Unlock", text: "is unblocked and can order again" },
+} as const;
 
 export default function UsersPage() {
-  const {
-    activeTab,
-    setActiveTab,
-    query,
-    setQuery,
-    counts,
-    filtered,
-    onApprove,
-    onReject,
-    tabs
-  } = useUsers();
+  const u = useUsers();
+  // UI gating only; the backend checkRole is the enforcement
+  const isSuper = getSession()?.role === "super_admin";
 
-  const onView = (id: string) => {
-    // Replace with your modal / route
-    console.log("View user:", id);
+  const [dialog, setDialog] = useState<Dialog>(null);
+  const [areaId, setAreaId] = useState("");
+  const [reason, setReason] = useState("");
+  const close = () => setDialog(null);
+
+  const open = (d: NonNullable<Dialog>) => {
+    setAreaId(String(d.user.area_id ?? ""));
+    setReason("");
+    setDialog(d);
   };
 
-  const onExport = () => {
-    // Replace with your export logic
-    console.log("Export clicked");
+  const submitApprove = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (dialog?.kind === "approve" && (await u.approve(dialog.user, areaId))) close();
+  };
+  const submitReject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (dialog?.kind === "reject" && reason.trim() && (await u.reject(dialog.user, reason.trim()))) close();
+  };
+  const confirm = async () => {
+    if (!dialog || dialog.kind === "approve" || dialog.kind === "reject") return;
+    await u[dialog.kind](dialog.user);
+    close();
   };
 
-  const onFilters = () => {
-    // Replace with opening a filter panel
-    console.log("Filters clicked");
-  };
+  const p = u.profile;
+  const unpaid = p?.order_history.filter((o) => o.payment_status === "unpaid") ?? [];
+  const confirmCopy = dialog && dialog.kind in CONFIRM_COPY ? CONFIRM_COPY[dialog.kind as keyof typeof CONFIRM_COPY] : null;
 
   return (
     <div className="users-page">
@@ -39,26 +62,22 @@ export default function UsersPage() {
           <p className="subtitle">Manage customer accounts</p>
         </div>
 
-        <button className="btn btn-export" onClick={onExport}>
+        <button className="btn btn-export" onClick={u.exportCsv}>
           <DownloadIcon className="icon" />
           Export
         </button>
       </div>
 
+      {u.error && <p role="alert">{u.error}</p>}
+
       <div className="users-toolbar">
         <div className="tabs">
-          {tabs.map((t) => {
-            const isActive = activeTab === t.key;
+          {u.tabs.map((t) => {
+            const isActive = u.activeTab === t.key;
             return (
-              <button
-                key={t.key}
-                className={`tab ${isActive ? "active" : ""}`}
-                onClick={() => setActiveTab(t.key)}
-              >
+              <button key={t.key} className={`tab ${isActive ? "active" : ""}`} onClick={() => u.setActiveTab(t.key)}>
                 {t.label}
-                <span className={`count ${isActive ? "active" : ""}`}>
-                  {counts[t.key]}
-                </span>
+                <span className={`count ${isActive ? "active" : ""}`}>{u.counts[t.key]}</span>
               </button>
             );
           })}
@@ -69,15 +88,10 @@ export default function UsersPage() {
             <input
               className="search"
               placeholder="Search by name or email..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={u.query}
+              onChange={(e) => u.setQuery(e.target.value)}
             />
           </div>
-
-          <button className="btn btn-filters" onClick={onFilters}>
-            <FilterIcon className="icon" />
-            Filters
-          </button>
         </div>
       </div>
 
@@ -95,59 +109,147 @@ export default function UsersPage() {
           </thead>
 
           <tbody>
-            {filtered.length === 0 ? (
+            {u.filtered.length === 0 ? (
               <tr>
                 <td className="empty" colSpan={6}>
                   No users found.
                 </td>
               </tr>
             ) : (
-              filtered.map((u) => (
-                <tr key={u.id}>
-                  <td className="name">{u.name}</td>
-                  <td className="muted">{u.email}</td>
-                  <td className="muted">{u.area}</td>
-                  <td>
-                    <span className={`status-pill ${u.status}`}>
-                      {u.status}
-                    </span>
-                  </td>
-                  <td className="muted">{u.registered}</td>
-                  <td>
-                    <div className="actions">
-                      <button
-                        className="icon-btn"
-                        onClick={() => onView(u.id)}
-                        aria-label="View"
-                        title="View"
-                      >
-                        <EyeIcon className="icon" />
-                      </button>
+              u.filtered.map((c) => {
+                const status = statusOf(c);
+                return (
+                  <tr key={c.id}>
+                    <td className="name">{c.full_name}</td>
+                    <td className="muted">{c.email}</td>
+                    <td className="muted">{u.areaName(c.area_id)}</td>
+                    <td>
+                      <span className={`status-pill ${status}`}>{status}</span>
+                    </td>
+                    <td className="muted">{formatDate(c.created_at)}</td>
+                    <td>
+                      <div className="actions">
+                        <button className="icon-btn" onClick={() => u.openProfile(c.id)} aria-label="View" title="View">
+                          <EyeIcon className="icon" />
+                        </button>
 
-                      {u.status === "pending" && (
-                        <>
-                          <button
-                            className="pill-btn approve"
-                            onClick={() => onApprove(u.id)}
-                          >
-                            Approve
+                        {isSuper && status === "pending" && (
+                          <>
+                            <button className="pill-btn approve" onClick={() => open({ kind: "approve", user: c })}>
+                              Approve
+                            </button>
+                            <button className="pill-btn reject" onClick={() => open({ kind: "reject", user: c })}>
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {isSuper && status === "accepted" && (
+                          <button className="pill-btn reject" onClick={() => open({ kind: "disable", user: c })}>
+                            Disable
                           </button>
-                          <button
-                            className="pill-btn reject"
-                            onClick={() => onReject(u.id)}
-                          >
-                            Reject
+                        )}
+                        {isSuper && status === "disabled" && (
+                          <button className="pill-btn approve" onClick={() => open({ kind: "enable", user: c })}>
+                            Enable
                           </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        )}
+                        {isSuper && status === "blocked" && (
+                          <button className="pill-btn approve" onClick={() => open({ kind: "unlock", user: c })}>
+                            Unlock
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
       </div>
+
+      <Modal open={dialog?.kind === "approve"} title={`Approve ${dialog?.user.full_name}`} onClose={close}>
+        <form className="modal__form" onSubmit={submitApprove}>
+          <label>
+            Delivery area (required)
+            <select value={areaId} onChange={(e) => setAreaId(e.target.value)} required>
+              <option value="">Select an area…</option>
+              {u.areas.map((a) => (
+                <option key={a.area_id} value={a.area_id}>{a.area_name}</option>
+              ))}
+            </select>
+          </label>
+          <div className="modal__actions">
+            <button type="button" className="modal__btn" onClick={close}>Cancel</button>
+            <button type="submit" className="modal__btn modal__btn--primary">Approve</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={dialog?.kind === "reject"} title={`Reject ${dialog?.user.full_name}`} onClose={close}>
+        <form className="modal__form" onSubmit={submitReject}>
+          <textarea
+            placeholder="Reason (required)"
+            rows={3}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            required
+          />
+          <div className="modal__actions">
+            <button type="button" className="modal__btn" onClick={close}>Cancel</button>
+            <button type="submit" className="modal__btn modal__btn--danger">Reject</button>
+          </div>
+        </form>
+      </Modal>
+
+      <ConfirmDialog
+        open={!!confirmCopy}
+        title={confirmCopy?.title ?? ""}
+        message={`${dialog?.user.full_name} ${confirmCopy?.text}. Continue?`}
+        confirmLabel={confirmCopy?.verb}
+        onCancel={close}
+        onConfirm={confirm}
+      />
+
+      <Modal open={!!p} title={p?.full_name ?? ""} onClose={u.closeProfile}>
+        {p && (
+          <div className="profile">
+            <p className="muted">
+              {p.email} · {p.phone ?? "no phone"} · {u.areaName(p.area_id)}
+            </p>
+            {p.address && <p className="muted">{p.address}</p>}
+            {p.rejection_reason && <p>Rejected: {p.rejection_reason}</p>}
+            {p.blocked_reason && <p>Blocked: {p.blocked_reason}</p>}
+
+            <h3>Unpaid</h3>
+            <p>
+              {unpaid.length} order{unpaid.length === 1 ? "" : "s"} ·{" "}
+              {formatMoney(unpaid.reduce((s, o) => s + Number(o.total_price), 0))}
+            </p>
+
+            <h3>Orders ({p.order_history.length})</h3>
+            <ul>
+              {p.order_history.map((o) => (
+                <li key={o.id}>
+                  {formatDate(o.created_at)} · {o.meal_time} · {o.status} · {o.payment_status} · {formatMoney(Number(o.total_price))}
+                </li>
+              ))}
+              {p.order_history.length === 0 && <li>No orders</li>}
+            </ul>
+
+            <h3>Status history</h3>
+            <ul>
+              {p.status_log.map((l) => (
+                <li key={l.id}>
+                  {formatDateTime(l.created_at)} · {l.previous_status ?? "—"} → {l.new_status}
+                  {l.reason ? ` (${l.reason})` : ""}
+                </li>
+              ))}
+              {p.status_log.length === 0 && <li>No changes recorded</li>}
+            </ul>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
