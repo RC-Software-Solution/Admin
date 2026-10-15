@@ -16,17 +16,9 @@ export const useDeliveryAreas = () => {
         load().catch((e: Error) => setError(e.message));
     }, [load]);
 
-    const onAddArea = () => {
-        const name = window.prompt("New area name")?.trim();
-        if (name) run(() => createArea(name));
-    };
-    const onEdit = (a: DeliveryArea) => {
-        const name = window.prompt("Rename area", a.area_name)?.trim();
-        if (name && name !== a.area_name) run(() => renameArea(a.area_id, name));
-    };
-    const onDelete = (a: DeliveryArea) => {
-        if (window.confirm(`Delete "${a.area_name}"?`)) run(() => deleteArea(a.area_id));
-    };
+    const onAdd = (name: string) => run(() => createArea(name));
+    const onRename = (a: DeliveryArea, name: string) => run(() => renameArea(a.area_id, name));
+    const onDelete = (a: DeliveryArea) => run(() => deleteArea(a.area_id));
 
-    return { areas, error, onAddArea, onEdit, onDelete };
+    return { areas, error, onAdd, onRename, onDelete };
 };

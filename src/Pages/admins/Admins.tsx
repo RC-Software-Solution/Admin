@@ -4,6 +4,7 @@ import "./admins.css";
 import { useAdmins } from "../../hooks/useAdmins";
 import type { AdminRole } from "../../types/admins";
 import { PlusIcon } from "../../components/common/Icons";
+import Modal from "../../components/common/Modal";
 
 export default function AdminsPage() {
   const { rows, error, add } = useAdmins();
@@ -27,7 +28,7 @@ export default function AdminsPage() {
             <p className="admins-subtitle">Manage administrative users</p>
           </div>
 
-          <button className="btn-add" onClick={() => setOpen((o) => !o)} type="button">
+          <button className="btn-add" onClick={() => setOpen(true)} type="button">
             <span className="btn-add-plus">
               <PlusIcon className="icon-sm" />
             </span>
@@ -35,8 +36,8 @@ export default function AdminsPage() {
           </button>
         </div>
 
-        {open && (
-          <form onSubmit={submit} style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "12px 0" }}>
+        <Modal open={open} title="Add admin" onClose={() => setOpen(false)}>
+          <form className="modal__form" onSubmit={submit}>
             <input placeholder="Full name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required />
             <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
             <input type="password" placeholder="Initial password (8+ chars)" minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
@@ -44,10 +45,14 @@ export default function AdminsPage() {
               <option value="admin">Admin</option>
               <option value="super_admin">Super Admin</option>
             </select>
-            <button className="btn-add" type="submit">Create</button>
+            {error && <p role="alert">{error}</p>}
+            <div className="modal__actions">
+              <button type="button" className="modal__btn" onClick={() => setOpen(false)}>Cancel</button>
+              <button type="submit" className="modal__btn modal__btn--primary">Create</button>
+            </div>
           </form>
-        )}
-        {error && <p role="alert">{error}</p>}
+        </Modal>
+        {!open && error && <p role="alert">{error}</p>}
 
         <div className="table-wrap">
           <table className="admins-table" role="table">

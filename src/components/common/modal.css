@@ -1,0 +1,16 @@
+.modal {
+  border: 0;
+  border-radius: 12px;
+  padding: 24px;
+  width: min(440px, 92vw);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+.modal::backdrop { background: rgba(15, 23, 42, 0.5); }
+.modal__title { margin: 0 0 12px; font-size: 18px; }
+.modal__body { margin: 0 0 20px; color: #475569; }
+.modal__form { display: flex; flex-direction: column; gap: 12px; }
+.modal__form input, .modal__form select { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+.modal__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.modal__btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; font: inherit; }
+.modal__btn--primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+.modal__btn--danger { background: #dc2626; border-color: #dc2626; color: #fff; }
