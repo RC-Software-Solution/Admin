@@ -69,6 +69,12 @@ export default function UsersPage() {
       </div>
 
       {u.error && <p role="alert">{u.error}</p>}
+      {u.areaFilter && (
+        <p>
+          Area: <strong>{u.areaName(u.areaFilter)}</strong>{" "}
+          <button type="button" className="modal__btn" onClick={u.clearAreaFilter}>Clear</button>
+        </p>
+      )}
 
       <div className="users-toolbar">
         <div className="tabs">

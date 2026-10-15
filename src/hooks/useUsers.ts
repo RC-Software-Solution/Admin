@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Customer, CustomerProfile, UserStatus, UserTab } from "../types/users";
 import { statusOf } from "../types/users";
@@ -20,6 +21,9 @@ export const useUsers = () => {
     const [areas, setAreas] = useState<DeliveryArea[]>([]);
     const [profile, setProfile] = useState<CustomerProfile | null>(null);
     const [error, setError] = useState("");
+    // ?area=<id> (linked from Delivery Areas) narrows every tab to one area
+    const [params, setParams] = useSearchParams();
+    const areaFilter = params.get("area");
 
     // One fetch of every customer; tabs and counts are derived client-side
     const load = useCallback(() => svc.listCustomers().then(setRows), []);
@@ -31,18 +35,19 @@ export const useUsers = () => {
 
     const counts = useMemo(() => {
         const c = { pending: 0, accepted: 0, rejected: 0, disabled: 0, blocked: 0 };
-        rows.forEach((r) => (c[statusOf(r)] += 1));
+        rows.forEach((r) => { if (!areaFilter || String(r.area_id) === areaFilter) c[statusOf(r)] += 1; });
         return c;
-    }, [rows]);
+    }, [rows, areaFilter]);
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         return rows.filter(
             (r) =>
                 statusOf(r) === activeTab &&
+                (!areaFilter || String(r.area_id) === areaFilter) &&
                 (!q || r.full_name.toLowerCase().includes(q) || r.email.toLowerCase().includes(q)),
         );
-    }, [rows, activeTab, query]);
+    }, [rows, activeTab, query, areaFilter]);
 
     const areaName = (id: Customer["area_id"]) =>
         id == null ? "—" : areas.find((a) => String(a.area_id) === String(id))?.area_name ?? `#${id}`;
@@ -68,7 +73,10 @@ export const useUsers = () => {
         }, (e: Error) => setError(e.message));
 
     return {
-        activeTab, setActiveTab, query, setQuery, counts, filtered, areas, areaName, error,
+        activeTab, setActiveTab, query, setQuery, counts, filtered, areaName, error,
+        areaFilter, clearAreaFilter: () => setParams({}),
+        // new approvals only go to active areas
+        areas: areas.filter((a) => a.status === "active"),
         profile, openProfile, closeProfile: () => setProfile(null), exportCsv,
         approve: (c: Customer, areaId: string) => run(() => svc.approveCustomer(c.id, areaId)),
         reject: (c: Customer, reason: string) => run(() => svc.rejectCustomer(c.id, reason)),

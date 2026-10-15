@@ -306,3 +306,5 @@
   font-weight: 900;
   color: #0f172a;
 }
+
+.da-actions { grid-template-columns: repeat(3, 1fr); }
