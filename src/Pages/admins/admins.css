@@ -110,22 +110,22 @@
 
 /* Column sizing similar to screenshot */
 .col-name {
-  width: 18%;
+  width: 16%;
 }
 .col-email {
-  width: 28%;
+  width: 24%;
 }
 .col-role {
-  width: 14%;
+  width: 11%;
 }
 .col-status {
-  width: 12%;
+  width: 10%;
 }
 .col-date {
-  width: 14%;
+  width: 12%;
 }
 .col-actions {
-  width: 14%;
+  width: 27%;
 }
 
 /* Pills */
@@ -220,4 +220,13 @@
 
 .btn-outline:hover {
   background: rgba(22, 163, 74, 0.08);
+}
+
+.admins-table tbody td.cell-actions {
+  white-space: normal;
+}
+.cell-actions .modal__btn {
+  padding: 4px 10px;
+  margin: 2px 4px 2px 0;
+  font-size: 12px;
 }
