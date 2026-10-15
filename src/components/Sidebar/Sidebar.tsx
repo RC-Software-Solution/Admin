@@ -3,7 +3,7 @@ import "./sidebar.css";
 import { getSession } from "../../services/apiClient";
 
 import { MdDashboard, MdLocationOn, MdCampaign } from "react-icons/md";
-import { FaUsers, FaUserShield } from "react-icons/fa";
+import { FaUsers, FaUserShield, FaClipboardList } from "react-icons/fa";
 
 const SidebarLayout = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ const SidebarLayout = () => {
     { name: "Admins", icon: <FaUserShield />, path: "/admins" },
     { name: "Delivery Areas", icon: <MdLocationOn />, path: "/delivery-areas" },
     { name: "Notices", icon: <MdCampaign />, path: "/notices" },
+    { name: "Orders", icon: <FaClipboardList />, path: "/orders" },
   ].filter((item) => isSuper || item.path !== "/admins");
 
   const activeItem = navItems.find((item) => item.path === location.pathname)?.name;
