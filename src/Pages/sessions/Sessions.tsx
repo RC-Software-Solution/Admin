@@ -9,8 +9,9 @@ import Modal from "../../components/common/Modal";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { formatMoney } from "../../utils/formatMoney";
 import { formatDateTime } from "../../utils/formatDate";
+import SessionDeliveryDialog from "./SessionDeliveryDialog";
 
-type Dialog = { kind: "add" } | { kind: "edit" | "delete" | "items"; session: MealSession } | null;
+type Dialog = { kind: "add" } | { kind: "edit" | "delete" | "items" | "delivery"; session: MealSession } | null;
 // Suggested windows; the admin can change them.
 const DEFAULT_TIMES: Record<MealTime, [string, string]> = { breakfast: ["06:00", "09:00"], lunch: ["11:00", "14:00"], dinner: ["18:00", "21:00"] };
 const hhmm = (t: string) => t.slice(0, 5);
@@ -28,17 +29,17 @@ export default function SessionsPage() {
   const { date, setDate, rows, error, orders, viewOrders, closeOrders, clearError, add, edit, remove, attach, setQuantity, detach } = useSessions();
   const { rows: catalog } = useFoodItems();
   const [dialog, setDialog] = useState<Dialog>(null);
-  const [form, setForm] = useState<SessionForm>({ date, meal_time: "lunch", start_time: "11:00", end_time: "14:00" });
+  const [form, setForm] = useState<SessionForm>({ date, meal_time: "lunch", start_time: "11:00", end_time: "14:00", notes: "" });
   const [picked, setPicked] = useState<Record<number, string>>({}); // food_item_id -> quantity text ("" = unlimited)
   const close = () => setDialog(null);
 
   const open = (d: NonNullable<Dialog>) => {
     clearError();
     setPicked({});
-    if (d.kind === "edit") setForm({ date: d.session.date, meal_time: d.session.meal_time, start_time: hhmm(d.session.start_time), end_time: hhmm(d.session.end_time) });
+    if (d.kind === "edit") setForm({ date: d.session.date, meal_time: d.session.meal_time, start_time: hhmm(d.session.start_time), end_time: hhmm(d.session.end_time), notes: d.session.notes ?? "" });
     if (d.kind === "add") {
       const free = (["breakfast", "lunch", "dinner"] as const).find((m) => !rows.some((r) => r.meal_time === m)) ?? "lunch";
-      setForm({ date, meal_time: free, start_time: DEFAULT_TIMES[free][0], end_time: DEFAULT_TIMES[free][1] });
+      setForm({ date, meal_time: free, start_time: DEFAULT_TIMES[free][0], end_time: DEFAULT_TIMES[free][1], notes: "" });
     }
     setDialog(d);
   };
@@ -91,6 +92,7 @@ export default function SessionsPage() {
             </select>
             <label>Opens <input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} required /></label>
             <label>Closes <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} required /></label>
+            <textarea placeholder="Notes for the team and drivers (optional)" rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             {error && <p role="alert">{error}</p>}
             <div className="modal__actions">
               <button type="button" className="modal__btn" onClick={close}>Cancel</button>
@@ -154,6 +156,8 @@ export default function SessionsPage() {
           <div className="modal__actions"><button type="button" className="modal__btn" onClick={closeOrders}>Close</button></div>
         </Modal>
 
+        {dialog?.kind === "delivery" && <SessionDeliveryDialog session={dialog.session} onClose={close} />}
+
         {!formOpen && dialog?.kind !== "items" && error && <p role="alert">{error}</p>}
 
         {rows.map((s) => (
@@ -162,11 +166,13 @@ export default function SessionsPage() {
               <h2 className="session__title">{s.meal_time} <small className="cell-muted">{hhmm(s.start_time)} – {hhmm(s.end_time)}</small> <span className={STATE_PILL[stateOf(s)]}>{stateOf(s)}</span></h2>
               <div className="session__actions">
                 <button type="button" className="modal__btn" onClick={() => viewOrders(s)}>Orders</button>
+                <button type="button" className="modal__btn" onClick={() => open({ kind: "delivery", session: s })}>Delivery</button>
                 <button type="button" className="modal__btn" onClick={() => open({ kind: "items", session: s })}>Add items</button>
                 <button type="button" className="modal__btn" onClick={() => open({ kind: "edit", session: s })}>Edit</button>
                 <button type="button" className="modal__btn" onClick={() => open({ kind: "delete", session: s })}>Delete</button>
               </div>
             </div>
+            {s.notes && <p className="session__notes">{s.notes}</p>}
             <div className="table-wrap">
               <table className="admins-table">
                 <thead><tr><th>Item</th><th>Price</th><th>Available qty</th><th></th></tr></thead>

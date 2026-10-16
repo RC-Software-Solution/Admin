@@ -36,7 +36,8 @@ export interface MealSession {
     meal_time: MealTime;
     start_time: string; // HH:MM:SS, Sri Lanka local
     end_time: string;
+    notes: string | null; // free text for the team, shown to drivers
     sessionItems: SessionItem[];
 }
 
-export type SessionForm = Pick<MealSession, "date" | "meal_time" | "start_time" | "end_time">;
+export type SessionForm = Pick<MealSession, "date" | "meal_time" | "start_time" | "end_time"> & { notes: string };

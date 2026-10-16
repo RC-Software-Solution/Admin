@@ -25,3 +25,13 @@ export const removeItem = (itemId: number) => api<unknown>(MENU_API, `/meal-sess
 /** Orders placed for one session: orders carry the session's date and meal time rather than its id. */
 export const listSessionOrders = (s: Pick<MealSession, "date" | "meal_time">) =>
   api<{ orders: Order[] }>(ORDER_API, `/orders?type=all&target_date=${s.date}&meal_time=${s.meal_time}&limit=200`).then((r) => r.orders);
+
+/** Who covers which area in a session (one driver per area). */
+export interface DeliveryAssignment { area_id: number; user_id: string }
+
+export const getSessionDelivery = (id: number) =>
+  api<{ data: { assignments: DeliveryAssignment[] } }>(MENU_API, `/meal-sessions/${id}/delivery`).then((r) => r.data.assignments);
+
+/** Replaces the session's whole set; an empty list clears it. */
+export const setSessionDelivery = (id: number, assignments: DeliveryAssignment[]) =>
+  api<unknown>(MENU_API, `/meal-sessions/${id}/delivery`, { method: "PUT", body: JSON.stringify({ assignments }) });
