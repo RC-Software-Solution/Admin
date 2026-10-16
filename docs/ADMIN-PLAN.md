@@ -108,12 +108,13 @@ Done and polling. Remaining from the requirements: filters (date range, area, se
 
 ## P1 status (built 2026-10-16) and later tasks
 
-Sessions, Food Items and Delivery Persons are built and tested on the real backend. Sessions show a derived upcoming/open/closed state (there is no status column; "cancel" is delete, and the unique date + meal time rule already prevents overlap) and an Orders view per session (`GET /orders?target_date=&meal_time=`). Delivery persons carry NIC and vehicle type (`scripts/sql/2026-10-16-delivery-person-details.sql`). Left for later, none of it launch scope:
+Sessions, Food Items and Delivery Persons are built and tested on the real backend. Sessions show a derived upcoming/open/closed state (there is no status column; "cancel" is delete, and the unique date + meal time rule already prevents overlap) and an Orders view per session (`GET /orders?target_date=&meal_time=`). Delivery persons carry NIC and vehicle type (`scripts/sql/2026-10-16-delivery-person-details.sql`). Later (none of it launch scope):
 
 - **S3 image upload for Food Items.** Storage is already decided: the menu-images S3 bucket behind CloudFront (`../AWS-INFRASTRUCTURE-PLAYBOOK.md` section 8). Needs the bucket first. Then add a presigned-PUT endpoint to `menu-service` and an upload button with preview that fills the existing `image_url` with the CloudFront URL. No schema change.
-- **Food Items extras from the requirements:** active/inactive (customer-facing menu queries and ordering must then skip inactive items), category and dietary tags, price history, export.
-- **Delivery Persons extras:** several assigned areas per driver (needs a join table; today one `area_id`) and an on-time performance metric (needs delivery timestamps from `delivery-service`).
-- **Sessions:** Delivery tab (assign drivers) and Notes.
+- **Done 2026-10-17:** Food Items category, dietary tags, active/inactive (hidden from customers on every menu query, blocked from new sessions), price history and CSV export. Delivery persons cover several areas: an admin assigns them, and a driver can take any area no other active driver holds (`/api/users/delivery-persons/me/areas`; the driver app's area screen shows My areas, Unassigned, Covered by others). Not enforced server-side: `delivery-service` still returns orders for any area a driver asks for.
+- **Delivery-person on-time rate:** skipped by decision. Orders record no delivering driver or delivery time, so it would need `delivered_by` and `delivered_at` on orders plus an agreed on-time rule.
+- **Sessions:** Delivery tab (assign drivers to a session) and Notes. The meaning of per-session assignment is not settled.
+- **Editing an existing order whose item was later deactivated:** the edit matches existing lines against the session's active items only (`order.controller.js`, edit flow), so that item's old quantity is likely not returned to session stock. Unverified; check before relying on edits near a deactivation.
 
 ## Known backend issues agents may hit
 

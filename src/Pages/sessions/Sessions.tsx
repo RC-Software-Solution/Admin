@@ -61,7 +61,7 @@ export default function SessionsPage() {
 
   const formOpen = dialog?.kind === "add" || dialog?.kind === "edit";
   const taken = dialog?.kind === "items" ? new Set(dialog.session.sessionItems.map((i) => i.food_item_id)) : new Set<number>();
-  const pickable = catalog.filter((f) => !taken.has(f.id));
+  const pickable = catalog.filter((f) => f.is_active && !taken.has(f.id));
 
   return (
     <div className="admins-page">
@@ -173,7 +173,7 @@ export default function SessionsPage() {
                 <tbody>
                   {s.sessionItems.map((i) => (
                     <tr key={i.id}>
-                      <td className="cell-strong">{i.foodItem.name}</td>
+                      <td className="cell-strong">{i.foodItem.name}{!i.foodItem.is_active && <> <span className="pill pill-status-suspended">inactive</span></>}</td>
                       <td>{formatMoney(Number(i.foodItem.price))}</td>
                       <td>
                         {/* key re-mounts the input when the saved value changes, so it always shows server truth */}

@@ -1,7 +1,8 @@
 import { api, MENU_API } from "../../services/apiClient";
-import type { FoodItem, FoodItemForm } from "../../types/menu";
+import type { FoodItem, FoodItemForm, PriceChange } from "../../types/menu";
 
-const body = (f: FoodItemForm) => JSON.stringify({ ...f, description: f.description || null, image_url: f.image_url || null });
+const body = (f: FoodItemForm) =>
+  JSON.stringify({ ...f, description: f.description || null, image_url: f.image_url || null, category: f.category || null, dietary_tags: f.dietary_tags || null });
 
 // The list is paginated server-side (default 10); a canteen menu is small, so take it all at once.
 export const listFoodItems = () =>
@@ -12,4 +13,10 @@ export const createFoodItem = (f: FoodItemForm) => api<unknown>(MENU_API, "/food
 export const updateFoodItem = (id: number, f: FoodItemForm) =>
   api<unknown>(MENU_API, `/food-items/${id}`, { method: "PUT", body: body(f) });
 
+export const setFoodItemActive = (id: number, is_active: boolean) =>
+  api<unknown>(MENU_API, `/food-items/${id}`, { method: "PUT", body: JSON.stringify({ is_active }) });
+
 export const deleteFoodItem = (id: number) => api<unknown>(MENU_API, `/food-items/${id}`, { method: "DELETE" });
+
+export const getPriceHistory = (id: number) =>
+  api<{ data: PriceChange[] }>(MENU_API, `/food-items/${id}/price-history`).then((r) => r.data);
