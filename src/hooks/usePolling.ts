@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Calls `fetcher` now and every `intervalMs`, skipping ticks while the tab is hidden and
- * refetching when it becomes visible again. Keeps the last good `data` if a refresh fails.
+ * refetching when it becomes visible again, and whenever `key` changes. Keeps the last good `data` if a refresh fails.
  */
-export function usePolling<T>(fetcher: (signal: AbortSignal) => Promise<T>, intervalMs = 30_000) {
+export function usePolling<T>(fetcher: (signal: AbortSignal) => Promise<T>, intervalMs = 30_000, key = "") {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState("");
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
@@ -37,7 +37,7 @@ export function usePolling<T>(fetcher: (signal: AbortSignal) => Promise<T>, inte
       document.removeEventListener("visibilitychange", onVisible);
       abort.current?.abort();
     };
-  }, [refresh, intervalMs]);
+  }, [refresh, intervalMs, key]); // a new `key` (e.g. changed filters) fetches immediately
 
   return { data, error, updatedAt, refresh };
 }

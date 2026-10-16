@@ -228,3 +228,10 @@
 .liveBar--stale{ color:#b45309; }
 .liveBar button{ border:1px solid #e5e7eb; background:#fff; border-radius:6px; padding:3px 10px; cursor:pointer; }
 .sectionNote{ color:#b45309; font-size:13px; padding:6px 0; }
+
+/* Filters */
+.filters{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:10px 0 6px; }
+.filters input, .filters select{ padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font:inherit; background:#fff; }
+.filters__range{ color:#6b7280; font-size:13px; }
+.dim{ opacity:.55; transition:opacity .15s; }
+.topItem__img:not(img){ background:#f3f4f6; }

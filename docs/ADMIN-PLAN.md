@@ -74,8 +74,8 @@ Until a page is built, **hide its sidebar entry**. Today every unbuilt entry jus
 **Gaps (backend):** order detail with items, an audit timeline, and a delivery-person field do not exist. Defer them unless asked; they are not launch scope.
 **Done when:** staff can find an order by filter, change its status, and mark it paid.
 
-### Dashboard (leftovers, low priority)
-Done and polling. Remaining from the requirements: filters (date range, area, session type), previous-period trend badges, item images in Top Items (needs `menu-service` data). `analytics-service` has no previous-period data yet.
+### Dashboard (done)
+Polling every 30s, now with filters and trends (built 2026-10-17): presets Today / Last 7 / Last 30 days or a custom range, an area filter and a session filter (`GET /analytics/dashboard?from=&to=&area_id=&session=`, Sri Lanka days, default last 7 days, at most 366 days). Sales and Orders show the percent change against the previous range of equal length. Top Items show the item's picture, matched by name because order lines store no food id (a renamed item loses its picture). Blocked Users and Unpaid Orders are "right now" counts and ignore the filters. The area filter narrows the area table to one row; the session filter does not change the three Session Performance tabs.
 
 ---
 

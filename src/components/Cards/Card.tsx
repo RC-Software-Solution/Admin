@@ -20,6 +20,7 @@ interface SessionRowProps {
 
 interface TopItemProps {
   name: string;
+  image?: string | null;
   revenue: string;
   sold: number;
 }
@@ -55,8 +56,9 @@ export const SessionRow: React.FC<SessionRowProps> = ({ date, orders, amount }) 
   </div>
 );
 
-export const TopItem: React.FC<TopItemProps> = ({ name, revenue, sold }) => (
+export const TopItem: React.FC<TopItemProps> = ({ name, image, revenue, sold }) => (
   <div className="topItem">
+    {image ? <img className="topItem__img" src={image} alt="" loading="lazy" /> : <div className="topItem__img" />}
     <div className="topItem__info">
       <div className="topItem__name">{name}</div>
       <div className="topItem__price">{revenue}</div>
