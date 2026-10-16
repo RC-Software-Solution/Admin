@@ -6,6 +6,9 @@ import Admins from "../Pages/admins/Admins";
 import DeliveryAreas from "../Pages/deliveryareas/DeliveryAreas";
 import Notices from "../Pages/notices/Notices";
 import Orders from "../Pages/orders/Orders";
+import Sessions from "../Pages/sessions/Sessions";
+import FoodItems from "../Pages/fooditems/FoodItems";
+import DeliveryPersons from "../Pages/deliverypersons/DeliveryPersons";
 
 import { getSession } from "../services/apiClient";
 import { ForgotPassword, ResetPassword } from "../Pages/Auth/PasswordReset";
@@ -46,6 +49,9 @@ const AppRoutes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
         <Route path="/delivery-areas" element={<DeliveryAreas />} />
         <Route path="/notices" element={<Notices />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/sessions" element={<Sessions />} />
+        <Route path="/food-items" element={<FoodItems />} />
+        <Route path="/delivery-persons" element={<DeliveryPersons />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Switch>
     </Layout>

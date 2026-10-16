@@ -1,0 +1,15 @@
+/* Shared by Sessions and Food Items on top of admins.css */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.toolbar input, .toolbar select, .modal__form textarea { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+
+.thumb { display: block; width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: #e2e8f0; }
+
+.session { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+.session__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.session__title { margin: 0; font-size: 18px; text-transform: capitalize; }
+.session__actions { display: flex; gap: 8px; }
+.qty { width: 80px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+
+.picker { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.picker__row { display: flex; align-items: center; gap: 10px; }
+.picker__row span { flex: 1; }

@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./sidebar.css";
 import { getSession } from "../../services/apiClient";
 
-import { MdDashboard, MdLocationOn, MdCampaign } from "react-icons/md";
+import { MdDashboard, MdLocationOn, MdCampaign, MdEventNote, MdRestaurantMenu, MdDeliveryDining } from "react-icons/md";
 import { FaUsers, FaUserShield, FaClipboardList } from "react-icons/fa";
 
 const SidebarLayout = () => {
@@ -17,6 +17,9 @@ const SidebarLayout = () => {
     { name: "Delivery Areas", icon: <MdLocationOn />, path: "/delivery-areas" },
     { name: "Notices", icon: <MdCampaign />, path: "/notices" },
     { name: "Orders", icon: <FaClipboardList />, path: "/orders" },
+    { name: "Sessions", icon: <MdEventNote />, path: "/sessions" },
+    { name: "Food Items", icon: <MdRestaurantMenu />, path: "/food-items" },
+    { name: "Delivery Persons", icon: <MdDeliveryDining />, path: "/delivery-persons" },
   ].filter((item) => isSuper || item.path !== "/admins");
 
   const activeItem = navItems.find((item) => item.path === location.pathname)?.name;
