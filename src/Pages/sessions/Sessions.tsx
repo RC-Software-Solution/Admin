@@ -8,14 +8,24 @@ import { PlusIcon } from "../../components/common/Icons";
 import Modal from "../../components/common/Modal";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { formatMoney } from "../../utils/formatMoney";
+import { formatDateTime } from "../../utils/formatDate";
 
 type Dialog = { kind: "add" } | { kind: "edit" | "delete" | "items"; session: MealSession } | null;
 // Suggested windows; the admin can change them.
 const DEFAULT_TIMES: Record<MealTime, [string, string]> = { breakfast: ["06:00", "09:00"], lunch: ["11:00", "14:00"], dinner: ["18:00", "21:00"] };
 const hhmm = (t: string) => t.slice(0, 5);
 
+/** upcoming / open / closed, from the Sri Lanka window (UTC+5:30, no DST). A window that ends at or before its start runs past midnight. */
+function stateOf(s: MealSession, now = Date.now()): "upcoming" | "open" | "closed" {
+  const start = new Date(`${s.date}T${s.start_time}+05:30`).getTime();
+  let end = new Date(`${s.date}T${s.end_time}+05:30`).getTime();
+  if (end <= start) end += 24 * 3600 * 1000;
+  return now < start ? "upcoming" : now < end ? "open" : "closed";
+}
+const STATE_PILL = { upcoming: "pill pill-blue", open: "pill pill-status-active", closed: "pill pill-status-suspended" };
+
 export default function SessionsPage() {
-  const { date, setDate, rows, error, clearError, add, edit, remove, attach, setQuantity, detach } = useSessions();
+  const { date, setDate, rows, error, orders, viewOrders, closeOrders, clearError, add, edit, remove, attach, setQuantity, detach } = useSessions();
   const { rows: catalog } = useFoodItems();
   const [dialog, setDialog] = useState<Dialog>(null);
   const [form, setForm] = useState<SessionForm>({ date, meal_time: "lunch", start_time: "11:00", end_time: "14:00" });
@@ -121,13 +131,37 @@ export default function SessionsPage() {
           onCancel={close}
           onConfirm={confirmDelete}
         />
+        <Modal open={orders !== null} title="Orders" onClose={closeOrders}>
+          <div className="table-wrap">
+            <table className="admins-table">
+              <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Payment</th><th>Placed</th></tr></thead>
+              <tbody>
+                {orders?.map((o) => (
+                  <tr key={o.id}>
+                    <td className="cell-strong">{o.id}</td>
+                    <td>{o.customer_name ?? "-"}</td>
+                    <td>{o.order_items.map((i) => `${i.quantity}x ${i.food_name}`).join(", ")}</td>
+                    <td>{formatMoney(Number(o.total_price))}</td>
+                    <td>{o.status}</td>
+                    <td>{o.payment_status}</td>
+                    <td className="cell-muted">{formatDateTime(o.created_at)}</td>
+                  </tr>
+                ))}
+                {!orders?.length && <tr><td colSpan={7} className="cell-muted">No orders for this session</td></tr>}
+              </tbody>
+            </table>
+          </div>
+          <div className="modal__actions"><button type="button" className="modal__btn" onClick={closeOrders}>Close</button></div>
+        </Modal>
+
         {!formOpen && dialog?.kind !== "items" && error && <p role="alert">{error}</p>}
 
         {rows.map((s) => (
           <section key={s.id} className="session">
             <div className="session__head">
-              <h2 className="session__title">{s.meal_time} <small className="cell-muted">{hhmm(s.start_time)} – {hhmm(s.end_time)}</small></h2>
+              <h2 className="session__title">{s.meal_time} <small className="cell-muted">{hhmm(s.start_time)} – {hhmm(s.end_time)}</small> <span className={STATE_PILL[stateOf(s)]}>{stateOf(s)}</span></h2>
               <div className="session__actions">
+                <button type="button" className="modal__btn" onClick={() => viewOrders(s)}>Orders</button>
                 <button type="button" className="modal__btn" onClick={() => open({ kind: "items", session: s })}>Add items</button>
                 <button type="button" className="modal__btn" onClick={() => open({ kind: "edit", session: s })}>Edit</button>
                 <button type="button" className="modal__btn" onClick={() => open({ kind: "delete", session: s })}>Delete</button>

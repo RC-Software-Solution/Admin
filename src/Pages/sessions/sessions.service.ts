@@ -1,4 +1,5 @@
-import { api, MENU_API } from "../../services/apiClient";
+import { api, MENU_API, ORDER_API } from "../../services/apiClient";
+import type { Order } from "../../types/orders";
 import type { MealSession, SessionForm } from "../../types/menu";
 
 // A day has at most three sessions (unique date + meal time), so one page of 10 is the whole day.
@@ -20,3 +21,7 @@ export const setItemQuantity = (itemId: number, available_quantity: number | nul
   api<unknown>(MENU_API, `/meal-session-items/${itemId}`, { method: "PUT", body: JSON.stringify({ available_quantity }) });
 
 export const removeItem = (itemId: number) => api<unknown>(MENU_API, `/meal-session-items/${itemId}`, { method: "DELETE" });
+
+/** Orders placed for one session: orders carry the session's date and meal time rather than its id. */
+export const listSessionOrders = (s: Pick<MealSession, "date" | "meal_time">) =>
+  api<{ orders: Order[] }>(ORDER_API, `/orders?type=all&target_date=${s.date}&meal_time=${s.meal_time}&limit=200`).then((r) => r.orders);

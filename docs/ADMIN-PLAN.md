@@ -106,6 +106,15 @@ Done and polling. Remaining from the requirements: filters (date range, area, se
 - **Settings:** not in the requirements. Candidates: ordering-window rules, auto-block threshold (currently 2 unpaid orders, hardcoded). Needs a decision on what is configurable.
 - **Audit Logs:** `UserStatusLog` records customer status changes only. A log page needs a list endpoint plus a wider log (admin actions, order status changes). Do this when a compliance need is stated.
 
+## P1 status (built 2026-10-16) and later tasks
+
+Sessions, Food Items and Delivery Persons are built and tested on the real backend. Sessions show a derived upcoming/open/closed state (there is no status column; "cancel" is delete, and the unique date + meal time rule already prevents overlap) and an Orders view per session (`GET /orders?target_date=&meal_time=`). Delivery persons carry NIC and vehicle type (`scripts/sql/2026-10-16-delivery-person-details.sql`). Left for later, none of it launch scope:
+
+- **S3 image upload for Food Items.** Storage is already decided: the menu-images S3 bucket behind CloudFront (`../AWS-INFRASTRUCTURE-PLAYBOOK.md` section 8). Needs the bucket first. Then add a presigned-PUT endpoint to `menu-service` and an upload button with preview that fills the existing `image_url` with the CloudFront URL. No schema change.
+- **Food Items extras from the requirements:** active/inactive (customer-facing menu queries and ordering must then skip inactive items), category and dietary tags, price history, export.
+- **Delivery Persons extras:** several assigned areas per driver (needs a join table; today one `area_id`) and an on-time performance metric (needs delivery timestamps from `delivery-service`).
+- **Sessions:** Delivery tab (assign drivers) and Notes.
+
 ## Known backend issues agents may hit
 
 - `GET /api/users/:userId` was internal-key protected, but the internal key defaults to `internal-dev-key`; this must not ship to production.

@@ -1,18 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import type { MealSession } from "../types/menu";
+import type { Order } from "../types/orders";
 import { colomboToday } from "../utils/formatDate";
-import { addItems, createSession, deleteSession, listSessions, removeItem, setItemQuantity, updateSession } from "../Pages/sessions/sessions.service";
+import { addItems, createSession, deleteSession, listSessionOrders, listSessions, removeItem, setItemQuantity, updateSession } from "../Pages/sessions/sessions.service";
 
 export const useSessions = () => {
     const [date, setDate] = useState(colomboToday);
     const [rows, setRows] = useState<MealSession[]>([]);
     const [error, setError] = useState("");
+    const [orders, setOrders] = useState<Order[] | null>(null); // null = orders dialog closed
 
     const load = useCallback(() => listSessions(date).then(setRows), [date]);
 
+    // `stale` drops the response of a superseded date, so a slow earlier fetch can't overwrite a newer one
     useEffect(() => {
-        load().catch((e: Error) => setError(e.message));
-    }, [load]);
+        let stale = false;
+        listSessions(date).then((r) => { if (!stale) setRows(r); }, (e: Error) => { if (!stale) setError(e.message); });
+        return () => { stale = true; };
+    }, [date]);
 
     // Run a mutation, then reload. Resolves true on success so a modal knows to close; failures show in `error`
     const run = (fn: () => Promise<unknown>) =>
@@ -22,7 +27,9 @@ export const useSessions = () => {
         );
 
     return {
-        date, setDate, rows, error, clearError: () => setError(""),
+        date, setDate, rows, error, orders, closeOrders: () => setOrders(null),
+        viewOrders: (s: MealSession) => listSessionOrders(s).then(setOrders, (e: Error) => setError(e.message)),
+        clearError: () => setError(""),
         add: (s: Parameters<typeof createSession>[0]) => run(() => createSession(s)),
         edit: (id: number, s: Parameters<typeof updateSession>[1]) => run(() => updateSession(id, s)),
         remove: (id: number) => run(() => deleteSession(id)),
