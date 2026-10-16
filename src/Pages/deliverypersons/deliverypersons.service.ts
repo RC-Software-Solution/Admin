@@ -10,7 +10,7 @@ export interface DriverForm {
   phone: string;
   nic: string;
   vehicle_type: string;
-  area_id: string;
+  area_ids: number[];
 }
 
 export const listDeliveryPersons = () => api<{ deliveryPersons: DeliveryPerson[] }>(USER_API, BASE).then((r) => r.deliveryPersons);
@@ -18,7 +18,7 @@ export const listDeliveryPersons = () => api<{ deliveryPersons: DeliveryPerson[]
 export const createDeliveryPerson = (d: DriverForm) =>
   api<unknown>(USER_API, BASE, { method: "POST", body: JSON.stringify({ ...d, phone: d.phone || undefined, nic: d.nic || undefined, vehicle_type: d.vehicle_type || undefined }) });
 
-export const updateDeliveryPerson = (id: string, d: Pick<DriverForm, "full_name" | "phone" | "nic" | "vehicle_type" | "area_id">) =>
+export const updateDeliveryPerson = (id: string, d: Pick<DriverForm, "full_name" | "phone" | "nic" | "vehicle_type" | "area_ids">) =>
   api<unknown>(USER_API, `${BASE}/${id}`, { method: "PUT", body: JSON.stringify(d) });
 
 export const setDeliveryPersonActive = (id: string, active: boolean) =>

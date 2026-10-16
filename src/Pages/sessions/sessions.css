@@ -13,3 +13,6 @@
 .picker { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
 .picker__row { display: flex; align-items: center; gap: 10px; }
 .picker__row span { flex: 1; }
+
+.area-picks { border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.area-picks label { display: flex; align-items: center; gap: 8px; }
