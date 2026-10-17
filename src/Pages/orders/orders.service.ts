@@ -12,6 +12,7 @@ export function listOrders(f: OrderFilters, page: number, signal?: AbortSignal) 
   if (f.status) q.set("status", f.status);
   if (f.payment_status) q.set("payment_status", f.payment_status);
   if (f.area_id) q.set("area_id", f.area_id);
+  if (f.q) q.set("q", f.q);
   if (f.from && f.to) {
     q.set("date_range", "custom");
     q.set("start_date", colombo(f.from, "00:00:00"));
@@ -25,3 +26,7 @@ export const updateOrderStatus = (id: string, status: OrderStatus, failure_reaso
 
 export const updatePaymentStatus = (id: string, payment_status: PaymentStatus) =>
   api<unknown>(ORDER_API, `/orders/${id}/payment`, { method: "PUT", body: JSON.stringify({ payment_status }) });
+
+/** A few orders whose id starts with `text`, for the top-bar search. */
+export const searchOrders = (text: string, signal?: AbortSignal) =>
+  api<{ orders: Order[] }>(ORDER_API, `/orders?${new URLSearchParams({ type: "all", limit: "5", q: text })}`, { signal }).then((r) => r.orders);

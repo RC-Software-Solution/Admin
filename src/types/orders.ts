@@ -27,6 +27,7 @@ export interface OrderFilters {
     area_id: string;
     from: string; // YYYY-MM-DD, Sri Lanka calendar day
     to: string;
+    q: string; // order id prefix
 }
 
 /** Mirror of the backend's allowed moves (order-service utils/orderStatus.js); the server enforces them. */

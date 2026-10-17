@@ -53,6 +53,7 @@ export default function OrdersPage() {
           <option value="">All areas</option>
           {o.areas.map((a) => <option key={a.area_id} value={a.area_id}>{a.area_name}</option>)}
         </select>
+        <input type="search" placeholder="Order id…" value={o.filters.q} onChange={(e) => o.setFilter("q", e.target.value.trim())} aria-label="Order id" />
         <label>
           From <input type="date" value={o.filters.from} max={o.filters.to || undefined} onChange={(e) => o.setFilter("from", e.target.value)} />
         </label>

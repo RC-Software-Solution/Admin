@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSession } from "../../services/apiClient";
 import { logout } from "../../services/auth.service";
+import Bell from "./Bell";
+import GlobalSearch from "./GlobalSearch";
 import "./topbar.css";
 
 interface TopbarProps {
@@ -28,14 +30,9 @@ const Topbar: React.FC<TopbarProps> = ({ setIsLoggedIn }) => {
 
   return (
     <header className="topbar">
-      <div className="searchWrap">
-        <input className="search" placeholder="Search" />
-      </div>
+      <GlobalSearch />
       <div className="topbar__right">
-        <button className="iconBtn">
-          🔔
-          <span className="notification-badge">3</span>
-        </button>
+        <Bell />
         <div className="user" onClick={handleToggleDropdown}>
           <div className="user__avatar">👤</div>
           <div className="user__name">{getSession()?.name}</div>

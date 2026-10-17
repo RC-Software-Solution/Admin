@@ -118,6 +118,15 @@ Sessions, Food Items and Delivery Persons are built and tested on the real backe
 - **Delivery-person on-time rate:** skipped by decision. Orders record no delivering driver or delivery time, so it would need `delivered_by` and `delivered_at` on orders plus an agreed on-time rule.
 - **Fixed (2026-10-17):** editing or cancelling an order that contains an item deactivated afterwards. Before, dropping it did not return its stock, and keeping it corrupted the order (line became "Unknown", total 0, stock over-decremented). order-service now reads session items with `include_inactive` (honoured only with the internal key), may keep or drop such an item but not add one (409), and placing a new order still rejects inactive items.
 
+## Top bar: bell and search (built 2026-10-18)
+
+The bell and search box in the top bar used to be placeholders (a hardcoded "3" and a dead input).
+
+- **Bell:** live counts of what needs action, polled every 30s: customers awaiting approval, unpaid orders, failed deliveries (`delivery_failed`) and blocked customers. The badge adds the first three (blocked is a state, not a to-do) and hides at 0. Each row links to the page that handles it (`/users?tab=pending`, `/orders?payment_status=unpaid`, `/orders?status=delivery_failed`, `/users?tab=blocked`). Backend: `GET /api/analytics/attention`, built from internal count endpoints in user-service (`pending-customers-count`) and order-service (`failed-deliveries-count`); a count is null if its service is down. It is a live view, not an inbox: there is no read/unread state and no per-event history.
+- **Search:** find a customer (name, email or phone, filtered in the browser from the customer list fetched on first use) or an order (id prefix, `q` filter on `GET /api/orders`, admins only, wildcards taken literally). Needs 2+ characters; shows up to 5 of each; a result opens Users or Orders with the match applied. The Orders page also gained an order id box. Not searched: food items, areas, sessions, notices.
+- **Deep links:** Users reads `?tab=` and `?q=` (and `?area=`); Orders reads `?status=`, `?payment_status=` and `?q=`.
+- **Not built:** an event inbox with read/unread state, and a bulk "notify" action on unpaid orders (see the requirements).
+
 ## To-Do
 
 - **Test a real push notification end to end.** Notices send pushes through Firebase (`notificationService.js`), but no real push has been sent in testing. Needs the Firebase service-account file in `Backend/secrets/` and a customer device (or emulator) that has registered an `fcm_token`. Check: send a notice to one area from the Notices page, confirm the device receives it, and that the page's "Sent to N devices" count matches. Also check an area with no registered devices (expects "Sent to 0") and the failed-token count.

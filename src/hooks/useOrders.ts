@@ -1,15 +1,35 @@
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { DeliveryArea } from "../types/deliveryAreas";
 import type { Order, OrderFilters, OrderStatus, PaymentStatus } from "../types/orders";
 import { listAreas } from "../Pages/deliveryareas/deliveryareas.services";
 import { listOrders, PAGE_SIZE, updateOrderStatus, updatePaymentStatus } from "../Pages/orders/orders.service";
 import { usePolling } from "./usePolling";
 
-const EMPTY: OrderFilters = { status: "", payment_status: "", area_id: "", from: "", to: "" };
+const EMPTY: OrderFilters = { status: "", payment_status: "", area_id: "", from: "", to: "", q: "" };
+
+const STATUSES: OrderStatus[] = ["pending", "preparing", "delivering", "delivered", "completed", "cancelled", "delivery_failed"];
+const PAYMENTS: PaymentStatus[] = ["pending", "paid", "unpaid", "ignored"];
+
+/** Filters named in the URL (linked from the top-bar bell and search); anything unrecognised is ignored. */
+const fromUrl = (p: URLSearchParams): Partial<OrderFilters> => ({
+    ...(STATUSES.includes(p.get("status") as OrderStatus) && { status: p.get("status") as OrderStatus }),
+    ...(PAYMENTS.includes(p.get("payment_status") as PaymentStatus) && { payment_status: p.get("payment_status") as PaymentStatus }),
+    ...(p.get("q") && { q: p.get("q") as string }),
+});
 
 export const useOrders = () => {
-    const [filters, setFilters] = useState<OrderFilters>(EMPTY);
+    const [params] = useSearchParams();
+    const urlKey = params.toString();
+    const [filters, setFilters] = useState<OrderFilters>({ ...EMPTY, ...fromUrl(params) });
     const [page, setPage] = useState(0);
+    // The page stays mounted when a link only changes the query string, so follow it when it changes
+    const [seenUrl, setSeenUrl] = useState(urlKey);
+    if (seenUrl !== urlKey) {
+        setSeenUrl(urlKey);
+        setFilters({ ...EMPTY, ...fromUrl(params) });
+        setPage(0);
+    }
     const [areas, setAreas] = useState<DeliveryArea[]>([]);
     const [actionError, setActionError] = useState("");
 

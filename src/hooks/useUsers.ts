@@ -15,15 +15,24 @@ const TABS: UserTab[] = [
 ];
 
 export const useUsers = () => {
-    const [activeTab, setActiveTab] = useState<UserStatus>("pending");
-    const [query, setQuery] = useState("");
+    // ?tab=pending|... and ?q=<text> (linked from the top-bar bell and search), ?area=<id> (from Delivery Areas)
+    const [params, setParams] = useSearchParams();
+    const areaFilter = params.get("area");
+    const urlTab = TABS.find((t) => t.key === params.get("tab"))?.key;
+    const urlQ = params.get("q");
+    const [activeTab, setActiveTab] = useState<UserStatus>(urlTab ?? "pending");
+    const [query, setQuery] = useState(urlQ ?? "");
+    // The page stays mounted when a link only changes the query string, so follow it when it changes
+    const [seen, setSeen] = useState({ urlTab, urlQ });
+    if (seen.urlTab !== urlTab || seen.urlQ !== urlQ) {
+        setSeen({ urlTab, urlQ });
+        if (urlTab) setActiveTab(urlTab);
+        if (urlQ !== null) setQuery(urlQ);
+    }
     const [rows, setRows] = useState<Customer[]>([]);
     const [areas, setAreas] = useState<DeliveryArea[]>([]);
     const [profile, setProfile] = useState<CustomerProfile | null>(null);
     const [error, setError] = useState("");
-    // ?area=<id> (linked from Delivery Areas) narrows every tab to one area
-    const [params, setParams] = useSearchParams();
-    const areaFilter = params.get("area");
 
     // One fetch of every customer; tabs and counts are derived client-side
     const load = useCallback(() => svc.listCustomers().then(setRows), []);
