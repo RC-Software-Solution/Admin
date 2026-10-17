@@ -7,7 +7,7 @@ Written for Claude agents. Each agent takes **one section** (or the foundation t
 | Tier | Entries | Why |
 |---|---|---|
 | Done | Login / Forgot / Reset password, Dashboard, Notices | Wired to the real backend |
-| **P0 (launch)** | Users, Admins (finish), Delivery Areas (finish), Orders (minimal) | The playbook's launch scope |
+| P0 (launch), built | Users, Admins, Delivery Areas, Orders (minimal) | The playbook's launch scope |
 | P1 | Sessions, Food Items, Delivery Persons | In the requirements, not in the launch scope |
 | P2 | Reports (built 2026-10-17); Settings, Audit Logs deferred | Settings and Audit Logs still need a product decision |
 
@@ -49,7 +49,9 @@ Until a page is built, **hide its sidebar entry**. Today every unbuilt entry jus
 
 ---
 
-## P0
+## P0 (built; checked against the code 2026-10-17)
+
+All four are built and committed. Users: list, approve with area, reject with reason, disable/enable/unlock, profile with status log, CSV export. Admins: edit, suspend/enable, reset password with the self-lockout safeguards. Delivery Areas: code, status, notes, metrics, assigned-user count, delete blocked with 409 when users are assigned. Orders: polled list, filters, unpaid quick filter, status and payment updates, customer names. Not re-verified here: that the SQL files in `Backend/scripts/sql/` have been run on every environment (there is no migration tooling, so each one is a manual step). Deferred by design: order detail with items, audit timeline, delivery-person field.
 
 ### Users (customers)
 **Backend is ready** (`user-service`, `/api/users/customers`, admin or super_admin): `GET ?status=pending|accepted|rejected|disabled|blocked`, `GET /:id/profile` (includes order history), `POST /:id/approve`, `POST /:id/reject`, `PUT /:id/assign-area`, `PUT /:id/disable`, `PUT /:id/enable`, `PUT /:id/unlock`, `GET /export`. Status changes are written to `UserStatusLog`.
