@@ -2,9 +2,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./sidebar.css";
 import { getSession } from "../../services/apiClient";
 
-import { MdDashboard, MdLocationOn, MdCampaign, MdEventNote, MdRestaurantMenu, MdDeliveryDining, MdAssessment } from "react-icons/md";
+import { MdDashboard, MdLocationOn, MdCampaign, MdEventNote, MdRestaurantMenu, MdDeliveryDining, MdAssessment, MdSettings } from "react-icons/md";
 import { FaUsers, FaUserShield, FaClipboardList } from "react-icons/fa";
 
+const SUPER_ONLY = ["/admins", "/settings"];
 const SidebarLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,7 +22,8 @@ const SidebarLayout = () => {
     { name: "Food Items", icon: <MdRestaurantMenu />, path: "/food-items" },
     { name: "Delivery Persons", icon: <MdDeliveryDining />, path: "/delivery-persons" },
     { name: "Reports", icon: <MdAssessment />, path: "/reports" },
-  ].filter((item) => isSuper || item.path !== "/admins");
+    { name: "Settings", icon: <MdSettings />, path: "/settings" },
+  ].filter((item) => isSuper || !SUPER_ONLY.includes(item.path));
 
   const activeItem = navItems.find((item) => item.path === location.pathname)?.name;
 

@@ -10,6 +10,7 @@ import Sessions from "../Pages/sessions/Sessions";
 import FoodItems from "../Pages/fooditems/FoodItems";
 import DeliveryPersons from "../Pages/deliverypersons/DeliveryPersons";
 import Reports from "../Pages/reports/Reports";
+import Settings from "../Pages/settings/Settings";
 
 import { getSession } from "../services/apiClient";
 import { ForgotPassword, ResetPassword } from "../Pages/Auth/PasswordReset";
@@ -54,6 +55,7 @@ const AppRoutes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
         <Route path="/food-items" element={<FoodItems />} />
         <Route path="/delivery-persons" element={<DeliveryPersons />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/settings" element={getSession()?.role === "super_admin" ? <Settings /> : <Navigate to="/dashboard" />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Switch>
     </Layout>
