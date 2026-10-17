@@ -9,7 +9,7 @@ Written for Claude agents. Each agent takes **one section** (or the foundation t
 | Done | Login / Forgot / Reset password, Dashboard, Notices | Wired to the real backend |
 | P0 (launch), built | Users, Admins, Delivery Areas, Orders (minimal) | The playbook's launch scope |
 | P1 | Sessions, Food Items, Delivery Persons | In the requirements, not in the launch scope |
-| P2 | Reports (built 2026-10-17); Settings, Audit Logs deferred | Settings and Audit Logs still need a product decision |
+| P2, built | Reports, Settings, Audit Logs | Built 2026-10-17 |
 
 Until a page is built, **hide its sidebar entry**. Today every unbuilt entry just redirects to the dashboard (see foundation task F1).
 
@@ -102,11 +102,11 @@ Polling every 30s, now with filters and trends (built 2026-10-17): presets Today
 
 ---
 
-## P2 (Reports built; the rest needs a product decision)
+## P2 (built 2026-10-17)
 
 - **Reports (built 2026-10-17):** one page with three tabs, Sales by day, Items and Areas, sharing the Dashboard's range, area and session filters (`GET /analytics/reports/:type?from=&to=&area_id=&session=`, type = sales | items | areas, same Sri Lanka day rules and 366-day cap) and a client-side CSV download. Revenue is the total value of orders in the range regardless of payment status (same as the Dashboard's session and area tables, unlike the Dashboard's paid-only Sales card). Items is capped at 100 rows by order-service. Not built: Unpaid customers report (the Orders unpaid filter covers it until staff say otherwise), PDF export, order-level drill-down (needs order detail in the backend).
-- **Settings:** not in the requirements. Candidates: ordering-window rules, auto-block threshold (currently 2 unpaid orders, hardcoded). Needs a decision on what is configurable.
-- **Audit Logs:** `UserStatusLog` records customer status changes only. A log page needs a list endpoint plus a wider log (admin actions, order status changes). Do this when a compliance need is stated.
+- **Settings (built):** super_admin only. One setting, the auto-block threshold (whole number 0 to 20, default 2, 0 = off), stored in `app_settings` (`scripts/sql/2026-10-17-app-settings.sql`, run it first; the default applies when the row is missing). The rule now actually runs: after order-service marks an order unpaid it calls user-service (`POST /api/internal/customers/:id/check-block`, internal key), which blocks the customer at the threshold and writes the usual status-log row. Saving a stricter limit also sweeps existing customers once. Ordering windows are not a setting: each meal session already carries its own start and end time.
+- **Audit Logs (built):** super_admin only. `audit_logs` table (`scripts/sql/2026-10-17-audit-logs.sql`, run it first). The `audit()` middleware (`src/middlewares/audit.js`, one identical copy per service, guarded by `tests/audit.test.js`) sits on the route and writes one row after a successful admin write; only the body fields named on the route are stored, so passwords never reach the log. Covered: admin and delivery-person account changes, settings, notices, delivery areas, food items, sessions and session items, order status and payment changes (including those made by drivers). `GET /api/users/audit-logs?from=&to=&group=&actor_id=&page=` pages 50 newest-first. Customer approve/reject/disable/unlock stays in the customer status log. Limits: a failed log write is only logged to the console and never blocks the action; order status changes record the new value, not the old one; reads, logins, retention and CSV export are not covered.
 
 ## P1 status (built 2026-10-16) and later tasks
 
@@ -121,6 +121,6 @@ Sessions, Food Items and Delivery Persons are built and tested on the real backe
 ## Known backend issues agents may hit
 
 - `GET /api/users/:userId` was internal-key protected, but the internal key defaults to `internal-dev-key`; this must not ship to production.
-- The auto-block job (`customerBlockingService`) exists but is never scheduled, so "blocked" only comes from manual action today.
+- Auto-blocking now runs when an order is marked unpaid (see Settings). Orders that become unpaid some other way, or customers already over the limit before the setting existed, are only caught by saving a stricter threshold or running `node src/jobs/runCustomerBlockingJob.js`.
 - No automated tests anywhere in `apps/`. Add a small test with any new backend logic that has branches.
 - Access tokens last 7 days; there is no refresh flow in Admin.
