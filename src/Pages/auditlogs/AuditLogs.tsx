@@ -5,6 +5,8 @@ import { formatDateTime } from "../../utils/formatDate";
 import { AUDIT_GROUPS } from "../../types/auditLogs";
 
 const words = (s: string) => s.replace(/[._]/g, " ");
+// UUIDs are shortened; order ids (ORD-...) and numeric ids are shown whole because their first characters don't tell records apart
+const shortId = (id: string) => (id.length === 36 ? id.slice(0, 8) : id);
 const show = (v: unknown) => (typeof v === "object" ? JSON.stringify(v) : String(v));
 
 const AuditLogs: React.FC = () => {
@@ -44,7 +46,7 @@ const AuditLogs: React.FC = () => {
                     <td>{formatDateTime(r.created_at)}</td>
                     <td>{r.actor_name ?? "Unknown"}{r.actor_role ? ` (${words(r.actor_role)})` : ""}</td>
                     <td>{words(r.action)}</td>
-                    <td>{words(r.target_type)}{r.target_id ? ` ${r.target_id.slice(0, 8)}` : ""}</td>
+                    <td>{words(r.target_type)}{r.target_id ? ` ${shortId(r.target_id)}` : ""}</td>
                     <td>{r.details ? Object.entries(r.details).map(([k, v]) => `${words(k)}: ${show(v)}`).join(", ") : "—"}</td>
                   </tr>
                 ))}
