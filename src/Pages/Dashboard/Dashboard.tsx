@@ -1,16 +1,10 @@
 import React from "react";
 import { StatCard, SessionRow, TopItem } from "../../components/Cards/Card";
 import "./dashboard.css";
-import { useDashboard, type Preset } from "../../hooks/useDashboard";
+import { useDashboard } from "../../hooks/useDashboard";
+import RangeFilters from "../../components/common/RangeFilters";
 import { formatMoney } from "../../utils/formatMoney";
 import { CurrencyIcon, ShoppingCartIcon, BanIcon, AlertIcon } from "../../components/common/Icons";
-
-const PRESETS: { id: Preset; label: string }[] = [
-  { id: "today", label: "Today" },
-  { id: "7d", label: "Last 7 days" },
-  { id: "30d", label: "Last 30 days" },
-  { id: "custom", label: "Custom" },
-];
 
 const day = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 
@@ -41,7 +35,6 @@ const Dashboard: React.FC = () => {
   const num = (n: number | null) => (n === null ? "—" : n);
   const days = (new Date(d.range.to).getTime() - new Date(d.range.from).getTime()) / 86400000 + 1;
   const unit = days === 1 ? "day" : `${days} days`;
-  const rangeLabel = d.range.from === d.range.to ? day(d.range.from) : `${day(d.range.from)} – ${day(d.range.to)}`;
   const salesTrend = trend(stats.sales?.change, unit);
   const ordersTrend = trend(orders?.change, unit);
 
@@ -50,32 +43,7 @@ const Dashboard: React.FC = () => {
       <h1 className="pageTitle">Dashboard</h1>
       <div className="pageSub">Overview of your panel</div>
 
-      <div className="filters">
-        <div className="tabs">
-          {PRESETS.map((p) => (
-            <button key={p.id} className={`tab ${d.preset === p.id ? "tab--active" : ""}`} onClick={() => d.setPreset(p.id)}>
-              {p.label}
-            </button>
-          ))}
-        </div>
-        {d.preset === "custom" && (
-          <>
-            <input type="date" aria-label="From" value={d.custom.from} max={d.custom.to} onChange={(e) => e.target.value && d.setCustom({ ...d.custom, from: e.target.value })} />
-            <input type="date" aria-label="To" value={d.custom.to} min={d.custom.from} onChange={(e) => e.target.value && d.setCustom({ ...d.custom, to: e.target.value })} />
-          </>
-        )}
-        <select aria-label="Area" value={d.areaId} onChange={(e) => d.setAreaId(e.target.value)}>
-          <option value="">All areas</option>
-          {d.areas.map((a) => <option key={a.area_id} value={a.area_id}>{a.area_name}</option>)}
-        </select>
-        <select aria-label="Session" value={d.session} onChange={(e) => d.setSession(e.target.value as typeof d.session)}>
-          <option value="">All sessions</option>
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch">Lunch</option>
-          <option value="dinner">Dinner</option>
-        </select>
-        <span className="filters__range">{rangeLabel}</span>
-      </div>
+      <RangeFilters f={d} />
 
       <div className={`liveBar ${error ? "liveBar--stale" : ""}`}>
         <span>

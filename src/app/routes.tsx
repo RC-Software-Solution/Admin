@@ -9,6 +9,7 @@ import Orders from "../Pages/orders/Orders";
 import Sessions from "../Pages/sessions/Sessions";
 import FoodItems from "../Pages/fooditems/FoodItems";
 import DeliveryPersons from "../Pages/deliverypersons/DeliveryPersons";
+import Reports from "../Pages/reports/Reports";
 
 import { getSession } from "../services/apiClient";
 import { ForgotPassword, ResetPassword } from "../Pages/Auth/PasswordReset";
@@ -52,6 +53,7 @@ const AppRoutes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
         <Route path="/sessions" element={<Sessions />} />
         <Route path="/food-items" element={<FoodItems />} />
         <Route path="/delivery-persons" element={<DeliveryPersons />} />
+        <Route path="/reports" element={<Reports />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Switch>
     </Layout>

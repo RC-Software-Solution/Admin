@@ -9,7 +9,7 @@ Written for Claude agents. Each agent takes **one section** (or the foundation t
 | Done | Login / Forgot / Reset password, Dashboard, Notices | Wired to the real backend |
 | **P0 (launch)** | Users, Admins (finish), Delivery Areas (finish), Orders (minimal) | The playbook's launch scope |
 | P1 | Sessions, Food Items, Delivery Persons | In the requirements, not in the launch scope |
-| P2 (deferred) | Reports, Settings, Audit Logs | No backend, and the requirements are unclear or absent |
+| P2 | Reports (built 2026-10-17); Settings, Audit Logs deferred | Settings and Audit Logs still need a product decision |
 
 Until a page is built, **hide its sidebar entry**. Today every unbuilt entry just redirects to the dashboard (see foundation task F1).
 
@@ -100,9 +100,9 @@ Polling every 30s, now with filters and trends (built 2026-10-17): presets Today
 
 ---
 
-## P2 (deferred, don't start without a product decision)
+## P2 (Reports built; the rest needs a product decision)
 
-- **Reports:** the requirements mark it "not sure". Sales, orders, item and area reports could be built on `analytics-service` with date and area filters, plus CSV export. Needs a scoping decision.
+- **Reports (built 2026-10-17):** one page with three tabs, Sales by day, Items and Areas, sharing the Dashboard's range, area and session filters (`GET /analytics/reports/:type?from=&to=&area_id=&session=`, type = sales | items | areas, same Sri Lanka day rules and 366-day cap) and a client-side CSV download. Revenue is the total value of orders in the range regardless of payment status (same as the Dashboard's session and area tables, unlike the Dashboard's paid-only Sales card). Items is capped at 100 rows by order-service. Not built: Unpaid customers report (the Orders unpaid filter covers it until staff say otherwise), PDF export, order-level drill-down (needs order detail in the backend).
 - **Settings:** not in the requirements. Candidates: ordering-window rules, auto-block threshold (currently 2 unpaid orders, hardcoded). Needs a decision on what is configurable.
 - **Audit Logs:** `UserStatusLog` records customer status changes only. A log page needs a list endpoint plus a wider log (admin actions, order status changes). Do this when a compliance need is stated.
 
