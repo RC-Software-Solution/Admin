@@ -128,13 +128,43 @@ The bell and search box in the top bar used to be placeholders (a hardcoded "3" 
 - **Bulk payment reminder (built):** on Orders with the Unpaid filter on, tick customers (ticking a row ticks all of that customer's rows) and press Notify. `POST /api/users/customers/notify-unpaid` (admin, super_admin) sends each customer one push: "You have N unpaid order(s) totalling LKR X. Please pay on your next delivery." The count and total are read from order-service at send time (`unpaid-by-customer`), not from the screen. Result line: sent / no device registered / nothing unpaid by then / failed. Audit-logged as `customer.notify_unpaid`. Deliberately no repeat guard (an admin can send the same reminder twice). Max 200 customers per send, one page of rows at a time.
 - **Not built:** an event inbox with read/unread state.
 
-## To-Do
+## To-Do (as of 2026-10-18)
 
-- **Test a real push notification end to end.** Notices and payment reminders send pushes through Firebase (`notificationService.js`). Verified 2026-10-18: the backend's service-account key authenticates and reaches Firebase (a deliberately fake token was rejected as "not a valid FCM registration token", not as an auth error). Still untested: an actual delivery, because no customer has registered a device (only an empty token exists). The customer app already has its own `google-services.json` for the same Firebase project and requests the correct native FCM token, so nothing needs copying from the backend key (which is a server secret and must never go in an app). To finish: run Frontend-Customer as a dev build (not Expo Go) on an Android emulator with Google Play services or a real phone, sign in as an accepted customer so the token registers, then send a notice to that customer's area and a reminder from Orders. Check the device receives both, and that the page counts match. Also check an area with no registered devices (expects "Sent to 0").
+Everything in this plan is built and committed. What remains is checks, environment steps, hardening and optional extras, roughly in priority order.
+
+### Needs a device or a person
+
+- [ ] **Test a real push notification end to end.** Notices and payment reminders send pushes through Firebase (`notificationService.js`). Verified 2026-10-18: the backend's service-account key authenticates and reaches Firebase (a deliberately fake token was rejected as "not a valid FCM registration token", not as an auth error). Still untested: an actual delivery, because no customer has registered a device (only an empty token exists). The customer app already has its own `google-services.json` for the same Firebase project and requests the correct native FCM token, so nothing needs copying from the backend key (which is a server secret and must never go in an app). To finish: run Frontend-Customer as a dev build (not Expo Go) on an Android emulator with Google Play services or a real phone, sign in as an accepted customer so the token registers, then send a notice to that customer's area and a reminder from Orders. Check the device receives both, and that the page counts match. Also check an area with no registered devices (expects "Sent to 0").
+- [ ] **Check the panel as a plain `admin`.** Only a super admin has been used in testing. Sign in as a plain admin and confirm Admins, Settings and Audit Logs are hidden from the sidebar, that their URLs redirect to the dashboard, and that the calls behind them return 403 (the backend `checkRole` is the real enforcement; the UI hiding is only convenience).
+- [ ] **Run the SQL migrations on every other environment.** There is no migration tool, so each file in `Backend/scripts/sql/` is a manual step. The local Docker database already has them all. In order: `2026-09-26-notices`, `2026-09-26-order-delivery-failed`, `2026-10-15-area-details`, `2026-10-16-delivery-person-areas`, `2026-10-16-delivery-person-details`, `2026-10-16-food-item-details`, `2026-10-17-session-delivery`, `2026-10-17-drop-driver-fixed-areas`, `2026-10-17-app-settings`, `2026-10-17-audit-logs`. Do NOT run `2026-09-27-seed-test-data.sql` anywhere real (test data only). An earlier session also prepared a cleanup SQL for test data that is not in the repo; confirm whether it is still needed.
+- [ ] **Driver app (Frontend-Delivery).** Needs a device or emulator test. Server-side enforcement is also missing: `delivery-service` still returns orders for any area a driver asks for instead of only the areas assigned to them for that session.
+- [ ] **Browser-test the audited routes not yet exercised.** Tested so far: settings, order payment, notices, areas, food items, admin disable/enable, customer reminders. Not yet: delivery-person create/edit/disable/reset, sessions, session items, session delivery assignment, admin create/edit/reset.
+
+### Before production (security)
+
+- [ ] **A real SMTP app password is stored in plain text in `Backend/docker/docker-compose.yml`**, which is tracked in git and has a GitHub remote (`RC-Software-Solution/Backend`). Treat it as exposed: rotate the password, move it to an untracked env file or a secret store, and check whether the old value was already pushed (if so it stays in history until the history is cleaned). Check the other compose files and `.env` files for the same.
+- [ ] **Internal API key.** It defaults to `internal-dev-key` in the compose file and in code. Set a strong `INTERNAL_API_KEY` for every deployed service. Also re-check that `GET /api/users/:userId` (internal-key protected) cannot be reached without it.
+- [ ] **Admin sessions.** Access tokens last 7 days and Admin has no refresh flow, so an admin is signed out when the token expires. Add a refresh flow or shorten the lifetime together with one.
+
+### Releasing the work
+
+- [ ] **Push and open PRs.** Nothing from this work is pushed: Admin `feat/notices` and Backend `dev` are local commits only.
+- [ ] **Uncommitted files that predate this work:** `Backend/scripts/sql/2026-09-27-seed-test-data.sql` (untracked test data) and `Admin/package-lock.json` (modified). Decide whether to commit or discard each.
+- [ ] **CI for the route-access test.** `tests/routes-access.test.js` needs a service's `node_modules` on `NODE_PATH` to run from the repo root (e.g. `NODE_PATH=apps/menu-service/node_modules:apps/user-service/node_modules`). Make that part of the CI job.
+
+### Optional features (none required for launch)
+
+- [ ] **S3 image upload for Food Items.** Blocked until the menu-images bucket exists (see Food Items above).
+- [ ] **Order detail** with items, an audit timeline and a delivery-person field. The delivery-person on-time rate needs the same data (`delivered_by`, `delivered_at` on orders) and was skipped by decision.
+- [ ] **Reports:** an Unpaid-customers report, PDF export, and drill-down into single orders.
+- [ ] **Audit logs:** record the old value for order status changes (today only the new one), alert on a failed log write instead of only printing it, and add retention and CSV export.
+- [ ] **Notifications:** an inbox with read/unread state per admin (today the bell shows live counts only).
+- [ ] **Notices:** edit support, and replace the two `window.confirm` calls (send, delete) with `ConfirmDialog`.
+- [ ] **Settings:** only the auto-block limit exists. Add more only when someone names a rule that needs to change.
 
 ## Known backend issues agents may hit
 
 - `GET /api/users/:userId` was internal-key protected, but the internal key defaults to `internal-dev-key`; this must not ship to production.
 - Auto-blocking now runs when an order is marked unpaid (see Settings). Orders that become unpaid some other way, or customers already over the limit before the setting existed, are only caught by saving a stricter threshold or running `node src/jobs/runCustomerBlockingJob.js`.
-- No automated tests anywhere in `apps/`. Add a small test with any new backend logic that has branches.
+- Several services now have small `node --test` suites (user, order, analytics) and the repo root has `tests/`. Keep adding a small test with any new backend logic that has branches.
 - Access tokens last 7 days; there is no refresh flow in Admin.
