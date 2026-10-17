@@ -27,6 +27,7 @@ export interface AuditQuery {
 /** The `group` filter: the part of an action before the dot. */
 export const AUDIT_GROUPS: { id: string; label: string }[] = [
     { id: "admin", label: "Admins" },
+    { id: "customer", label: "Customer reminders" },
     { id: "driver", label: "Delivery persons" },
     { id: "settings", label: "Settings" },
     { id: "order", label: "Orders" },

@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import type { DeliveryArea } from "../types/deliveryAreas";
 import type { Order, OrderFilters, OrderStatus, PaymentStatus } from "../types/orders";
 import { listAreas } from "../Pages/deliveryareas/deliveryareas.services";
-import { listOrders, PAGE_SIZE, updateOrderStatus, updatePaymentStatus } from "../Pages/orders/orders.service";
+import { listOrders, notifyUnpaid, PAGE_SIZE, updateOrderStatus, updatePaymentStatus } from "../Pages/orders/orders.service";
 import { usePolling } from "./usePolling";
 
 const EMPTY: OrderFilters = { status: "", payment_status: "", area_id: "", from: "", to: "", q: "" };
@@ -23,12 +23,16 @@ export const useOrders = () => {
     const urlKey = params.toString();
     const [filters, setFilters] = useState<OrderFilters>({ ...EMPTY, ...fromUrl(params) });
     const [page, setPage] = useState(0);
+    // Customers ticked for a payment reminder (by customer id, so all of a customer's rows tick together)
+    const [selected, setSelected] = useState<string[]>([]);
+    const [reminderResult, setReminderResult] = useState("");
     // The page stays mounted when a link only changes the query string, so follow it when it changes
     const [seenUrl, setSeenUrl] = useState(urlKey);
     if (seenUrl !== urlKey) {
         setSeenUrl(urlKey);
         setFilters({ ...EMPTY, ...fromUrl(params) });
         setPage(0);
+        setSelected([]);
     }
     const [areas, setAreas] = useState<DeliveryArea[]>([]);
     const [actionError, setActionError] = useState("");
@@ -48,6 +52,7 @@ export const useOrders = () => {
     const setFilter = useCallback(<K extends keyof OrderFilters>(k: K, v: OrderFilters[K]) => {
         setFilters((f) => ({ ...f, [k]: v }));
         setPage(0);
+        setSelected([]);
     }, []);
 
     // Run a mutation, then refresh. Resolves true on success so a modal knows to close.
@@ -64,7 +69,26 @@ export const useOrders = () => {
         orders: data?.slice(0, PAGE_SIZE) ?? [],
         loaded: data !== null,
         hasNext: (data?.length ?? 0) > PAGE_SIZE,
-        page, setPage, filters, setFilter, areas, areaName, updatedAt, refresh,
+        page, setPage: (p: number) => { setPage(p); setSelected([]); }, filters, setFilter, areas, areaName, updatedAt, refresh,
+        selected,
+        toggleCustomer: (id: string) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id])),
+        selectPage: (all: boolean) => setSelected(all ? [...new Set(data?.slice(0, PAGE_SIZE).map((o) => o.customer_id) ?? [])] : []),
+        reminderResult,
+        sendReminders: async () => {
+            try {
+                const r = await notifyUnpaid(selected);
+                const parts = [`Reminder sent to ${r.sent} customer${r.sent === 1 ? "" : "s"}`];
+                if (r.no_device) parts.push(`${r.no_device} ha${r.no_device === 1 ? "s" : "ve"} no device registered`);
+                if (r.nothing_unpaid) parts.push(`${r.nothing_unpaid} had nothing unpaid`);
+                if (r.failed) parts.push(`${r.failed} failed`);
+                setReminderResult(parts.join(", ") + ".");
+                setActionError("");
+                setSelected([]);
+            } catch (e) {
+                setActionError(e instanceof Error ? e.message : "Could not send the reminders");
+            }
+        },
+        dismissReminderResult: () => setReminderResult(""),
         error: actionError || error,
         setStatus: (o: Order, status: OrderStatus, reason?: string) => run(() => updateOrderStatus(o.id, status, reason)),
         setPayment: (o: Order, p: PaymentStatus) => run(() => updatePaymentStatus(o.id, p)),

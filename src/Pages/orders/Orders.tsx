@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./orders.css";
 import { useOrders } from "../../hooks/useOrders";
 import Modal from "../../components/common/Modal";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { formatDateTime } from "../../utils/formatDate";
 import { formatMoney } from "../../utils/formatMoney";
 import { NEXT_STATUSES, type Order, type OrderStatus, type PaymentStatus } from "../../types/orders";
@@ -15,6 +16,7 @@ export default function OrdersPage() {
   const [editing, setEditing] = useState<Order | null>(null);
   const [next, setNext] = useState<OrderStatus | "">("");
   const [reason, setReason] = useState("");
+  const [confirmingReminder, setConfirmingReminder] = useState(false);
 
   const openStatus = (order: Order) => {
     setNext(NEXT_STATUSES[order.status]?.[0] ?? "");
@@ -67,15 +69,22 @@ export default function OrdersPage() {
         >
           Unpaid only
         </button>
+        {unpaidOnly && (
+          <button type="button" className="orders-btn orders-btn--primary" disabled={o.selected.length === 0} onClick={() => setConfirmingReminder(true)}>
+            {o.selected.length === 0 ? "Notify customers" : `Notify ${o.selected.length} customer${o.selected.length === 1 ? "" : "s"}`}
+          </button>
+        )}
       </div>
       {(o.filters.from === "") !== (o.filters.to === "") && <p className="orders-hint">Pick both dates to filter by date.</p>}
 
       {o.error && <p role="alert">{o.error}</p>}
+      {o.reminderResult && (<p role="status">{o.reminderResult} <button type="button" className="orders-btn" onClick={o.dismissReminderResult}>Dismiss</button></p>)}
 
       <div className="orders-card">
         <table className="orders-table">
           <thead>
             <tr>
+              {unpaidOnly && (<th><input type="checkbox" aria-label="Select all customers on this page" checked={o.orders.length > 0 && o.orders.every((r) => o.selected.includes(r.customer_id))} onChange={(e) => o.selectPage(e.target.checked)} /></th>)}
               <th>Order</th>
               <th>Customer</th>
               <th>Area</th>
@@ -90,11 +99,12 @@ export default function OrdersPage() {
           <tbody>
             {o.orders.length === 0 ? (
               <tr>
-                <td className="orders-empty" colSpan={9}>{o.loaded ? "No orders found." : "Loading…"}</td>
+                <td className="orders-empty" colSpan={unpaidOnly ? 10 : 9}>{o.loaded ? "No orders found." : "Loading…"}</td>
               </tr>
             ) : (
               o.orders.map((r) => (
                 <tr key={r.id}>
+                  {unpaidOnly && (<td><input type="checkbox" aria-label={`Select ${r.customer_name ?? r.customer_id}`} checked={o.selected.includes(r.customer_id)} onChange={() => o.toggleCustomer(r.customer_id)} /></td>)}
                   <td className="orders-id">{r.id}</td>
                   <td>{r.customer_name ?? r.customer_id.slice(0, 8)}</td>
                   <td>{o.areaName(r.area_id)}</td>
@@ -127,6 +137,15 @@ export default function OrdersPage() {
         <span>Page {o.page + 1}</span>
         <button type="button" className="orders-btn" disabled={!o.hasNext} onClick={() => o.setPage(o.page + 1)}>Next</button>
       </div>
+
+      <ConfirmDialog
+        open={confirmingReminder}
+        title="Send payment reminders"
+        message={`Send a payment reminder to ${o.selected.length} customer${o.selected.length === 1 ? "" : "s"}? Each gets one push with their unpaid total. Customers without the app installed will not receive it.`}
+        confirmLabel="Send"
+        onCancel={() => setConfirmingReminder(false)}
+        onConfirm={() => { setConfirmingReminder(false); o.sendReminders(); }}
+      />
 
       <Modal open={!!editing} title={`Update ${editing?.id ?? ""}`} onClose={() => setEditing(null)}>
         <form className="modal__form" onSubmit={submit}>

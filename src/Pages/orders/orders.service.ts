@@ -1,4 +1,4 @@
-import { api, ORDER_API } from "../../services/apiClient";
+import { api, ORDER_API, USER_API } from "../../services/apiClient";
 import type { Order, OrderFilters, OrderStatus, PaymentStatus } from "../../types/orders";
 
 export const PAGE_SIZE = 25;
@@ -30,3 +30,14 @@ export const updatePaymentStatus = (id: string, payment_status: PaymentStatus) =
 /** A few orders whose id starts with `text`, for the top-bar search. */
 export const searchOrders = (text: string, signal?: AbortSignal) =>
   api<{ orders: Order[] }>(ORDER_API, `/orders?${new URLSearchParams({ type: "all", limit: "5", q: text })}`, { signal }).then((r) => r.orders);
+
+export interface ReminderResult {
+  sent: number;
+  no_device: number; // never registered a phone, so nothing could be delivered
+  nothing_unpaid: number; // paid up since the list was loaded
+  failed: number;
+}
+
+/** One payment-reminder push per customer; amounts are worked out server-side. */
+export const notifyUnpaid = (customerIds: string[]) =>
+  api<ReminderResult>(USER_API, "/users/customers/notify-unpaid", { method: "POST", body: JSON.stringify({ customer_ids: customerIds }) });
