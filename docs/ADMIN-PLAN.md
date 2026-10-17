@@ -118,6 +118,10 @@ Sessions, Food Items and Delivery Persons are built and tested on the real backe
 - **Delivery-person on-time rate:** skipped by decision. Orders record no delivering driver or delivery time, so it would need `delivered_by` and `delivered_at` on orders plus an agreed on-time rule.
 - **Fixed (2026-10-17):** editing or cancelling an order that contains an item deactivated afterwards. Before, dropping it did not return its stock, and keeping it corrupted the order (line became "Unknown", total 0, stock over-decremented). order-service now reads session items with `include_inactive` (honoured only with the internal key), may keep or drop such an item but not add one (409), and placing a new order still rejects inactive items.
 
+## To-Do
+
+- **Test a real push notification end to end.** Notices send pushes through Firebase (`notificationService.js`), but no real push has been sent in testing. Needs the Firebase service-account file in `Backend/secrets/` and a customer device (or emulator) that has registered an `fcm_token`. Check: send a notice to one area from the Notices page, confirm the device receives it, and that the page's "Sent to N devices" count matches. Also check an area with no registered devices (expects "Sent to 0") and the failed-token count.
+
 ## Known backend issues agents may hit
 
 - `GET /api/users/:userId` was internal-key protected, but the internal key defaults to `internal-dev-key`; this must not ship to production.
