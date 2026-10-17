@@ -1,0 +1,18 @@
+/* UI kit styles. Every class starts with ui-. Tokens come from styles/variables.css. */
+
+:where([class^="ui-"], [class*=" ui-"]) {
+  box-sizing: border-box;
+}
+
+.ui-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+.ui-nowrap {
+  white-space: nowrap;
+}
+.ui-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
