@@ -2,8 +2,16 @@ body {
   margin: 0;
   padding: 0;
   font-family: var(--font-sans);
-  background: var(--white);
-  color: var(--gray-900);
+  background: var(--paper);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums; /* amounts and ids line up */
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-head);
 }
 
 /* One visible focus ring for keyboard users everywhere. Component rules with more specificity may override it. */

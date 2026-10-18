@@ -1,0 +1,1 @@
+Bricolage Grotesque (variable, weight 200-800) and IBM Plex Sans (400, 500, 600): Latin subset woff2 files from Fontsource (https://fontsource.org), served from the app so there is no CDN dependency. Both families are licensed under the SIL Open Font License 1.1. Sinhala and Tamil text falls back to the system font.

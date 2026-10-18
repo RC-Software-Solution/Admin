@@ -1,41 +1,56 @@
 :root {
-  /* Brand and status colours. Each has a solid colour plus bg / border / text for soft surfaces (badges, alerts). */
-  --color-primary: #16a34a; /* brand green: accents, icons, focus */
-  --color-primary-solid: #15803d; /* filled buttons and green text; #16a34a is only 3.3:1 against white */
-  --color-primary-solid-hover: #166534;
-  --color-primary-bg: #f0fdf4;
-  --color-primary-border: #bbf7d0;
-  --color-primary-text: #166534;
+  /* Palette: see docs/superpowers/specs/2026-10-18-admin-visual-identity-design.md */
+  --tea: #123524; /* sidebar, selected chips, toasts */
+  --mint: #8fd0a8; /* marker on Tea */
+  --paper: #f3f5f0; /* page ground */
+  --ink: #18241d; /* text */
 
-  --color-danger: #dc2626;
-  --color-danger-hover: #b91c1c;
-  --color-danger-bg: #fee2e2;
-  --color-danger-border: #fecaca;
-  --color-danger-text: #991b1b;
+  /* Semantic colours. Each has a solid colour plus bg / border / text for soft surfaces. */
+  --color-primary: #16803c; /* Leaf: accents, active states, focus */
+  --color-primary-solid: #16803c; /* filled buttons; white text on it is 5.0:1 */
+  --color-primary-solid-hover: #116332;
+  --color-primary-bg: #e2f0e6;
+  --color-primary-border: #b9d9c3;
+  --color-primary-text: #116332;
 
-  --color-warning: #f59e0b;
-  --color-warning-bg: #fffbeb;
-  --color-warning-border: #fde68a;
-  --color-warning-text: #b45309;
+  --color-danger: #b3362a; /* Brick: failed, cancelled, destructive */
+  --color-danger-hover: #8a261c;
+  --color-danger-bg: #f8dfdb;
+  --color-danger-border: #e8b5ae;
+  --color-danger-text: #8a261c;
 
-  --color-info: #2563eb;
-  --color-info-bg: #dbeafe;
-  --color-info-border: #bfdbfe;
-  --color-info-text: #1e40af;
+  --color-warning: #e0a100; /* Turmeric: needs a human (use as a fill; text on it is --color-warning-text) */
+  --color-warning-bg: #fbefc9;
+  --color-warning-border: #ecd185;
+  --color-warning-text: #6b4b00;
+
+  --color-info: #2c4c68;
+  --color-info-bg: #e6edf3;
+  --color-info-border: #c6d4e0;
+  --color-info-text: #1f3a52;
 
   --white: #ffffff;
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
+  --gray-50: #f6f8f4;
+  --gray-100: #eef1ec;
+  --gray-200: #dde3db; /* hairlines */
+  --gray-300: #c3ccc1; /* control borders */
+  --gray-400: #98a69c;
+  --gray-500: #5c6b61; /* Mist: secondary text (5.5:1 on white) */
+  --gray-600: #4a5a50;
+  --gray-700: #36463c;
+  --gray-800: #25352b;
+  --gray-900: #18241d;
 
-  --font-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  /* On the dark rail and on dark pills */
+  --rail-text: #c9dccf;
+  --rail-muted: #86a893;
+  --on-dark-hover: rgba(255, 255, 255, 0.06);
+  --on-dark-active: rgba(255, 255, 255, 0.1);
+  --on-dark-soft: rgba(255, 255, 255, 0.72);
+  --hover-wash: rgba(18, 53, 36, 0.07);
+
+  --font-head: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", "Nirmala UI", Roboto, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --text-xs: 12px;
@@ -53,16 +68,16 @@
   --space-6: 24px;
   --space-8: 32px;
 
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-full: 999px;
+  --radius-sm: 4px; /* badges */
+  --radius-md: 6px; /* controls */
+  --radius-lg: 10px; /* floating things and panels */
+  --radius-full: 999px; /* chips, user pill */
 
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 8px 16px rgba(15, 23, 42, 0.1);
-  --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.25);
-  --overlay: rgba(15, 23, 42, 0.5);
-  --focus-ring: 0 0 0 3px rgba(22, 163, 74, 0.35);
+  --shadow-sm: 0 1px 2px rgba(18, 53, 36, 0.08);
+  --shadow-md: 0 8px 16px rgba(18, 53, 36, 0.12);
+  --shadow-lg: 0 12px 32px rgba(18, 53, 36, 0.16), 0 2px 6px rgba(18, 53, 36, 0.08); /* menus, dialogs, toasts */
+  --overlay: rgba(18, 53, 36, 0.45);
+  --focus-ring: 0 0 0 3px rgba(22, 128, 60, 0.28);
 
   --z-drawer: 100;
   --z-dropdown: 1000;
@@ -70,7 +85,7 @@
 
   /* Breakpoints (media queries cannot read custom properties, so write the literals): 640px phone, 1024px drawer */
 
-  /* Legacy names, still used by two old rules; remove when the Users page migrates. */
+  /* Legacy names, still used by notices.css; remove when the Notices page migrates. */
   --primary-color: var(--color-primary);
   --danger-color: var(--color-danger);
   --warning-color: var(--color-warning);
