@@ -4,3 +4,7 @@ export type { BadgeTone } from "./Badge";
 export { Button } from "./Button";
 export { EmptyState } from "./EmptyState";
 export { Spinner } from "./Spinner";
+export { Card } from "./Card";
+export { Field } from "./Field";
+export { FilterBar } from "./FilterBar";
+export { PageHeader } from "./PageHeader";

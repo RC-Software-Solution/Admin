@@ -144,3 +144,78 @@
 }
 .ui-empty__title { margin: 0; font-weight: 600; color: var(--gray-700); }
 .ui-empty__hint { margin: 0; font-size: var(--text-sm); }
+
+/* ===== Card ===== */
+.ui-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-3);
+}
+.ui-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--gray-200);
+}
+.ui-card__title { margin: 0; font-size: var(--text-md); }
+.ui-card__body { padding: var(--space-4); }
+
+/* ===== PageHeader ===== */
+.ui-pageheader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.ui-pageheader__title { margin: 0; font-size: var(--text-xl); line-height: 1.2; }
+.ui-pageheader__subtitle { margin: var(--space-1) 0 0; color: var(--gray-500); font-size: var(--text-sm); }
+
+/* ===== FilterBar ===== */
+.ui-filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.ui-filterbar :is(input, select) {
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  font: inherit;
+  font-size: var(--text-base);
+}
+.ui-filterbar label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+}
+@media (max-width: 640px) {
+  .ui-filterbar > * { flex: 1 1 140px; }
+  .ui-filterbar :is(input, select) { min-height: 44px; min-width: 0; flex: 1; }
+}
+
+/* ===== Field ===== */
+.ui-field { display: flex; flex-direction: column; gap: var(--space-1); }
+.ui-field__label { font-size: var(--text-sm); font-weight: 600; color: var(--gray-700); }
+.ui-field :is(input, select, textarea) {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  font: inherit;
+  font-size: var(--text-base);
+}
+.ui-field :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--color-danger); }
+.ui-field__hint, .ui-field__error { margin: 0; font-size: var(--text-xs); }
+.ui-field__hint { color: var(--gray-500); }
+.ui-field__error { color: var(--color-danger-text); }

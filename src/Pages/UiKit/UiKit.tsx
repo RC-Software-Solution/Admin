@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Alert, Badge, Button, EmptyState, Spinner } from "../../components/ui";
+import { Alert, Badge, Button, Card, EmptyState, Field, FilterBar, PageHeader, Spinner } from "../../components/ui";
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
   <section style={{ display: "grid", gap: "var(--space-3)", marginBottom: "var(--space-8)" }}>
@@ -39,6 +39,21 @@ export default function UiKit() {
         <Alert tone="info">Refreshes every 30s.</Alert>
         <Spinner label="Loading" />
         <EmptyState title="No orders found" hint="Try clearing the filters." action={<Button>Clear filters</Button>} />
+      </Section>
+      <Section title="PageHeader, FilterBar, Card, Field">
+        <PageHeader title="Orders" subtitle="Refreshes every 30s" actions={<Button variant="primary">Add</Button>} />
+        <FilterBar>
+          <select aria-label="Status"><option>All statuses</option></select>
+          <input type="search" placeholder="Order id…" aria-label="Order id" />
+          <label>From <input type="date" /></label>
+          <Button aria-pressed="true">Unpaid only</Button>
+        </FilterBar>
+        <Card title="Card title" actions={<Button size="sm">Action</Button>}>
+          <div style={{ display: "grid", gap: "var(--space-3)" }}>
+            <Field label="Name" hint="As shown to customers"><input /></Field>
+            <Field label="Price" error="Enter a positive number"><input defaultValue="-1" /></Field>
+          </div>
+        </Card>
       </Section>
       {/* gallery:end */}
     </div>
