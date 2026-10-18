@@ -516,8 +516,10 @@
   .ui-table td[data-slot="select"] { order: -1; flex: none; }
   .ui-table td[data-slot="title"] { flex: 1 1 0; min-width: 0; }
   .ui-table td[data-slot="amount"] { flex: none; }
-  .ui-table td[data-slot="inline"] { flex: 0 1 auto; }
-  .ui-table td[data-slot="actions"] { flex: 1 1 auto; flex-wrap: wrap; justify-content: flex-end; }
+  .ui-table td[data-slot="inline"] { flex: 0 1 auto; order: 2; }
+  .ui-table td[data-slot="actions"] { flex: 1 1 auto; order: 3; flex-wrap: wrap; justify-content: flex-end; }
+  /* Forces a line break after select + title + amount; the negative margin cancels the row gap it adds */
+  .ui-table tr::after { content: ""; order: 1; flex: 0 0 100%; height: 0; margin-top: calc(var(--space-2) * -1); }
   .ui-row--attn { box-shadow: inset 4px 0 0 var(--color-warning); }
   .ui-row--bad { box-shadow: inset 4px 0 0 var(--color-danger); }
   .ui-row--attn > td:first-child, .ui-row--bad > td:first-child { box-shadow: none; }
