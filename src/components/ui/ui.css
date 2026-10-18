@@ -196,6 +196,7 @@
   margin-bottom: var(--space-3);
 }
 .ui-filterbar :is(input, select) {
+  box-sizing: border-box;
   min-height: 38px;
   padding: 0 var(--space-3);
   border: 1px solid var(--gray-300);
@@ -231,6 +232,7 @@
 .ui-field { display: flex; flex-direction: column; gap: 6px; }
 .ui-field__label { font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
 .ui-field :is(input, select, textarea) {
+  box-sizing: border-box;
   min-height: 40px;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--gray-300);
