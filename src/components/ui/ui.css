@@ -435,6 +435,9 @@
   cursor: pointer;
 }
 .ui-radio input { accent-color: var(--color-primary); }
+/* beat the global .modal__form label / input rules, which stack the label and pad the radio */
+.ui-radios .ui-radio { flex-direction: row; gap: 10px; font-weight: 500; font-size: var(--text-base); }
+.ui-radios .ui-radio input { padding: 0; }
 .ui-radio.is-on { border-color: var(--color-primary); background: var(--color-primary-bg); }
 .ui-radio.is-bad.is-on { border-color: var(--color-danger); background: var(--color-danger-bg); }
 .ui-radio.is-bad input { accent-color: var(--color-danger); }
@@ -472,6 +475,8 @@
   border-bottom: 1px solid var(--gray-200);
   vertical-align: middle;
 }
+.ui-table th.ui-right { text-align: right; }
+.ui-table td.ui-right .ui-actions { justify-content: flex-end; }
 .ui-table tbody tr:hover { background: var(--white); }
 /* A coloured edge marks rows that need a human (turmeric) or went wrong (brick) */
 .ui-row--attn > td:first-child { box-shadow: inset 4px 0 0 var(--color-warning); }
