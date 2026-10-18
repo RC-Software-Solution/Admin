@@ -10,3 +10,5 @@ export { FilterBar } from "./FilterBar";
 export { PageHeader } from "./PageHeader";
 export { ToastProvider } from "./ToastProvider";
 export { useToast } from "./useToast";
+export { DataTable } from "./DataTable";
+export type { Column } from "./DataTable";

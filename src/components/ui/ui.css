@@ -257,3 +257,67 @@
 @media (max-width: 640px) {
   .ui-toasts { left: var(--space-4); max-width: none; bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* ===== DataTable ===== */
+.ui-datatable { padding: var(--space-2); }
+.ui-datatable > .ui-alert { margin: var(--space-2); }
+.ui-datatable__state { display: flex; justify-content: center; padding: var(--space-8); color: var(--gray-500); }
+.ui-datatable__scroll { overflow-x: auto; }
+.ui-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.ui-table th {
+  padding: var(--space-3);
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+  color: var(--gray-600);
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+.ui-table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--gray-100);
+  vertical-align: middle;
+}
+.ui-table tbody tr:hover { background: var(--gray-50); }
+
+/* Phones: every row becomes a card. Title top-left, select top-right, label/value pairs, actions last. */
+@media (max-width: 640px) {
+  .ui-datatable { padding: 0; }
+  .ui-table, .ui-table tbody { display: block; }
+  .ui-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .ui-table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .ui-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    grid-column: 1 / -1;
+    padding: 0;
+    border: 0;
+    text-align: right;
+  }
+  .ui-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--gray-500);
+    font-size: var(--text-xs);
+    text-align: left;
+  }
+  .ui-table td[data-slot] { text-align: left; }
+  .ui-table td[data-slot]::before { content: none; }
+  .ui-table td[data-slot="title"] { grid-column: 1; grid-row: 1; font-weight: 600; }
+  .ui-table td[data-slot="select"] { grid-column: 2; grid-row: 1; }
+  .ui-table td[data-slot="actions"] { flex-wrap: wrap; justify-content: flex-start; padding-top: var(--space-1); }
+  .ui-nowrap { white-space: normal; }
+}

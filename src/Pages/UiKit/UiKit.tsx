@@ -1,5 +1,20 @@
 import type { ReactNode } from "react";
-import { Alert, Badge, Button, Card, EmptyState, Field, FilterBar, PageHeader, Spinner, useToast } from "../../components/ui";
+import { Alert, Badge, Button, Card, DataTable, EmptyState, Field, FilterBar, PageHeader, Spinner, useToast } from "../../components/ui";
+import type { Column } from "../../components/ui";
+
+interface Row { id: string; customer: string; total: string; status: "paid" | "unpaid" }
+const ROWS: Row[] = [
+  { id: "ORD-20261018-0001", customer: "Nimal Perera", total: "LKR 450.00", status: "paid" },
+  { id: "ORD-20261018-0002", customer: "Kumari Silva", total: "LKR 485.00", status: "unpaid" },
+];
+const COLUMNS: Column<Row>[] = [
+  { key: "select", label: "Select", mobile: "select", header: <input type="checkbox" aria-label="Select all" />, cell: (r) => <input type="checkbox" aria-label={`Select ${r.customer}`} /> },
+  { key: "id", label: "Order", mobile: "title", cell: (r) => <span className="ui-mono">{r.id}</span> },
+  { key: "customer", label: "Customer", cell: (r) => r.customer },
+  { key: "total", label: "Total", cell: (r) => r.total },
+  { key: "status", label: "Payment", cell: (r) => <Badge tone={r.status === "paid" ? "success" : "danger"}>{r.status}</Badge> },
+  { key: "actions", label: "Actions", mobile: "actions", cell: () => <div className="ui-actions"><Button size="sm">Edit</Button><Button size="sm" variant="primary">Mark paid</Button></div> },
+];
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
   <section style={{ display: "grid", gap: "var(--space-3)", marginBottom: "var(--space-8)" }}>
@@ -62,6 +77,12 @@ export default function UiKit() {
           <Button onClick={() => toast.show("Could not save", "danger")}>Error toast</Button>
           <Button onClick={() => toast.show("Refreshing…", "info")}>Info toast</Button>
         </div>
+      </Section>
+      <Section title="DataTable">
+        <Card flush><DataTable columns={COLUMNS} rows={ROWS} rowKey={(r) => r.id} /></Card>
+        <Card flush><DataTable columns={COLUMNS} rows={[]} rowKey={(r) => r.id} loading /></Card>
+        <Card flush><DataTable columns={COLUMNS} rows={[]} rowKey={(r) => r.id} emptyTitle="No orders found" /></Card>
+        <Card flush><DataTable columns={COLUMNS} rows={ROWS.slice(0, 1)} rowKey={(r) => r.id} error="Refresh failed: Request failed (500)" /></Card>
       </Section>
       {/* gallery:end */}
     </div>
