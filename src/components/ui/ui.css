@@ -280,6 +280,8 @@
   font-weight: 500;
 }
 .ui-toast--danger { background: var(--color-danger); }
+/* The global focus ring is leaf green, too dark on Tea and Brick */
+.ui-toast :focus-visible, .ui-selbar :focus-visible { outline-color: var(--mint); }
 .ui-toast__close {
   flex-shrink: 0;
   border: 0;
@@ -396,7 +398,7 @@
   bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: var(--z-dropdown);
+  z-index: calc(var(--z-drawer) - 2); /* below the drawer backdrop (drawer - 1) so an open drawer covers it */
   display: flex;
   align-items: center;
   gap: var(--space-4);

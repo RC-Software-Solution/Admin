@@ -117,6 +117,7 @@
   cursor: pointer;
 }
 .notification-badge {
+  box-sizing: border-box;
   position: absolute;
   top: -6px;
   right: -6px;
@@ -133,6 +134,7 @@
   font-weight: 600;
 }
 .bell__panel {
+  box-sizing: border-box;
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
