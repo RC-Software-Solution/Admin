@@ -33,6 +33,7 @@ export default function OrdersPage() {
   const [next, setNext] = useState<OrderStatus | "">("");
   const [reason, setReason] = useState("");
   const [confirmingReminder, setConfirmingReminder] = useState(false);
+  const [busy, setBusy] = useState<string[]>([]); // orders with a one-click change in flight
 
   const openStatus = (order: Order) => {
     setNext(NEXT_STATUSES[order.status]?.[0] ?? "");
@@ -46,12 +47,24 @@ export default function OrdersPage() {
       toast.show("Order updated");
     }
   };
-  const advance = async (order: Order, to: OrderStatus) => {
-    if (await o.setStatus(order, to)) toast.show(`Moved to ${label(to)}`);
+  // A second click while a change is in flight would hit the next button that renders in the same spot, so ignore it.
+  const guarded = async (order: Order, fn: () => Promise<void>) => {
+    if (busy.includes(order.id)) return;
+    setBusy((b) => [...b, order.id]);
+    try {
+      await fn();
+    } finally {
+      setBusy((b) => b.filter((id) => id !== order.id));
+    }
   };
-  const pay = async (order: Order, status: PaymentStatus) => {
-    if (await o.setPayment(order, status)) toast.show(`Marked ${status}`);
-  };
+  const advance = (order: Order, to: OrderStatus) =>
+    guarded(order, async () => {
+      if (await o.setStatus(order, to)) toast.show(`Moved to ${label(to)}`);
+    });
+  const pay = (order: Order, status: PaymentStatus) =>
+    guarded(order, async () => {
+      if (await o.setPayment(order, status)) toast.show(`Marked ${status}`);
+    });
   const sendReminders = async () => {
     setConfirmingReminder(false);
     const summary = await o.sendReminders();
@@ -66,10 +79,11 @@ export default function OrdersPage() {
   const rowActions = (r: Order) => {
     const forward = NEXT_STATUSES[r.status]?.[0];
     const canPay = r.payment_status !== "paid" && r.status !== "cancelled";
+    const loading = busy.includes(r.id);
     const primary = forward ? (
-      <Button size="sm" onClick={() => advance(r, forward)}>{ADVANCE_LABEL[forward] ?? `Move to ${label(forward)}`}</Button>
+      <Button size="sm" loading={loading} onClick={() => advance(r, forward)}>{ADVANCE_LABEL[forward] ?? `Move to ${label(forward)}`}</Button>
     ) : canPay ? (
-      <Button size="sm" variant="primary" onClick={() => pay(r, "paid")}>Mark paid</Button>
+      <Button size="sm" variant="primary" loading={loading} onClick={() => pay(r, "paid")}>Mark paid</Button>
     ) : null;
     const items: MenuItem[] = [];
     if (NEXT_STATUSES[r.status]) items.push({ label: "Update status…", onSelect: () => openStatus(r) });
