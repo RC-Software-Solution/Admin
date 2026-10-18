@@ -25,7 +25,6 @@ export const useOrders = () => {
     const [page, setPage] = useState(0);
     // Customers ticked for a payment reminder (by customer id, so all of a customer's rows tick together)
     const [selected, setSelected] = useState<string[]>([]);
-    const [reminderResult, setReminderResult] = useState("");
     // The page stays mounted when a link only changes the query string, so follow it when it changes
     const [seenUrl, setSeenUrl] = useState(urlKey);
     if (seenUrl !== urlKey) {
@@ -73,22 +72,22 @@ export const useOrders = () => {
         selected,
         toggleCustomer: (id: string) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id])),
         selectPage: (all: boolean) => setSelected(all ? [...new Set(data?.slice(0, PAGE_SIZE).map((o) => o.customer_id) ?? [])] : []),
-        reminderResult,
-        sendReminders: async () => {
+        /** Resolves to a one-line summary on success, or null on failure (the reason is in `error`). */
+        sendReminders: async (): Promise<string | null> => {
             try {
                 const r = await notifyUnpaid(selected);
                 const parts = [`Reminder sent to ${r.sent} customer${r.sent === 1 ? "" : "s"}`];
                 if (r.no_device) parts.push(`${r.no_device} ha${r.no_device === 1 ? "s" : "ve"} no device registered`);
                 if (r.nothing_unpaid) parts.push(`${r.nothing_unpaid} had nothing unpaid`);
                 if (r.failed) parts.push(`${r.failed} failed`);
-                setReminderResult(parts.join(", ") + ".");
                 setActionError("");
                 setSelected([]);
+                return parts.join(", ") + ".";
             } catch (e) {
                 setActionError(e instanceof Error ? e.message : "Could not send the reminders");
+                return null;
             }
         },
-        dismissReminderResult: () => setReminderResult(""),
         error: actionError || error,
         setStatus: (o: Order, status: OrderStatus, reason?: string) => run(() => updateOrderStatus(o.id, status, reason)),
         setPayment: (o: Order, p: PaymentStatus) => run(() => updatePaymentStatus(o.id, p)),
