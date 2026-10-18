@@ -1,5 +1,5 @@
 import type { Dispatch, RefObject, SetStateAction } from "react";
-import { MdMenu } from "react-icons/md";
+import { LuMenu } from "react-icons/lu";
 import Bell from "./Bell";
 import GlobalSearch from "./GlobalSearch";
 import UserMenu from "./UserMenu";
@@ -16,7 +16,7 @@ export default function Topbar({ setIsLoggedIn, navOpen, menuButtonRef, onMenu }
   return (
     <header className="topbar">
       <button type="button" ref={menuButtonRef} className="topbar__menu" aria-label="Menu" aria-expanded={navOpen} aria-controls="app-sidebar" onClick={onMenu}>
-        <MdMenu aria-hidden="true" />
+        <LuMenu aria-hidden="true" />
       </button>
       <GlobalSearch />
       <div className="topbar__right">

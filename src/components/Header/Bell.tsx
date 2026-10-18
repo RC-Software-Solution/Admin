@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { MdNotificationsNone } from "react-icons/md";
+import { LuBell } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useAttention } from "../../hooks/useAttention";
 import { useDismiss } from "../../hooks/useDismiss";
@@ -23,7 +23,7 @@ export default function Bell() {
   return (
     <div className="bell" ref={box}>
       <button className="iconBtn" aria-label={badge > 0 ? `${badge} items need attention` : "Notifications"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <MdNotificationsNone aria-hidden="true" />
+        <LuBell aria-hidden="true" />
         {badge > 0 && <span className="notification-badge">{badge > 99 ? "99+" : badge}</span>}
       </button>
       {open && (

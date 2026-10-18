@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalSearch } from "../../hooks/useGlobalSearch";
 import { useDismiss } from "../../hooks/useDismiss";
+import { LuSearch } from "react-icons/lu";
 import { statusOf } from "../../types/users";
 
 /** Top-bar search: jump straight to a customer (name, email, phone) or an order (id). */
@@ -23,6 +24,7 @@ export default function GlobalSearch() {
 
   return (
     <div className="searchWrap" ref={box}>
+      <LuSearch className="searchWrap__icon" aria-hidden="true" />
       <input
         className="topbar__search"
         type="search"

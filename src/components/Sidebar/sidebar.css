@@ -1,25 +1,53 @@
 .sidebar {
-  width: 260px;
+  width: 244px;
   flex-shrink: 0;
-  border-right: 1px solid var(--gray-200);
-  background: var(--white);
   display: flex;
   flex-direction: column;
+  gap: 22px;
+  padding: 20px 12px;
+  background: var(--tea);
+  color: var(--rail-text);
   overflow-y: auto;
 }
 
-.sidebar__title {
-  padding: var(--space-4) var(--space-4) var(--space-2);
-  font-weight: 800;
-  font-size: 22px;
-  color: var(--color-primary-solid);
+/* The global focus ring is leaf green, which is too dark on Tea */
+.sidebar :focus-visible {
+  outline-color: var(--mint);
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  color: var(--white);
+  font-family: var(--font-head);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.sidebar__mark {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--mint), var(--color-primary));
+}
+
+.sidebar__mark::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 2px;
+  background: var(--tea);
 }
 
 .nav {
-  padding: var(--space-2);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 22px;
 }
 
 .nav__group {
@@ -29,44 +57,49 @@
 }
 
 .nav__group-title {
-  padding: var(--space-1) var(--space-3);
+  padding: 0 10px 6px;
+  color: var(--rail-muted);
   font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--gray-500);
+  font-weight: 500;
 }
 
 .nav__item {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: 10px var(--space-3);
+  gap: 11px;
+  padding: 9px 10px;
   border-radius: var(--radius-md);
-  color: var(--gray-900);
-  text-decoration: none;
+  color: var(--rail-text);
   font-size: var(--text-base);
+  text-decoration: none;
 }
 
 .nav__item:hover {
-  background: var(--gray-50);
+  background: var(--on-dark-hover);
+  color: var(--white);
 }
 
 .nav__icon {
   display: inline-flex;
   font-size: 18px;
-  color: var(--gray-500);
 }
 
 .nav__item--active {
-  background: var(--color-primary-bg);
-  color: var(--color-primary-text);
+  background: var(--on-dark-active);
+  color: var(--white);
   font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--color-primary);
 }
 
-.nav__item--active .nav__icon {
-  color: var(--color-primary);
+.nav__item--active::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--mint);
 }
 
 /* Below 1024px the sidebar is a drawer. Hidden links must not be reachable by keyboard, hence visibility. */

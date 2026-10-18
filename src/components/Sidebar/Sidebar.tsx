@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
-import { MdDashboard, MdLocationOn, MdCampaign, MdEventNote, MdRestaurantMenu, MdDeliveryDining, MdAssessment, MdSettings, MdHistory } from "react-icons/md";
-import { FaUsers, FaUserShield, FaClipboardList } from "react-icons/fa";
+import { LuCalendarDays, LuChartColumn, LuHistory, LuLayoutDashboard, LuMapPin, LuMegaphone, LuReceiptText, LuShieldCheck, LuSlidersHorizontal, LuTruck, LuUsers, LuUtensils } from "react-icons/lu";
 import { getSession } from "../../services/apiClient";
 import "./sidebar.css";
 
@@ -18,31 +17,31 @@ interface NavGroup {
 }
 
 const GROUPS: NavGroup[] = [
-  { title: "Overview", items: [{ name: "Dashboard", icon: <MdDashboard />, path: "/dashboard" }] },
+  { title: "Overview", items: [{ name: "Dashboard", icon: <LuLayoutDashboard />, path: "/dashboard" }] },
   {
     title: "Customers",
     items: [
-      { name: "Users", icon: <FaUsers />, path: "/users" },
-      { name: "Orders", icon: <FaClipboardList />, path: "/orders" },
-      { name: "Notices", icon: <MdCampaign />, path: "/notices" },
+      { name: "Users", icon: <LuUsers />, path: "/users" },
+      { name: "Orders", icon: <LuReceiptText />, path: "/orders" },
+      { name: "Notices", icon: <LuMegaphone />, path: "/notices" },
     ],
   },
   {
     title: "Operations",
     items: [
-      { name: "Delivery Areas", icon: <MdLocationOn />, path: "/delivery-areas" },
-      { name: "Sessions", icon: <MdEventNote />, path: "/sessions" },
-      { name: "Food Items", icon: <MdRestaurantMenu />, path: "/food-items" },
-      { name: "Delivery Persons", icon: <MdDeliveryDining />, path: "/delivery-persons" },
+      { name: "Delivery Areas", icon: <LuMapPin />, path: "/delivery-areas" },
+      { name: "Sessions", icon: <LuCalendarDays />, path: "/sessions" },
+      { name: "Food Items", icon: <LuUtensils />, path: "/food-items" },
+      { name: "Delivery Persons", icon: <LuTruck />, path: "/delivery-persons" },
     ],
   },
-  { title: "Insights", items: [{ name: "Reports", icon: <MdAssessment />, path: "/reports" }] },
+  { title: "Insights", items: [{ name: "Reports", icon: <LuChartColumn />, path: "/reports" }] },
   {
     title: "Admin",
     items: [
-      { name: "Admins", icon: <FaUserShield />, path: "/admins", superOnly: true },
-      { name: "Settings", icon: <MdSettings />, path: "/settings", superOnly: true },
-      { name: "Audit Logs", icon: <MdHistory />, path: "/audit-logs", superOnly: true },
+      { name: "Admins", icon: <LuShieldCheck />, path: "/admins", superOnly: true },
+      { name: "Settings", icon: <LuSlidersHorizontal />, path: "/settings", superOnly: true },
+      { name: "Audit Logs", icon: <LuHistory />, path: "/audit-logs", superOnly: true },
     ],
   },
 ];
@@ -57,7 +56,10 @@ export default function Sidebar({ open, onNavigate }: SidebarProps) {
 
   return (
     <aside id="app-sidebar" className={`sidebar ${open ? "sidebar--open" : ""}`}>
-      <div className="sidebar__title">Admin Panel</div>
+      <div className="sidebar__brand">
+        <i className="sidebar__mark" aria-hidden="true" />
+        Admin Panel
+      </div>
       <nav className="nav" aria-label="Main">
         {GROUPS.map((g) => {
           const items = g.items.filter((i) => isSuper || !i.superOnly);

@@ -2,6 +2,7 @@
   display: flex;
   height: 100vh; /* fallback */
   height: 100dvh;
+  background: var(--paper);
 }
 
 .contentWrapper {
@@ -13,7 +14,7 @@
 
 .main {
   flex: 1;
-  padding: var(--space-5);
+  padding: 0 var(--space-6) var(--space-8);
   overflow-y: auto;
 }
 
@@ -29,10 +30,14 @@
     z-index: calc(var(--z-drawer) - 1);
     background: var(--overlay);
   }
+
+  .main {
+    padding: 0 var(--space-5) var(--space-6);
+  }
 }
 
 @media (max-width: 640px) {
   .main {
-    padding: var(--space-3);
+    padding: 0 14px 96px; /* room for the selection bar */
   }
 }
