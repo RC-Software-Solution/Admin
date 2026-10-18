@@ -201,7 +201,7 @@
 }
 @media (max-width: 640px) {
   .ui-filterbar > * { flex: 1 1 140px; }
-  .ui-filterbar :is(input, select) { min-height: 44px; min-width: 0; flex: 1; }
+  .ui-filterbar :is(input, select) { min-height: 44px; min-width: 0; flex: 1 1 140px; }
 }
 
 /* ===== Field ===== */
