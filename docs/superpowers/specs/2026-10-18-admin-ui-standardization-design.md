@@ -100,3 +100,13 @@ Existing `Modal` and `ConfirmDialog` are restyled with the new `Button`; below 6
 ## Out of scope
 
 Dark mode, sortable or paginated lists (beyond Audit Logs), new features, backend changes, a component library.
+
+## Amendments (2026-10-18, while writing the foundation plan)
+
+- Filled buttons use `#15803d` (`--color-primary-solid`); the brand green `#16a34a` stays for accents, icons and focus. Reason: `#16a34a` with white text is 3.3:1, below WCAG AA (4.5:1).
+- `Skeleton` is not built; `Spinner` covers loading until a page needs more.
+- `Tabs` is built with its first consumer (the Users page) in the next plan, not in the foundation.
+- `Alert` is added to the kit; it replaces `.sectionNote` and the bare `<p role="alert">` and is used by `DataTable`.
+- On phones the global search shrinks to the available width instead of collapsing to an icon.
+- The user menu uses the disclosure pattern (button plus panel; Escape and outside click close it). It has one item, so arrow-key menu navigation is not needed.
+- Plan 1 (`docs/superpowers/plans/2026-10-18-admin-ui-foundation.md`) covers Phases 0, 1, 2 and the Orders pilot. Plan 2 covers the remaining page migrations and Phase 4.

@@ -25,6 +25,8 @@ Until a page is built, **hide its sidebar entry**. Today every unbuilt entry jus
 - Errors: `api()` throws `Error(message)`. Show it on the page, and keep the last good data visible.
 - Live data uses `hooks/usePolling.ts` (30s, pauses when the tab is hidden). Only use it where freshness matters (Orders). Static lists load on mount and after each mutation.
 
+**UI kit.** New and migrated pages use `src/components/ui` (`import { Button, Badge, Card, PageHeader, FilterBar, Field, DataTable, Alert, EmptyState, Spinner, useToast } from "../../components/ui"`). Colours, spacing and type come from the tokens in `src/styles/variables.css`; never write a hex value in a page stylesheet. Lists use `DataTable` (it becomes stacked cards on phones); errors use `Alert`; success feedback uses `useToast`; destructive confirms use `ConfirmDialog` (`tone="primary"` for non-destructive ones). Look at `src/Pages/orders/Orders.tsx` for the reference page, and at `/ui-kit` in `npm run dev` for every component. Pages not yet migrated still use their own CSS; see `docs/superpowers/specs/2026-10-18-admin-ui-standardization-design.md`.
+
 **Auth and roles.** `getSession()` reads role and expiry from the JWT. UI gating is only UX; the backend `checkRole` is the real enforcement. Super-admin-only actions: approve/reject customers, manage admins. Everything else is `admin` or `super_admin`.
 
 **Formatting.** Money is LKR via `utils/formatMoney.ts`. Business time is **Sri Lanka (UTC+5:30)**. Never compute "today" from the browser or server clock in local time.
