@@ -12,6 +12,7 @@ import DeliveryPersons from "../Pages/deliverypersons/DeliveryPersons";
 import Reports from "../Pages/reports/Reports";
 import Settings from "../Pages/settings/Settings";
 import AuditLogs from "../Pages/auditlogs/AuditLogs";
+import UiKit from "../Pages/UiKit/UiKit";
 
 import { getSession } from "../services/apiClient";
 import { ForgotPassword, ResetPassword } from "../Pages/Auth/PasswordReset";
@@ -58,6 +59,7 @@ const AppRoutes: React.FC<RoutesProps> = ({ isLoggedIn, setIsLoggedIn }) => {
         <Route path="/reports" element={<Reports />} />
         <Route path="/settings" element={getSession()?.role === "super_admin" ? <Settings /> : <Navigate to="/dashboard" />} />
         <Route path="/audit-logs" element={getSession()?.role === "super_admin" ? <AuditLogs /> : <Navigate to="/dashboard" />} />
+        {import.meta.env.DEV && <Route path="/ui-kit" element={<UiKit />} />}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Switch>
     </Layout>
