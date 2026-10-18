@@ -55,6 +55,8 @@ export default function OrdersPage() {
   const unpaidOnly = o.filters.payment_status === "unpaid";
   const nextOptions = (editing && NEXT_STATUSES[editing.status]) || [];
 
+  const allSelected = o.orders.length > 0 && o.orders.every((r) => o.selected.includes(r.customer_id));
+
   const selectColumn: Column<Order> = {
     key: "select",
     label: "Select",
@@ -63,7 +65,7 @@ export default function OrdersPage() {
       <input
         type="checkbox"
         aria-label="Select all customers on this page"
-        checked={o.orders.length > 0 && o.orders.every((r) => o.selected.includes(r.customer_id))}
+        checked={allSelected}
         onChange={(e) => o.selectPage(e.target.checked)}
       />
     ),
@@ -135,6 +137,12 @@ export default function OrdersPage() {
           Unpaid only
         </Button>
         {unpaidOnly && (
+          <label className="ui-phone-only">
+            <input type="checkbox" checked={allSelected} onChange={(e) => o.selectPage(e.target.checked)} />
+            Select all on this page
+          </label>
+        )}
+        {unpaidOnly && (
           <Button variant="primary" disabled={o.selected.length === 0} onClick={() => setConfirmingReminder(true)}>
             {o.selected.length === 0 ? "Notify customers" : `Notify ${o.selected.length} customer${o.selected.length === 1 ? "" : "s"}`}
           </Button>
@@ -147,7 +155,7 @@ export default function OrdersPage() {
           columns={columns}
           rows={o.orders}
           rowKey={(r) => r.id}
-          loading={!o.loaded}
+          loading={!o.loaded && !o.error}
           error={editing ? null : o.error}
           emptyTitle="No orders found"
         />

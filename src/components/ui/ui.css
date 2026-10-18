@@ -199,9 +199,14 @@
   font-size: var(--text-sm);
   color: var(--gray-600);
 }
+/* Phone-only control (e.g. select-all, whose table header is hidden on phones) */
+.ui-filterbar .ui-phone-only { display: none; }
+
 @media (max-width: 640px) {
   .ui-filterbar > * { flex: 1 1 140px; }
   .ui-filterbar :is(input, select) { min-height: 44px; min-width: 0; flex: 1 1 140px; }
+  .ui-filterbar .ui-phone-only { display: flex; }
+  .ui-filterbar .ui-phone-only input { min-height: 0; flex: none; }
 }
 
 /* ===== Field ===== */
