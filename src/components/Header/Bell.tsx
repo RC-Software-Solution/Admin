@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { MdNotificationsNone } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAttention } from "../../hooks/useAttention";
+import { useDismiss } from "../../hooks/useDismiss";
 
 const ROWS = [
   { key: "pendingApprovals", one: "customer awaiting approval", many: "customers awaiting approval", to: "/users?tab=pending" },
@@ -16,22 +18,12 @@ export default function Bell() {
   const box = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: MouseEvent) => !box.current?.contains(e.target as Node) && setOpen(false);
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("mousedown", away);
-    document.addEventListener("keydown", esc);
-    return () => {
-      document.removeEventListener("mousedown", away);
-      document.removeEventListener("keydown", esc);
-    };
-  }, [open]);
+  useDismiss(open, box, () => setOpen(false));
 
   return (
     <div className="bell" ref={box}>
       <button className="iconBtn" aria-label={badge > 0 ? `${badge} items need attention` : "Notifications"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        🔔
+        <MdNotificationsNone aria-hidden="true" />
         {badge > 0 && <span className="notification-badge">{badge > 99 ? "99+" : badge}</span>}
       </button>
       {open && (

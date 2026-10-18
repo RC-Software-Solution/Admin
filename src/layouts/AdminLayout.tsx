@@ -1,20 +1,30 @@
-import React from "react"; 
+import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Topbar from "../components/Header/Topbar";
 import "./layout.css";
 
 interface LayoutProps {
   children?: React.ReactNode;
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; // add this prop
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, setIsLoggedIn }) => {
+  // Below 1024px the sidebar is a drawer; on wider screens this flag has no visual effect.
+  const [navOpen, setNavOpen] = useState(false);
+
+  useEffect(() => {
+    if (!navOpen) return;
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setNavOpen(false);
+    document.addEventListener("keydown", esc);
+    return () => document.removeEventListener("keydown", esc);
+  }, [navOpen]);
+
   return (
     <div className="appContainer">
-      <Sidebar />
+      <Sidebar open={navOpen} onNavigate={() => setNavOpen(false)} />
+      {navOpen && <div className="drawerBackdrop" onClick={() => setNavOpen(false)} />}
       <div className="contentWrapper">
-        {/* Pass setIsLoggedIn to Topbar */}
-        <Topbar setIsLoggedIn={setIsLoggedIn} />
+        <Topbar setIsLoggedIn={setIsLoggedIn} navOpen={navOpen} onMenu={() => setNavOpen((o) => !o)} />
         <main className="main">{children}</main>
       </div>
     </div>

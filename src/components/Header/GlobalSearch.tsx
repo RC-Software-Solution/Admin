@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalSearch } from "../../hooks/useGlobalSearch";
+import { useDismiss } from "../../hooks/useDismiss";
 import { statusOf } from "../../types/users";
 
 /** Top-bar search: jump straight to a customer (name, email, phone) or an order (id). */
@@ -11,17 +12,7 @@ export default function GlobalSearch() {
   const navigate = useNavigate();
   const s = useGlobalSearch(text, open);
 
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: MouseEvent) => !box.current?.contains(e.target as Node) && setOpen(false);
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("mousedown", away);
-    document.addEventListener("keydown", esc);
-    return () => {
-      document.removeEventListener("mousedown", away);
-      document.removeEventListener("keydown", esc);
-    };
-  }, [open]);
+  useDismiss(open, box, () => setOpen(false));
 
   const go = (to: string) => {
     setOpen(false);
@@ -33,7 +24,7 @@ export default function GlobalSearch() {
   return (
     <div className="searchWrap" ref={box}>
       <input
-        className="search"
+        className="topbar__search"
         type="search"
         placeholder="Find a customer or order id"
         aria-label="Search customers and orders"
