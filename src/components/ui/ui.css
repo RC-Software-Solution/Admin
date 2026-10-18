@@ -204,7 +204,7 @@
 
 @media (max-width: 640px) {
   .ui-filterbar > * { flex: 1 1 140px; }
-  .ui-filterbar :is(input, select) { min-height: 44px; min-width: 0; flex: 1 1 140px; }
+  .ui-filterbar :is(input, select) { min-height: 44px; min-width: 0; flex: 1 1 140px; font-size: 16px; }
   .ui-filterbar .ui-phone-only { display: flex; }
   .ui-filterbar .ui-phone-only input { min-height: 0; flex: none; }
 }
@@ -221,6 +221,10 @@
   font-size: var(--text-base);
 }
 .ui-field :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--color-danger); }
+/* After the base rule above: equal specificity, so source order decides. 16px stops iOS focus zoom. */
+@media (max-width: 640px) {
+  .ui-field :is(input, select, textarea) { font-size: 16px; }
+}
 .ui-field__hint, .ui-field__error { margin: 0; font-size: var(--text-xs); }
 .ui-field__hint { color: var(--gray-500); }
 .ui-field__error { color: var(--color-danger-text); }

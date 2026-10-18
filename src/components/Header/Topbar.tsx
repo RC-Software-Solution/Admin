@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 import { MdMenu } from "react-icons/md";
 import Bell from "./Bell";
 import GlobalSearch from "./GlobalSearch";
@@ -8,13 +8,14 @@ import "./topbar.css";
 interface TopbarProps {
   setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
   navOpen: boolean;
+  menuButtonRef: RefObject<HTMLButtonElement | null>;
   onMenu: () => void;
 }
 
-export default function Topbar({ setIsLoggedIn, navOpen, onMenu }: TopbarProps) {
+export default function Topbar({ setIsLoggedIn, navOpen, menuButtonRef, onMenu }: TopbarProps) {
   return (
     <header className="topbar">
-      <button type="button" className="topbar__menu" aria-label="Menu" aria-expanded={navOpen} aria-controls="app-sidebar" onClick={onMenu}>
+      <button type="button" ref={menuButtonRef} className="topbar__menu" aria-label="Menu" aria-expanded={navOpen} aria-controls="app-sidebar" onClick={onMenu}>
         <MdMenu aria-hidden="true" />
       </button>
       <GlobalSearch />
