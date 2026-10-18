@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Alert, Badge, Button, Card, EmptyState, Field, FilterBar, PageHeader, Spinner } from "../../components/ui";
+import { Alert, Badge, Button, Card, EmptyState, Field, FilterBar, PageHeader, Spinner, useToast } from "../../components/ui";
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
   <section style={{ display: "grid", gap: "var(--space-3)", marginBottom: "var(--space-8)" }}>
@@ -10,6 +10,7 @@ const Section = ({ title, children }: { title: string; children: ReactNode }) =>
 
 /** Dev-only gallery (route /ui-kit) so every kit component can be checked at desktop and phone width. */
 export default function UiKit() {
+  const toast = useToast();
   return (
     <div>
       <Section title="Button">
@@ -54,6 +55,13 @@ export default function UiKit() {
             <Field label="Price" error="Enter a positive number"><input defaultValue="-1" /></Field>
           </div>
         </Card>
+      </Section>
+      <Section title="Toast">
+        <div className="ui-actions">
+          <Button onClick={() => toast.show("Marked paid")}>Success toast</Button>
+          <Button onClick={() => toast.show("Could not save", "danger")}>Error toast</Button>
+          <Button onClick={() => toast.show("Refreshing…", "info")}>Info toast</Button>
+        </div>
       </Section>
       {/* gallery:end */}
     </div>
