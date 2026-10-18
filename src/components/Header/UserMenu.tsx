@@ -25,7 +25,7 @@ export default function UserMenu({ setIsLoggedIn }: UserMenuProps) {
 
   return (
     <div className="user" ref={box}>
-      <button type="button" className="user__trigger" aria-expanded={open} aria-controls="user-menu-panel" onClick={() => setOpen((o) => !o)}>
+      <button type="button" className="user__trigger" aria-label={`Account menu, ${name}`} aria-expanded={open} aria-controls="user-menu-panel" onClick={() => setOpen((o) => !o)}>
         <span className="user__avatar" aria-hidden="true">{name.trim().charAt(0).toUpperCase()}</span>
         <span className="user__name">{name}</span>
         <MdKeyboardArrowDown className="user__caret" aria-hidden="true" />
