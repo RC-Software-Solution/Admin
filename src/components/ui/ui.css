@@ -662,6 +662,8 @@ a.ui-btn { text-decoration: none; }
 .ui-btn--danger-ghost { background: transparent; color: var(--color-danger-text); }
 .ui-btn--danger-ghost:hover:not(:disabled) { background: var(--color-danger-bg); }
 .ui-card__header { flex-wrap: wrap; }
+/* beat the global .modal__form label rule, which would stack the "(optional)" under the label text */
+.modal__form .ui-field__label { display: block; font-size: var(--text-sm); }
 .ui-field__opt { font-weight: 400; color: var(--gray-500); }
 .ui-field textarea { resize: vertical; }
 .ui-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
