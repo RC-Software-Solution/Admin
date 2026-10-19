@@ -4,10 +4,11 @@ import { createFoodItem, deleteFoodItem, getPriceHistory, listFoodItems, setFood
 
 export const useFoodItems = () => {
     const [rows, setRows] = useState<FoodItem[]>([]);
+    const [loaded, setLoaded] = useState(false); // false until the first list arrives
     const [error, setError] = useState("");
     const [history, setHistory] = useState<PriceChange[] | null>(null); // null = history dialog closed
 
-    const load = useCallback(() => listFoodItems().then(setRows), []);
+    const load = useCallback(() => listFoodItems().then((r) => { setRows(r); setLoaded(true); }), []);
 
     useEffect(() => {
         load().catch((e: Error) => setError(e.message));
@@ -21,7 +22,7 @@ export const useFoodItems = () => {
         );
 
     return {
-        rows, error, clearError: () => setError(""),
+        rows, loaded, error, clearError: () => setError(""),
         add: (f: Parameters<typeof createFoodItem>[0]) => run(() => createFoodItem(f)),
         edit: (id: number, f: Parameters<typeof updateFoodItem>[1]) => run(() => updateFoodItem(id, f)),
         setActive: (id: number, active: boolean) => run(() => setFoodItemActive(id, active)),
