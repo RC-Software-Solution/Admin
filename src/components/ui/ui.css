@@ -578,6 +578,7 @@ a.ui-btn { text-decoration: none; }
   white-space: nowrap;
   cursor: pointer;
 }
+.ui-segmented__btn:focus-visible { outline-offset: -2px; }
 .ui-segmented__btn:hover { color: var(--ink); }
 .ui-segmented__btn[aria-pressed="true"] { background: var(--white); color: var(--ink); box-shadow: var(--shadow-sm); }
 
@@ -614,7 +615,7 @@ a.ui-btn { text-decoration: none; }
   box-shadow: var(--shadow-lg);
 }
 .ui-drawer::backdrop { background: var(--overlay); }
-.ui-drawer__inner { position: relative; display: grid; gap: var(--space-6); align-content: start; padding: var(--space-6); }
+.ui-drawer__inner { position: relative; display: grid; min-height: 100%; gap: var(--space-6); align-content: start; padding: var(--space-6); }
 .ui-drawer__close {
   position: absolute;
   top: var(--space-4);
