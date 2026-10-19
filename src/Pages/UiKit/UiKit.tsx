@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Alert, Badge, Button, Card, Chip, Chips, DataTable, EmptyState, Field, FilterBar, Menu, OrderTrack, PageHeader, PaymentMark, SelectionBar, Spinner, useToast } from "../../components/ui";
+import { Alert, Avatar, Badge, Button, Card, Chip, Chips, DataTable, Drawer, EmptyState, Field, FilterBar, Menu, OrderTrack, PageHeader, PaymentMark, SearchField, Segmented, SelectionBar, Spinner, useToast } from "../../components/ui";
 import type { Column } from "../../components/ui";
 import type { OrderStatus, PaymentStatus } from "../../types/orders";
 
@@ -26,6 +26,7 @@ const COLUMNS: Column<Row>[] = [
       </div>
     ),
   },
+  { key: "meal", label: "Meal", mobile: "hide", cell: () => "Lunch" },
   { key: "total", label: "Total", align: "right", mobile: "amount", cell: (r) => <strong>LKR {r.total.toLocaleString("en-LK")}</strong> },
   { key: "progress", label: "Progress", mobile: "inline", cell: (r) => <OrderTrack status={r.status} /> },
   { key: "payment", label: "Payment", mobile: "inline", cell: (r) => <PaymentMark status={r.pay} /> },
@@ -57,6 +58,8 @@ export default function UiKit() {
   const toast = useToast();
   const [chip, setChip] = useState("All");
   const [bar, setBar] = useState(false);
+  const [range, setRange] = useState("7d");
+  const [drawer, setDrawer] = useState(false);
   return (
     <div>
       <PageHeader title="UI kit" subtitle="Everything the pages are built from" actions={<Button variant="primary">Primary action</Button>} />
@@ -125,6 +128,44 @@ export default function UiKit() {
             <Button variant="primary">Send payment reminder</Button>
           </SelectionBar>
         )}
+      </Section>
+      <Section title="Avatars">
+        <div className="ui-actions" style={{ gap: "var(--space-4)" }}>
+          <Avatar name="Amaya Rathnayake" />
+          <Avatar name="Amaya Rathnayake" size="lg" />
+          <Avatar name="Chicken fried rice" size="md" square tone="auto" />
+          <Avatar name="Vegetable kottu" size="md" square tone="auto" />
+          <Avatar name="Egg hoppers" size="md" square tone="auto" />
+          <Avatar name="Fish ambul thiyal" size="md" square tone="auto" />
+        </div>
+      </Section>
+      <Section title="Segmented control and search field">
+        <div className="ui-actions">
+          <Segmented
+            label="Example range"
+            value={range}
+            onChange={setRange}
+            options={[
+              { value: "today", label: "Today" },
+              { value: "7d", label: "Last 7 days" },
+              { value: "30d", label: "Last 30 days" },
+              { value: "custom", label: "Custom" },
+            ]}
+          />
+        </div>
+        <SearchField label="Search customers" placeholder="Search by name or email" />
+      </Section>
+      <Section title="Drawer">
+        <div className="ui-actions">
+          <Button onClick={() => setDrawer(true)}>Open drawer</Button>
+        </div>
+        <Drawer open={drawer} label="Example drawer" onClose={() => setDrawer(false)}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", paddingRight: 40 }}>
+            <Avatar name="Amaya Rathnayake" size="lg" />
+            <h2 style={{ margin: 0 }}>Amaya Rathnayake</h2>
+          </div>
+          <p className="ui-hint">The drawer is a native dialog: Esc, the Close button or a click outside close it.</p>
+        </Drawer>
       </Section>
       <Section title="DataTable">
         <DataTable columns={COLUMNS} rows={ROWS} rowKey={(r) => r.id} rowTone={(r) => (r.status === "delivery_failed" ? "bad" : r.pay === "unpaid" || r.status === "pending" ? "attn" : undefined)} />

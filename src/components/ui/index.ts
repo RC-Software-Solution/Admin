@@ -18,3 +18,7 @@ export { PaymentMark } from "./PaymentMark";
 export { Menu } from "./Menu";
 export type { MenuItem } from "./Menu";
 export { SelectionBar } from "./SelectionBar";
+export { Avatar } from "./Avatar";
+export { Segmented } from "./Segmented";
+export { SearchField } from "./SearchField";
+export { Drawer } from "./Drawer";

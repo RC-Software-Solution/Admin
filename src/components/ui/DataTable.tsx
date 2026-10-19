@@ -10,8 +10,8 @@ export interface Column<T> {
   header?: ReactNode; // replaces the label in the desktop header (e.g. a select-all checkbox)
   align?: "right"; // numbers and actions
   // Slot on phones: title and amount share the first line, select goes before them, inline cells sit unlabeled
-  // side by side, actions come last. Omit for a label/value pair.
-  mobile?: "title" | "amount" | "select" | "inline" | "actions";
+  // side by side, actions come last, hide drops the cell on phones. Omit for a label/value pair.
+  mobile?: "title" | "amount" | "select" | "inline" | "actions" | "hide";
   nowrap?: boolean;
 }
 
