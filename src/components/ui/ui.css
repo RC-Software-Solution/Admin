@@ -642,3 +642,11 @@ a.ui-btn { text-decoration: none; }
   .ui-search input { min-height: 44px; }
   .ui-drawer__inner { padding: var(--space-5) var(--space-4); }
 }
+
+/* FilterBar inside a page header (Dashboard range controls) and the range note next to the filters */
+.ui-pageheader .ui-filterbar { margin-bottom: 0; }
+.ui-filterbar__note { color: var(--gray-500); font-size: var(--text-sm); }
+
+@media (max-width: 640px) {
+  .ui-filterbar > .ui-segmented { flex-basis: 100%; }
+}

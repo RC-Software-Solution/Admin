@@ -1,30 +1,29 @@
+import { FilterBar, Segmented } from "../ui";
 import type { useRangeFilters, Preset } from "../../hooks/useRangeFilters";
 
-const PRESETS: { id: Preset; label: string }[] = [
-  { id: "today", label: "Today" },
-  { id: "7d", label: "Last 7 days" },
-  { id: "30d", label: "Last 30 days" },
-  { id: "custom", label: "Custom" },
+const PRESETS: { value: Preset; label: string }[] = [
+  { value: "today", label: "Today" },
+  { value: "7d", label: "Last 7 days" },
+  { value: "30d", label: "Last 30 days" },
+  { value: "custom", label: "Custom" },
 ];
 
 const day = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 
-/** Preset / custom range, area and session pickers; styled by the `.filters` rules in dashboard.css. */
-export default function RangeFilters({ f }: { f: ReturnType<typeof useRangeFilters> }) {
+/** Preset / custom range, area and session pickers, shared by the Dashboard and Reports. */
+export default function RangeFilters({ f, showRange = true }: { f: ReturnType<typeof useRangeFilters>; showRange?: boolean }) {
   const rangeLabel = f.range.from === f.range.to ? day(f.range.from) : `${day(f.range.from)} – ${day(f.range.to)}`;
   return (
-    <div className="filters">
-      <div className="tabs">
-        {PRESETS.map((p) => (
-          <button key={p.id} className={`tab ${f.preset === p.id ? "tab--active" : ""}`} onClick={() => f.setPreset(p.id)}>
-            {p.label}
-          </button>
-        ))}
-      </div>
+    <FilterBar label="Range, area and session">
+      <Segmented label="Range" value={f.preset} options={PRESETS} onChange={f.setPreset} />
       {f.preset === "custom" && (
         <>
-          <input type="date" aria-label="From" value={f.custom.from} max={f.custom.to} onChange={(e) => e.target.value && f.setCustom({ ...f.custom, from: e.target.value })} />
-          <input type="date" aria-label="To" value={f.custom.to} min={f.custom.from} onChange={(e) => e.target.value && f.setCustom({ ...f.custom, to: e.target.value })} />
+          <label>
+            From <input type="date" value={f.custom.from} max={f.custom.to} onChange={(e) => e.target.value && f.setCustom({ ...f.custom, from: e.target.value })} />
+          </label>
+          <label>
+            To <input type="date" value={f.custom.to} min={f.custom.from} onChange={(e) => e.target.value && f.setCustom({ ...f.custom, to: e.target.value })} />
+          </label>
         </>
       )}
       <select aria-label="Area" value={f.areaId} onChange={(e) => f.setAreaId(e.target.value)}>
@@ -37,7 +36,7 @@ export default function RangeFilters({ f }: { f: ReturnType<typeof useRangeFilte
         <option value="lunch">Lunch</option>
         <option value="dinner">Dinner</option>
       </select>
-      <span className="filters__range">{rangeLabel}</span>
-    </div>
+      {showRange && <span className="ui-filterbar__note">{rangeLabel}</span>}
+    </FilterBar>
   );
 }
