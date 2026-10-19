@@ -724,10 +724,19 @@ a.ui-btn { text-decoration: none; }
 }
 
 /* Tabs: views of the same data, underlined */
-.ui-tabs { display: flex; gap: 22px; margin-bottom: var(--space-4); overflow-x: auto; border-bottom: 1px solid var(--gray-200); }
+/* The side padding gives the focus ring room inside the scroll container; the rule is a background so it stays as wide as the content column. */
+.ui-tabs {
+  display: flex;
+  gap: 22px;
+  margin: 0 -8px var(--space-4);
+  padding: 0 8px 1px;
+  overflow-x: auto;
+  background: linear-gradient(var(--gray-200), var(--gray-200)) 8px 100% / calc(100% - 16px) 1px no-repeat;
+}
 .ui-tab {
   flex: none;
-  padding: 10px 0;
+  padding: 10px 8px;
+  margin: 0 -8px;
   border: 0;
   border-bottom: 2px solid transparent;
   background: none;
@@ -740,7 +749,7 @@ a.ui-btn { text-decoration: none; }
 }
 .ui-tab:hover { color: var(--ink); }
 .ui-tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--color-primary); font-weight: 600; }
-.ui-tab:focus-visible { outline-offset: -2px; }
+.ui-tab:focus-visible { outline-offset: -4px; } /* inside the box, clear of the label and of the 2px underline */
 @media (max-width: 640px) {
   .ui-tab { min-height: 44px; }
 }
