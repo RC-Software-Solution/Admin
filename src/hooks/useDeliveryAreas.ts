@@ -6,9 +6,10 @@ export const useDeliveryAreas = () => {
     const [areas, setAreas] = useState<DeliveryArea[]>([]);
     const [metrics, setMetrics] = useState<AreaMetric[] | null>(null); // null = analytics unavailable
     const [error, setError] = useState("");
+    const [loaded, setLoaded] = useState(false); // false until the first area list arrives
 
     const load = useCallback(
-        () => Promise.all([listAreas().then(setAreas), getAreaMetrics().then(setMetrics, () => setMetrics(null))]),
+        () => Promise.all([listAreas().then((a) => { setAreas(a); setLoaded(true); }), getAreaMetrics().then(setMetrics, () => setMetrics(null))]),
         [],
     );
 
@@ -26,7 +27,7 @@ export const useDeliveryAreas = () => {
     const metricOf = (a: DeliveryArea) => metrics?.find((m) => String(m.area_id) === String(a.area_id));
 
     return {
-        areas, error, metricsAvailable: metrics !== null, metricOf,
+        areas, error, loaded, metricsAvailable: metrics !== null, metricOf,
         onSave: (a: DeliveryArea | undefined, f: AreaForm) => run(() => (a ? updateArea(a.area_id, f) : createArea(f))),
         onDelete: (a: DeliveryArea) => run(() => deleteArea(a.area_id)),
     };
