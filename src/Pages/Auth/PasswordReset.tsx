@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { forgotPassword, resetPassword } from "../../services/auth.service";
 import { Alert, Button, Field } from "../../components/ui";
@@ -17,6 +17,12 @@ function Form({ headline, lede, title, intro, submitLabel, onSubmit, children }:
   const [error, setError] = useState("");
   const [done, setDone] = useState("");
   const [loading, setLoading] = useState(false);
+  const backRef = useRef<HTMLAnchorElement>(null);
+
+  // The submit button unmounts on success; hand keyboard focus to the way out
+  useEffect(() => {
+    if (done) backRef.current?.focus();
+  }, [done]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +50,7 @@ function Form({ headline, lede, title, intro, submitLabel, onSubmit, children }:
             </Button>
           </>
         )}
-        <Link className="ui-link auth__back" to="/login">
+        <Link ref={backRef} className="ui-link auth__back" to="/login">
           Back to sign in
         </Link>
       </form>
