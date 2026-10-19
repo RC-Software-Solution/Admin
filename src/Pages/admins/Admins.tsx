@@ -1,8 +1,9 @@
 import { useState } from "react";
-import "./admins.css";
+import { LuPlus } from "react-icons/lu";
 import { useAdmins } from "../../hooks/useAdmins";
 import type { Admin, AdminRole } from "../../types/admins";
-import { PlusIcon } from "../../components/common/Icons";
+import { Alert, Badge, Button, DataTable, Field, Mark, PageHeader, Who } from "../../components/ui";
+import type { Column } from "../../components/ui";
 import Modal from "../../components/common/Modal";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { formatDate } from "../../utils/formatDate";
@@ -11,7 +12,7 @@ type Dialog = { kind: "add" } | { kind: "edit" | "reset" | "toggle"; admin: Admi
 const EMPTY = { full_name: "", email: "", password: "", role: "admin" as AdminRole };
 
 export default function AdminsPage() {
-  const { rows, error, clearError, add, edit, setActive, resetPassword } = useAdmins();
+  const { rows, loaded, error, clearError, add, edit, setActive, resetPassword } = useAdmins();
   const [dialog, setDialog] = useState<Dialog>(null);
   const [form, setForm] = useState(EMPTY);
   const close = () => setDialog(null);
@@ -44,121 +45,90 @@ export default function AdminsPage() {
   const showName = dialog?.kind === "add" || dialog?.kind === "edit";
   const showPassword = dialog?.kind === "add" || dialog?.kind === "reset";
 
-  return (
-    <div className="admins-page">
-      <div className="admins-card">
-        <div className="admins-header">
-          <div>
-            <h1 className="admins-title">Admins</h1>
-            <p className="admins-subtitle">Manage administrative users</p>
-          </div>
-
-          <button className="btn-add" onClick={() => open({ kind: "add" })} type="button">
-            <span className="btn-add-plus">
-              <PlusIcon className="icon-sm" />
-            </span>
-            Add Admin
-          </button>
+  const columns: Column<Admin>[] = [
+    { key: "admin", label: "Admin", mobile: "title", cell: (a) => <Who name={a.full_name} meta={a.email} /> },
+    { key: "role", label: "Role", mobile: "inline", cell: (a) => (a.role === "super_admin" ? <Badge tone="dark">Super admin</Badge> : <Badge>Admin</Badge>) },
+    { key: "status", label: "Status", mobile: "inline", cell: (a) => <Mark tone={a.status === "active" ? "leaf" : "mist"}>{a.status === "active" ? "Active" : "Suspended"}</Mark> },
+    { key: "added", label: "Added", mobile: "hide", nowrap: true, cell: (a) => <span className="ui-cell__meta">{formatDate(a.created_at)}</span> },
+    {
+      key: "actions",
+      label: "Actions",
+      align: "right",
+      mobile: "actions",
+      cell: (a) => (
+        <div className="ui-actions">
+          <Button size="sm" aria-label={`Edit ${a.full_name}`} onClick={() => open({ kind: "edit", admin: a })}>
+            Edit
+          </Button>
+          <Button size="sm" aria-label={`Reset password for ${a.full_name}`} onClick={() => open({ kind: "reset", admin: a })}>
+            Reset password
+          </Button>
+          <Button size="sm" variant={a.status === "active" ? "danger-ghost" : "secondary"} aria-label={`${a.status === "active" ? "Suspend" : "Enable"} ${a.full_name}`} onClick={() => open({ kind: "toggle", admin: a })}>
+            {a.status === "active" ? "Suspend" : "Enable"}
+          </Button>
         </div>
+      ),
+    },
+  ];
 
-        <Modal open={formOpen} title={title} onClose={close}>
-          <form className="modal__form" onSubmit={submit}>
-            {showName && (
-              <input placeholder="Full name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required />
-            )}
-            {dialog?.kind === "add" && (
-              <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-            )}
-            {showPassword && (
-              <input type="password" placeholder={dialog?.kind === "add" ? "Initial password (8+ chars)" : "New password (8+ chars)"} minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-            )}
-            {showName && (
+  return (
+    <div>
+      <PageHeader
+        title="Admins"
+        subtitle="Who can sign in to this panel"
+        actions={
+          <Button variant="primary" onClick={() => open({ kind: "add" })}>
+            <LuPlus aria-hidden="true" /> Add admin
+          </Button>
+        }
+      />
+
+      <DataTable columns={columns} rows={rows} rowKey={(a) => a.id} loading={!loaded && !error} error={dialog ? null : error} emptyTitle="No admins yet" />
+
+      <Modal open={formOpen} title={title} onClose={close}>
+        <form className="modal__form" onSubmit={submit}>
+          {showName && (
+            <Field label="Full name">
+              <input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required />
+            </Field>
+          )}
+          {dialog?.kind === "add" && (
+            <Field label="Email">
+              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+            </Field>
+          )}
+          {showPassword && (
+            <Field label={dialog?.kind === "add" ? "Initial password" : "New password"} hint="At least 8 characters">
+              <input type="password" minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+            </Field>
+          )}
+          {showName && (
+            <Field label="Role">
               <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as AdminRole })}>
                 <option value="admin">Admin</option>
-                <option value="super_admin">Super Admin</option>
+                <option value="super_admin">Super admin</option>
               </select>
-            )}
-            {error && <p role="alert">{error}</p>}
-            <div className="modal__actions">
-              <button type="button" className="modal__btn" onClick={close}>Cancel</button>
-              <button type="submit" className="modal__btn modal__btn--primary">Save</button>
-            </div>
-          </form>
-        </Modal>
+            </Field>
+          )}
+          {error && <Alert>{error}</Alert>}
+          <div className="modal__actions">
+            <Button onClick={close}>Cancel</Button>
+            <Button type="submit" variant="primary">
+              Save
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
-        <ConfirmDialog
-          open={dialog?.kind === "toggle"}
-          title={target?.status === "active" ? "Suspend admin" : "Enable admin"}
-          message={
-            target?.status === "active"
-              ? `${target.full_name} will be signed out and unable to log in.`
-              : `${target?.full_name} will be able to log in again.`
-          }
-          confirmLabel={target?.status === "active" ? "Suspend" : "Enable"}
-          onCancel={close}
-          onConfirm={toggle}
-        />
-        {!formOpen && error && <p role="alert">{error}</p>}
-
-        <div className="table-wrap">
-          <table className="admins-table" role="table">
-            <thead>
-              <tr>
-                <th className="col-name">Name</th>
-                <th className="col-email">Email</th>
-                <th className="col-role">Role</th>
-                <th className="col-status">Status</th>
-                <th className="col-date">Created Date</th>
-                <th className="col-actions">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {rows.map((a) => (
-                <tr key={a.id}>
-                  <td className="cell-strong">{a.full_name}</td>
-                  <td className="cell-muted">{a.email}</td>
-
-                  <td>
-                    <span
-                      className={
-                        a.role === "super_admin"
-                          ? "pill pill-green"
-                          : "pill pill-blue"
-                      }
-                    >
-                      {a.role === "super_admin" ? "Super Admin" : "Admin"}
-                    </span>
-                  </td>
-
-                  <td>
-                    <span
-                      className={
-                        a.status === "active"
-                          ? "pill pill-status-active"
-                          : "pill pill-status-suspended"
-                      }
-                    >
-                      {a.status}
-                    </span>
-                  </td>
-
-                  <td className="cell-muted">{formatDate(a.created_at)}</td>
-
-                  <td className="cell-actions">
-                    <button type="button" className="modal__btn" onClick={() => open({ kind: "edit", admin: a })}>Edit</button>
-                    <button type="button" className="modal__btn" onClick={() => open({ kind: "toggle", admin: a })}>
-                      {a.status === "active" ? "Suspend" : "Enable"}
-                    </button>
-                    <button type="button" className="modal__btn" onClick={() => open({ kind: "reset", admin: a })}>Reset password</button>
-                  </td>
-
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <ConfirmDialog
+        open={dialog?.kind === "toggle"}
+        title={target?.status === "active" ? "Suspend admin" : "Enable admin"}
+        message={target?.status === "active" ? `${target.full_name} will be signed out and unable to log in.` : `${target?.full_name} will be able to log in again.`}
+        confirmLabel={target?.status === "active" ? "Suspend" : "Enable"}
+        tone={target?.status === "active" ? "danger" : "primary"}
+        onCancel={close}
+        onConfirm={toggle}
+      />
     </div>
   );
 }

@@ -7,8 +7,9 @@ type NewAdmin = Parameters<typeof createAdmin>[0];
 export const useAdmins = () => {
     const [rows, setRows] = useState<Admin[]>([]);
     const [error, setError] = useState("");
+    const [loaded, setLoaded] = useState(false); // false until the first list arrives
 
-    const load = useCallback(() => listAdmins().then(setRows), []);
+    const load = useCallback(() => listAdmins().then((r) => { setRows(r); setLoaded(true); }), []);
 
     useEffect(() => {
         load().catch((e: Error) => setError(e.message));
@@ -22,7 +23,7 @@ export const useAdmins = () => {
         );
 
     return {
-        rows, error, clearError: () => setError(""),
+        rows, loaded, error, clearError: () => setError(""),
         add: (a: NewAdmin) => run(() => createAdmin(a)),
         edit: (id: string, a: Parameters<typeof updateAdmin>[1]) => run(() => updateAdmin(id, a)),
         setActive: (id: string, active: boolean) => run(() => setAdminActive(id, active)),
