@@ -69,16 +69,6 @@ async (page) => {
     const json = (body) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
 
     if (p.endsWith("/analytics/area-metrics")) return json({ data: METRICS });
-    if (p.endsWith("/areas")) return json(AREAS);
-    if (p.endsWith("/users/notices")) return json({ notices: NOTICES });
-    if (/\/meal-sessions\/\d+\/delivery$/.test(p)) return json({ data: { assignments: [{ area_id: 1, user_id: PERSONS[0].id }] } });
-    if (p.endsWith("/meal-sessions")) return json({ data: { mealSessions: url.searchParams.get("date") === today ? SESSIONS : [] } });
-    if (/\/food-items\/\d+\/price-history$/.test(p)) return json({ data: PRICE_HISTORY });
-    if (p.endsWith("/food-items")) return json({ data: { foodItems: FOOD } });
-    if (p.endsWith("/users/delivery-persons")) return json({ deliveryPersons: PERSONS });
-    if (p.endsWith("/users/admins")) return json({ admins: ADMINS });
-    if (p.endsWith("/users/audit-logs")) return json({ rows: AUDIT, total: 86, page_size: 25 });
-
     const report = p.match(/\/analytics\/reports\/(sales|items|areas)$/);
     if (report) {
       const from = url.searchParams.get("from") ?? today;
@@ -92,6 +82,15 @@ async (page) => {
       }
       return json({ range, data: AREAS.map((a, i) => ({ area_id: a.area_id, area_name: a.area_name, orderCount: METRICS[i].orderCount, totalRevenue: METRICS[i].totalRevenue, completedCount: Math.round(METRICS[i].orderCount * 0.9) })) });
     }
+    if (p.endsWith("/areas")) return json(AREAS);
+    if (p.endsWith("/users/notices")) return json({ notices: NOTICES });
+    if (/\/meal-sessions\/\d+\/delivery$/.test(p)) return json({ data: { assignments: [{ area_id: 1, user_id: PERSONS[0].id }] } });
+    if (p.endsWith("/meal-sessions")) return json({ data: { mealSessions: url.searchParams.get("date") === today ? SESSIONS : [] } });
+    if (/\/food-items\/\d+\/price-history$/.test(p)) return json({ data: PRICE_HISTORY });
+    if (p.endsWith("/food-items")) return json({ data: { foodItems: FOOD } });
+    if (p.endsWith("/users/delivery-persons")) return json({ deliveryPersons: PERSONS });
+    if (p.endsWith("/users/admins")) return json({ admins: ADMINS });
+    if (p.endsWith("/users/audit-logs")) return json({ rows: AUDIT, total: 86, page_size: 25 });
     return route.fallback();
   });
   return "stubbed remaining pages";
