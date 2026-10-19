@@ -55,6 +55,7 @@ export default function NoticesPage() {
 
   const remove = async () => {
     const n = toDelete;
+    setError("");
     setToDelete(null);
     if (!n) return;
     try {

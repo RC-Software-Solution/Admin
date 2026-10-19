@@ -100,7 +100,7 @@ export default function FoodItemsPage() {
       key: "available",
       label: "Available",
       mobile: "inline",
-      cell: (r) => <Switch label={`${r.name} available to customers`} checked={r.is_active} disabled={busy.includes(r.id)} showState onChange={(v) => toggle(r, v)} />,
+      cell: (r) => <Switch label={`${r.name} available to customers`} checked={r.is_active} showState onChange={(v) => toggle(r, v)} />,
     },
     {
       key: "actions",

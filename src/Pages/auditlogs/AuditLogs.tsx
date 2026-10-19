@@ -23,7 +23,7 @@ export default function AuditLogs() {
       mobile: "title",
       cell: (r) => (
         <>
-          <b>{r.actor_name ?? "Unknown"}</b>
+          <b className="ui-cell__title">{r.actor_name ?? "Unknown"}</b>
           {r.actor_role && <span className="ui-cell__meta"> {words(r.actor_role)}</span>}
         </>
       ),

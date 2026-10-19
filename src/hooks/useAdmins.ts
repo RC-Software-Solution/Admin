@@ -12,7 +12,7 @@ export const useAdmins = () => {
     const load = useCallback(() => listAdmins().then((r) => { setRows(r); setLoaded(true); }), []);
 
     useEffect(() => {
-        load().catch((e: Error) => setError(e.message));
+        load().catch((e: Error) => { setError(e.message); setLoaded(true); });
     }, [load]);
 
     // Run a mutation, then reload. Resolves true on success so a modal knows to close; failures show in `error`

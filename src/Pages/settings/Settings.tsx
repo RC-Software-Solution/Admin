@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./settings.css";
 import { useSettings } from "../../hooks/useSettings";
 import { Alert, Button, Card, Field, PageHeader, Spinner } from "../../components/ui";
@@ -7,6 +7,7 @@ export default function Settings() {
   const { settings, error, notice, saving, save } = useSettings();
   // Text the admin is typing; null until they touch the field, so it shows the saved value without an effect
   const [draft, setDraft] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   if (!settings) {
     return (
@@ -32,7 +33,10 @@ export default function Settings() {
           className="set-card"
           onSubmit={async (e) => {
             e.preventDefault();
-            if (dirty && (await save(n))) setDraft(null);
+            if (dirty && (await save(n))) {
+              setDraft(null);
+              inputRef.current?.focus(); // Save is disabled again once clean; keep focus in the form
+            }
           }}
         >
           <div>
@@ -43,7 +47,7 @@ export default function Settings() {
           </div>
           <div className="set-card__form">
             <Field label="Block at this many unpaid orders" hint={rule} error={valid ? undefined : rule}>
-              <input type="number" min={0} max={settings.max_threshold} step={1} value={value} onChange={(e) => setDraft(e.target.value)} />
+              <input ref={inputRef} type="number" min={0} max={settings.max_threshold} step={1} value={value} onChange={(e) => setDraft(e.target.value)} />
             </Field>
             <Alert tone="warning">Saving a stricter limit also blocks customers who are already over it.</Alert>
             {error && <Alert>{error}</Alert>}

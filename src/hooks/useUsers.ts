@@ -42,7 +42,7 @@ export const useUsers = () => {
     );
 
     useEffect(() => {
-        load().catch((e: Error) => setError(e.message));
+        load().catch((e: Error) => { setError(e.message); setLoaded(true); });
         listAreas().then(setAreas).catch((e: Error) => setError(e.message));
     }, [load]);
 

@@ -19,7 +19,8 @@ export default function Modal({ open, title, onClose, wide = false, children }: 
     if (!d) return;
     if (open && !d.open) {
       d.showModal();
-      d.scrollTop = 0; // showModal focuses the last-reachable control; keep the title in view
+      d.scrollTop = 0; // showModal() focuses the first focusable control; in a long dialog whose only control sits at the bottom
+      // (Sessions orders) that scrolls it to the bottom, so reset the scroll to show the title
     }
     if (!open && d.open) d.close();
   }, [open]);

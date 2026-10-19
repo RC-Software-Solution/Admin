@@ -21,7 +21,7 @@ export const useDeliveryAreas = () => {
         );
 
     useEffect(() => {
-        load().catch((e: Error) => setError(e.message));
+        load().catch((e: Error) => { setError(e.message); setLoaded(true); });
     }, [load]);
 
     const metricOf = (a: DeliveryArea) => metrics?.find((m) => String(m.area_id) === String(a.area_id));
