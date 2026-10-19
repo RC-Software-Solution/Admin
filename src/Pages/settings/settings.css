@@ -1,0 +1,12 @@
+.set-page { max-width: 780px; }
+.set-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--space-8); }
+.set-card__title { margin: 0 0 var(--space-2); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.set-card__text { margin: 0; color: var(--gray-500); font-size: var(--text-base); }
+.set-card__form { display: grid; gap: var(--space-4); align-content: start; }
+.set-card__form .ui-alert { margin-bottom: 0; }
+.set-card__form .ui-field input { box-sizing: border-box; width: 120px; max-width: 100%; }
+.set-card__save { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.set-card__current { color: var(--gray-500); font-size: var(--text-sm); }
+@media (max-width: 900px) {
+  .set-card { grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
+}
