@@ -6,9 +6,10 @@ import {
 
 export const useDeliveryPersons = () => {
     const [rows, setRows] = useState<DeliveryPerson[]>([]);
+    const [loaded, setLoaded] = useState(false);
     const [error, setError] = useState("");
 
-    const load = useCallback(() => listDeliveryPersons().then(setRows), []);
+    const load = useCallback(() => listDeliveryPersons().then((r) => { setRows(r); setLoaded(true); }), []);
 
     useEffect(() => {
         load().catch((e: Error) => setError(e.message));
@@ -22,7 +23,7 @@ export const useDeliveryPersons = () => {
         );
 
     return {
-        rows, error, clearError: () => setError(""),
+        rows, loaded, error, clearError: () => setError(""),
         add: (d: Parameters<typeof createDeliveryPerson>[0]) => run(() => createDeliveryPerson(d)),
         edit: (id: string, d: Parameters<typeof updateDeliveryPerson>[1]) => run(() => updateDeliveryPerson(id, d)),
         setActive: (id: string, active: boolean) => run(() => setDeliveryPersonActive(id, active)),

@@ -1,9 +1,10 @@
 import { useState } from "react";
-import "../admins/admins.css";
+import { LuPlus } from "react-icons/lu";
 import { useDeliveryPersons } from "../../hooks/useDeliveryPersons";
 import type { DriverForm } from "./deliverypersons.service";
 import type { DeliveryPerson } from "../../types/deliveryPersons";
-import { PlusIcon } from "../../components/common/Icons";
+import { Alert, Button, DataTable, Field, Mark, PageHeader, Who } from "../../components/ui";
+import type { Column } from "../../components/ui";
 import Modal from "../../components/common/Modal";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 
@@ -11,11 +12,10 @@ type Dialog = { kind: "add" } | { kind: "edit" | "reset" | "toggle"; person: Del
 const EMPTY: DriverForm = { full_name: "", email: "", password: "", phone: "", nic: "", vehicle_type: "" };
 
 export default function DeliveryPersonsPage() {
-  const { rows, error, clearError, add, edit, setActive, resetPassword } = useDeliveryPersons();
+  const { rows, loaded, error, clearError, add, edit, setActive, resetPassword } = useDeliveryPersons();
   const [dialog, setDialog] = useState<Dialog>(null);
   const [form, setForm] = useState(EMPTY);
   const close = () => setDialog(null);
-
 
   const open = (d: NonNullable<Dialog>) => {
     clearError();
@@ -46,77 +46,98 @@ export default function DeliveryPersonsPage() {
   const showPassword = dialog?.kind === "add" || dialog?.kind === "reset";
   const set = (k: keyof DriverForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, [k]: e.target.value });
 
+  const columns: Column<DeliveryPerson>[] = [
+    { key: "driver", label: "Driver", mobile: "title", cell: (p) => <Who name={p.full_name} meta={p.email} /> },
+    { key: "phone", label: "Phone", mobile: "hide", nowrap: true, cell: (p) => p.phone ?? "—" },
+    { key: "nic", label: "NIC", mobile: "hide", nowrap: true, cell: (p) => p.nic ?? "—" },
+    { key: "vehicle", label: "Vehicle", mobile: "hide", cell: (p) => p.vehicle_type ?? "—" },
+    { key: "status", label: "Status", mobile: "inline", cell: (p) => <Mark tone={p.status === "active" ? "leaf" : "mist"}>{p.status === "active" ? "Active" : "Inactive"}</Mark> },
+    {
+      key: "actions",
+      label: "Actions",
+      align: "right",
+      mobile: "actions",
+      cell: (p) => (
+        <div className="ui-actions">
+          <Button size="sm" aria-label={`Edit ${p.full_name}`} onClick={() => open({ kind: "edit", person: p })}>
+            Edit
+          </Button>
+          <Button size="sm" aria-label={`Reset password for ${p.full_name}`} onClick={() => open({ kind: "reset", person: p })}>
+            Reset password
+          </Button>
+          <Button size="sm" variant={p.status === "active" ? "danger-ghost" : "secondary"} aria-label={`${p.status === "active" ? "Disable" : "Enable"} ${p.full_name}`} onClick={() => open({ kind: "toggle", person: p })}>
+            {p.status === "active" ? "Disable" : "Enable"}
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="admins-page">
-      <div className="admins-card">
-        <div className="admins-header">
-          <div>
-            <h1 className="admins-title">Delivery Persons</h1>
-            <p className="admins-subtitle">Drivers. They are assigned to areas per meal session, from Sessions</p>
+    <div>
+      <PageHeader
+        title="Delivery Persons"
+        subtitle="Drivers who take orders to customers"
+        actions={
+          <Button variant="primary" onClick={() => open({ kind: "add" })}>
+            <LuPlus aria-hidden="true" /> Add delivery person
+          </Button>
+        }
+      />
+
+      <DataTable columns={columns} rows={rows} rowKey={(p) => p.id} loading={!loaded && !error} error={dialog ? null : error} emptyTitle="No delivery persons yet" />
+
+      <Modal open={formOpen} title={title} onClose={close}>
+        <form className="modal__form" onSubmit={submit}>
+          {showProfile && (
+            <Field label="Full name">
+              <input value={form.full_name} onChange={set("full_name")} required />
+            </Field>
+          )}
+          {dialog?.kind === "add" && (
+            <Field label="Email">
+              <input type="email" value={form.email} onChange={set("email")} required />
+            </Field>
+          )}
+          {showProfile && (
+            <Field label="Phone" optional>
+              <input type="tel" value={form.phone} onChange={set("phone")} />
+            </Field>
+          )}
+          {showProfile && (
+            <Field label="NIC" optional>
+              <input maxLength={20} value={form.nic} onChange={set("nic")} />
+            </Field>
+          )}
+          {showProfile && (
+            <Field label="Vehicle type" optional>
+              <input maxLength={50} value={form.vehicle_type} onChange={set("vehicle_type")} />
+            </Field>
+          )}
+          {showPassword && (
+            <Field label={dialog?.kind === "add" ? "Initial password" : "New password"} hint="At least 8 characters">
+              <input type="password" minLength={8} value={form.password} onChange={set("password")} required />
+            </Field>
+          )}
+          {error && <Alert>{error}</Alert>}
+          <div className="modal__actions">
+            <Button onClick={close}>Cancel</Button>
+            <Button type="submit" variant="primary">
+              Save
+            </Button>
           </div>
-          <button className="btn-add" onClick={() => open({ kind: "add" })} type="button">
-            <span className="btn-add-plus"><PlusIcon className="icon-sm" /></span>
-            Add Driver
-          </button>
-        </div>
+        </form>
+      </Modal>
 
-        <Modal open={formOpen} title={title} onClose={close}>
-          <form className="modal__form" onSubmit={submit}>
-            {showProfile && <input placeholder="Full name" value={form.full_name} onChange={set("full_name")} required />}
-            {dialog?.kind === "add" && <input type="email" placeholder="Email" value={form.email} onChange={set("email")} required />}
-            {showProfile && <input type="tel" placeholder="Phone (optional)" value={form.phone} onChange={set("phone")} />}
-            {showProfile && <input placeholder="NIC (optional)" maxLength={20} value={form.nic} onChange={set("nic")} />}
-            {showProfile && <input placeholder="Vehicle type (optional)" maxLength={50} value={form.vehicle_type} onChange={set("vehicle_type")} />}
-            {showPassword && (
-              <input type="password" placeholder={dialog?.kind === "add" ? "Initial password (8+ chars)" : "New password (8+ chars)"} minLength={8} value={form.password} onChange={set("password")} required />
-            )}
-            {error && <p role="alert">{error}</p>}
-            <div className="modal__actions">
-              <button type="button" className="modal__btn" onClick={close}>Cancel</button>
-              <button type="submit" className="modal__btn modal__btn--primary">Save</button>
-            </div>
-          </form>
-        </Modal>
-
-        <ConfirmDialog
-          open={dialog?.kind === "toggle"}
-          title={target?.status === "active" ? "Disable driver" : "Enable driver"}
-          message={
-            target?.status === "active"
-              ? `${target.full_name} will be signed out and unable to log in.`
-              : `${target?.full_name} will be able to log in again.`
-          }
-          confirmLabel={target?.status === "active" ? "Disable" : "Enable"}
-          onCancel={close}
-          onConfirm={toggle}
-        />
-        {!formOpen && error && <p role="alert">{error}</p>}
-
-        <div className="table-wrap">
-          <table className="admins-table">
-            <thead>
-              <tr><th>Name</th><th>Contact</th><th>NIC</th><th>Vehicle</th><th>Status</th><th className="col-actions">Actions</th></tr>
-            </thead>
-            <tbody>
-              {rows.map((p) => (
-                <tr key={p.id}>
-                  <td className="cell-strong">{p.full_name}</td>
-                  <td className="cell-muted">{p.email}{p.phone && <div>{p.phone}</div>}</td>
-                  <td className="cell-muted">{p.nic ?? "—"}</td>
-                  <td className="cell-muted">{p.vehicle_type ?? "—"}</td>
-                  <td><span className={p.status === "active" ? "pill pill-status-active" : "pill pill-status-suspended"}>{p.status}</span></td>
-                  <td className="cell-actions">
-                    <button type="button" className="modal__btn" onClick={() => open({ kind: "edit", person: p })}>Edit</button>
-                    <button type="button" className="modal__btn" onClick={() => open({ kind: "toggle", person: p })}>{p.status === "active" ? "Disable" : "Enable"}</button>
-                    <button type="button" className="modal__btn" onClick={() => open({ kind: "reset", person: p })}>Reset password</button>
-                  </td>
-                </tr>
-              ))}
-              {!rows.length && <tr><td colSpan={7} className="cell-muted">No delivery persons</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <ConfirmDialog
+        open={dialog?.kind === "toggle"}
+        title={target?.status === "active" ? "Disable driver" : "Enable driver"}
+        message={target?.status === "active" ? `${target.full_name} will be signed out and unable to log in.` : `${target?.full_name} will be able to log in again.`}
+        confirmLabel={target?.status === "active" ? "Disable" : "Enable"}
+        tone={target?.status === "active" ? "danger" : "primary"}
+        onCancel={close}
+        onConfirm={toggle}
+      />
     </div>
   );
 }
