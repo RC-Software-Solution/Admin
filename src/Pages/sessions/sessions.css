@@ -1,17 +1,33 @@
-/* Shared by Sessions and Food Items on top of admins.css */
-.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-.toolbar input, .toolbar select, .modal__form textarea { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
-
-.thumb { display: block; width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: #e2e8f0; }
-
-.session { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
-.session__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-.session__title { margin: 0; font-size: 18px; text-transform: capitalize; }
-.session__actions { display: flex; gap: 8px; }
-.qty { width: 80px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
-
-.picker { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-.picker__row { display: flex; align-items: center; gap: 10px; }
-.picker__row span { flex: 1; }
-
-.session__notes { margin: 0 0 10px; padding: 8px 10px; background: #f8fafc; border-left: 3px solid #cbd5e1; white-space: pre-wrap; }
+.sess-date { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4); }
+.sess-date input {
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  font: inherit;
+  font-size: var(--text-base);
+}
+.sess-date input:focus-visible { outline: none; border-color: var(--color-primary); box-shadow: var(--focus-ring); }
+.sess-title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.sess-time { color: var(--gray-500); font-size: var(--text-base); font-weight: 400; }
+.sess-notes { margin: 0; padding: var(--space-3) var(--space-4); color: var(--gray-700); white-space: pre-wrap; }
+.sess-add { padding: var(--space-3) var(--space-4); }
+.sess-empty { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.sess-empty p { margin: 0; color: var(--gray-500); }
+.sess-picker { display: grid; gap: var(--space-3); max-height: 320px; margin-bottom: var(--space-4); overflow-y: auto; }
+.sess-pick { display: flex; align-items: center; gap: var(--space-3); min-height: 38px; }
+.sess-pick__name { flex: 1; min-width: 0; }
+.sess-pick input[type="number"] {
+  box-sizing: border-box;
+  width: 110px;
+  min-height: 36px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font: inherit;
+}
+@media (max-width: 640px) {
+  .sess-date input { flex: 1; min-width: 0; min-height: 44px; font-size: 16px; }
+}

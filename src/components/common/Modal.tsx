@@ -5,11 +5,12 @@ interface ModalProps {
   open: boolean;
   title: string;
   onClose: () => void;
+  wide?: boolean;
   children: React.ReactNode;
 }
 
 // Native <dialog>: the browser gives us focus trapping, Esc to close and the backdrop.
-export default function Modal({ open, title, onClose, children }: ModalProps) {
+export default function Modal({ open, title, onClose, wide = false, children }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export default function Modal({ open, title, onClose, children }: ModalProps) {
   return (
     <dialog
       ref={ref}
-      className="modal"
+      className={`modal${wide ? " modal--wide" : ""}`}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()} // click on the backdrop
     >
