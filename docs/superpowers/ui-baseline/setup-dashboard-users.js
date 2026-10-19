@@ -84,6 +84,7 @@ async (page) => {
         errors: [],
       });
     }
+    if (url.pathname.endsWith("/areas")) return json([1, 2, 3].map((n) => ({ area_id: n, area_name: ["Colombo 03", "Nugegoda", "Dehiwala"][n - 1], status: "active" })));
     if (url.pathname.endsWith("/users/customers")) return json(customers);
     const m = url.pathname.match(/\/users\/customers\/([^/]+)\/profile$/);
     if (m) {

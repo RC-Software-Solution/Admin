@@ -47,3 +47,6 @@
   .modal__actions { flex-direction: column-reverse; }
   .modal__actions > * { width: 100%; }
 }
+
+/* Labels that wrap a field in a dialog form stack the text above the field (moved here from the retired users.css) */
+.modal__form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: var(--text-base); }

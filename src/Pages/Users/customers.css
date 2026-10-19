@@ -3,3 +3,28 @@
 .cust { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
 .cust__text { min-width: 0; }
 .cust__text .ui-cell__meta { margin-top: 0; overflow-wrap: anywhere; }
+
+/* ===== Profile drawer ===== */
+.cust-head { display: flex; align-items: center; gap: var(--space-4); padding-right: 40px; }
+.cust-head h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.cust-head__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: 6px; color: var(--gray-500); font-size: var(--text-sm); }
+.cust-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4) 20px; margin: 0; }
+.cust-details dt { color: var(--gray-500); font-size: var(--text-sm); font-weight: 600; }
+.cust-details dd { margin: 4px 0 0; overflow-wrap: anywhere; }
+.cust-details__wide { grid-column: 1 / -1; }
+.cust-orders { margin: 0; padding: 0; list-style: none; }
+.cust-order { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px var(--space-3); padding: var(--space-3) 0; border-bottom: 1px solid var(--gray-200); }
+.cust-order__total { font-weight: 600; text-align: right; }
+.cust-order__pay { justify-self: end; }
+.cust-order__meal { text-transform: capitalize; }
+.cust-timeline { display: grid; margin: 0; padding: 0; list-style: none; }
+.cust-timeline > li { position: relative; display: grid; grid-template-columns: 14px 1fr; gap: 14px; padding-bottom: 18px; }
+.cust-timeline > li::before { content: ""; position: absolute; left: 6px; top: 14px; bottom: 0; width: 2px; background: var(--gray-200); }
+.cust-timeline > li:last-child::before { display: none; }
+.cust-timeline__pt { box-sizing: border-box; width: 14px; height: 14px; margin-top: 3px; border: 3px solid var(--color-primary); border-radius: 50%; background: var(--white); }
+.cust-timeline__pt--bad { border-color: var(--color-danger); }
+.cust-timeline__pt--warn { border-color: var(--color-warning); }
+.cust-timeline__title { font-weight: 600; }
+@media (max-width: 640px) {
+  .cust-details { grid-template-columns: minmax(0, 1fr); }
+}

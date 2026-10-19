@@ -1,3 +1,4 @@
+import type { OrderStatus, PaymentStatus } from "./orders";
 export type UserStatus = "pending" | "accepted" | "rejected" | "disabled" | "blocked";
 
 /** Row from GET /users/customers (password and refresh_token are stripped server-side). */
@@ -26,8 +27,8 @@ export interface StatusLogEntry {
 
 export interface CustomerOrder {
     id: string;
-    status: string;
-    payment_status: "pending" | "paid" | "unpaid" | "ignored";
+    status: OrderStatus;
+    payment_status: PaymentStatus;
     total_price: string; // DECIMAL arrives as a string
     meal_time: string;
     created_at: string;

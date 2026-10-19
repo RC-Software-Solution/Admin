@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { LuDownload } from "react-icons/lu";
-import "./users.css"; // still styles the profile modal below until Task 4 replaces it
 import "./customers.css";
 import { useUsers } from "../../hooks/useUsers";
 import { Alert, Avatar, Button, Chip, Chips, DataTable, Field, PageHeader, SearchField } from "../../components/ui";
@@ -8,10 +7,10 @@ import type { Column } from "../../components/ui";
 import Modal from "../../components/common/Modal";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { getSession } from "../../services/apiClient";
-import { formatDate, formatDateTime } from "../../utils/formatDate";
-import { formatMoney } from "../../utils/formatMoney";
+import { formatDateTime } from "../../utils/formatDate";
 import { statusOf, type Customer } from "../../types/users";
 import { ACTIONS, type CustomerAction } from "./customerActions";
+import CustomerDrawer from "./CustomerDrawer";
 
 type Dialog = { kind: CustomerAction; user: Customer } | null;
 
@@ -51,8 +50,6 @@ export default function UsersPage() {
     close();
   };
 
-  const p = u.profile;
-  const unpaid = p?.order_history.filter((o) => o.payment_status === "unpaid") ?? [];
   const confirmCopy = dialog && dialog.kind in CONFIRM_COPY ? CONFIRM_COPY[dialog.kind as keyof typeof CONFIRM_COPY] : null;
 
   const rowActions = (c: Customer) => (
@@ -182,45 +179,17 @@ export default function UsersPage() {
         onConfirm={confirm}
       />
 
-      <Modal open={!!p} title={p?.full_name ?? ""} onClose={u.closeProfile}>
-        {p && (
-          <div className="profile">
-            <p className="muted">
-              {p.email} · {p.phone ?? "no phone"} · {u.areaName(p.area_id)}
-            </p>
-            {p.address && <p className="muted">{p.address}</p>}
-            {p.rejection_reason && <p>Rejected: {p.rejection_reason}</p>}
-            {p.blocked_reason && <p>Blocked: {p.blocked_reason}</p>}
-
-            <h3>Unpaid</h3>
-            <p>
-              {unpaid.length} order{unpaid.length === 1 ? "" : "s"} ·{" "}
-              {formatMoney(unpaid.reduce((s, o) => s + Number(o.total_price), 0))}
-            </p>
-
-            <h3>Orders ({p.order_history.length})</h3>
-            <ul>
-              {p.order_history.map((o) => (
-                <li key={o.id}>
-                  {formatDate(o.created_at)} · {o.meal_time} · {o.status} · {o.payment_status} · {formatMoney(Number(o.total_price))}
-                </li>
-              ))}
-              {p.order_history.length === 0 && <li>No orders</li>}
-            </ul>
-
-            <h3>Status history</h3>
-            <ul>
-              {p.status_log.map((l) => (
-                <li key={l.id}>
-                  {formatDateTime(l.created_at)} · {l.previous_status ?? "—"} → {l.new_status}
-                  {l.reason ? ` (${l.reason})` : ""}
-                </li>
-              ))}
-              {p.status_log.length === 0 && <li>No changes recorded</li>}
-            </ul>
-          </div>
-        )}
-      </Modal>
+      <CustomerDrawer
+        profile={u.profile}
+        areaName={u.areaName(u.profile?.area_id ?? null)}
+        canAct={isSuper}
+        onClose={u.closeProfile}
+        onAction={(kind) => {
+          // close the drawer first so the profile is never stale behind the confirmation dialog
+          if (u.profile) open({ kind, user: u.profile });
+          u.closeProfile();
+        }}
+      />
     </div>
   );
 }
