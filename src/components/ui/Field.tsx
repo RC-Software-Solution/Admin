@@ -3,18 +3,22 @@ import type { ReactElement } from "react";
 
 interface FieldProps {
   label: string;
+  optional?: boolean; // appends a quiet "(optional)" to the label
   hint?: string;
   error?: string;
   children: ReactElement; // one input, select or textarea
 }
 
-export function Field({ label, hint, error, children }: FieldProps) {
+export function Field({ label, optional, hint, error, children }: FieldProps) {
   const id = useId();
   const noteId = `${id}-note`;
   const note = error ?? hint;
   return (
     <div className="ui-field">
-      <label htmlFor={id} className="ui-field__label">{label}</label>
+      <label htmlFor={id} className="ui-field__label">
+        {label}
+        {optional && <span className="ui-field__opt"> (optional)</span>}
+      </label>
       {cloneElement(children, {
         id,
         "aria-describedby": note ? noteId : undefined,

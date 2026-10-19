@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from "react";
 import { Spinner } from "./Spinner";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "ghost";
+  variant?: "primary" | "secondary" | "danger" | "ghost" | "danger-ghost";
   size?: "sm" | "md";
   loading?: boolean;
 }

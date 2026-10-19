@@ -22,3 +22,7 @@ export { Avatar } from "./Avatar";
 export { Segmented } from "./Segmented";
 export { SearchField } from "./SearchField";
 export { Drawer } from "./Drawer";
+export { Switch } from "./Switch";
+export { Tabs } from "./Tabs";
+export { Mark } from "./Mark";
+export { Who } from "./Who";

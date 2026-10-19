@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Alert, Avatar, Badge, Button, Card, Chip, Chips, DataTable, Drawer, EmptyState, Field, FilterBar, Menu, OrderTrack, PageHeader, PaymentMark, SearchField, Segmented, SelectionBar, Spinner, useToast } from "../../components/ui";
+import { Alert, Avatar, Badge, Button, Card, Chip, Chips, DataTable, Drawer, EmptyState, Field, FilterBar, Mark, Menu, OrderTrack, PageHeader, PaymentMark, SearchField, Segmented, SelectionBar, Spinner, Switch, Tabs, Who, useToast } from "../../components/ui";
 import type { Column } from "../../components/ui";
 import type { OrderStatus, PaymentStatus } from "../../types/orders";
 
@@ -43,6 +43,10 @@ const COLUMNS: Column<Row>[] = [
     ),
   },
 ];
+const FOOTER_COLUMNS: Column<Row>[] = [
+  { key: "name", label: "Customer", mobile: "title", cell: (r) => r.name, footer: "Total" },
+  { key: "total", label: "Total", align: "right", mobile: "amount", cell: (r) => `LKR ${r.total.toLocaleString("en-LK")}`, footer: "LKR 2,010" },
+];
 const ALL: OrderStatus[] = ["pending", "preparing", "delivering", "delivered", "completed", "cancelled", "delivery_failed"];
 const PAYS: PaymentStatus[] = ["paid", "unpaid", "pending", "ignored"];
 
@@ -60,6 +64,9 @@ export default function UiKit() {
   const [bar, setBar] = useState(false);
   const [range, setRange] = useState("7d");
   const [drawer, setDrawer] = useState(false);
+  const [on, setOn] = useState(true);
+  const [off, setOff] = useState(false);
+  const [tab, setTab] = useState<"sales" | "items" | "areas">("sales");
   return (
     <div>
       <PageHeader title="UI kit" subtitle="Everything the pages are built from" actions={<Button variant="primary">Primary action</Button>} />
@@ -172,6 +179,70 @@ export default function UiKit() {
         <DataTable columns={COLUMNS} rows={[]} rowKey={(r) => r.id} loading />
         <DataTable columns={COLUMNS} rows={[]} rowKey={(r) => r.id} emptyTitle="No orders found" />
         <DataTable columns={COLUMNS} rows={ROWS.slice(0, 1)} rowKey={(r) => r.id} error="Refresh failed: Request failed (500)" />
+      </Section>
+      <Section title="Switch">
+        <div className="ui-actions" style={{ gap: "var(--space-6)" }}>
+          <Switch label="Available to customers" checked={on} onChange={setOn} showState />
+          <Switch label="Available on weekends" checked={off} onChange={setOff} showState />
+          <Switch label="Locked setting" checked disabled onChange={() => {}} showState />
+        </div>
+      </Section>
+      <Section title="Tabs">
+        <Tabs
+          label="Example reports"
+          value={tab}
+          onChange={setTab}
+          tabs={[
+            { value: "sales", label: "Sales" },
+            { value: "items", label: "Items" },
+            { value: "areas", label: "Areas" },
+          ]}
+        >
+          <p className="ui-hint">The {tab} view. Arrow keys, Home and End move between tabs.</p>
+        </Tabs>
+      </Section>
+      <Section title="Mark and Who">
+        <div className="ui-actions" style={{ gap: "var(--space-6)" }}>
+          <Mark tone="leaf">Active</Mark>
+          <Mark tone="turmeric">Needs review</Mark>
+          <Mark tone="brick">Failed</Mark>
+          <Mark tone="mist">Inactive</Mark>
+          <Mark tone="ring">Waiting</Mark>
+        </div>
+        <Who name="Amaya Rathnayake" meta="amaya@example.com" />
+        <Who name="Chicken fried rice" meta="Rice and curry" square tone="auto" size="md" />
+      </Section>
+      <Section title="Badges and buttons">
+        <div className="ui-actions">
+          <Badge>neutral</Badge>
+          <Badge tone="success">success</Badge>
+          <Badge tone="warning">warning</Badge>
+          <Badge tone="danger">danger</Badge>
+          <Badge tone="info">info</Badge>
+          <Badge tone="dark">dark</Badge>
+          <Badge tone="outline">outline</Badge>
+        </div>
+        <div className="ui-actions">
+          <Button variant="danger-ghost">Remove</Button>
+          <Button>Secondary</Button>
+        </div>
+      </Section>
+      <Section title="Footer row">
+        <DataTable columns={FOOTER_COLUMNS} rows={ROWS.slice(0, 3)} rowKey={(r) => r.id} />
+      </Section>
+      <Section title="Optional field">
+        <Field label="Description" optional hint="Shown under the item name">
+          <textarea rows={3} />
+        </Field>
+        <div className="ui-form-row">
+          <Field label="Price (LKR)"><input defaultValue="485" /></Field>
+          <Field label="Type">
+            <select defaultValue="veg">
+              <option value="veg">Veg</option>
+              <option value="nonveg">Non-veg</option>
+            </select>
+          </Field>
+        </div>
       </Section>
     </div>
   );

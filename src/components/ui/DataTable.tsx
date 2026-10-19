@@ -13,6 +13,7 @@ export interface Column<T> {
   // side by side, actions come last, hide drops the cell on phones. Omit for a label/value pair.
   mobile?: "title" | "amount" | "select" | "inline" | "actions" | "hide";
   nowrap?: boolean;
+  footer?: ReactNode; // a total or summary shown under the last row; any column with one turns on the footer row
 }
 
 interface DataTableProps<T> {
@@ -65,6 +66,17 @@ export function DataTable<T>({ columns, rows, rowKey, loading = false, error, em
                 );
               })}
             </tbody>
+            {columns.some((c) => c.footer !== undefined) && (
+              <tfoot role="rowgroup">
+                <tr role="row">
+                  {columns.map((c) => (
+                    <td key={c.key} role="cell" data-label={c.label} data-slot={c.mobile} className={cls(c.nowrap && "ui-nowrap", c.align === "right" && "ui-right")}>
+                      {c.footer}
+                    </td>
+                  ))}
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       )}

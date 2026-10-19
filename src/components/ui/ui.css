@@ -651,3 +651,103 @@ a.ui-btn { text-decoration: none; }
 @media (max-width: 640px) {
   .ui-filterbar > .ui-segmented { flex-basis: 100%; }
 }
+
+/* ===== Plan 4 additions: switch, tabs, mark, who, tones, footer row, helpers ===== */
+.ui-link { color: var(--color-primary-text); text-decoration: underline; text-underline-offset: 3px; }
+.ui-link:hover { color: var(--color-primary-solid-hover); }
+.ui-dim { opacity: 0.55; transition: opacity 0.15s; }
+.ui-tag { display: inline-block; margin: 2px 4px 2px 0; padding: 1px 8px; border-radius: var(--radius-full); background: var(--gray-100); color: var(--gray-700); font-size: var(--text-xs); }
+.ui-badge--dark { background: var(--tea); color: var(--white); border-color: var(--tea); }
+.ui-badge--outline { background: none; color: var(--gray-500); border-color: var(--gray-300); }
+.ui-btn--danger-ghost { background: transparent; color: var(--color-danger-text); }
+.ui-btn--danger-ghost:hover:not(:disabled) { background: var(--color-danger-bg); }
+.ui-card__header { flex-wrap: wrap; }
+.ui-field__opt { font-weight: 400; color: var(--gray-500); }
+.ui-field textarea { resize: vertical; }
+.ui-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.ui-filterbar__note--end { margin-left: auto; }
+
+/* Mark: a state as a dot and a word */
+.ui-mark { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 500; white-space: nowrap; }
+.ui-mark__dot { width: 8px; height: 8px; flex: none; border-radius: var(--radius-full); }
+.ui-mark__dot--leaf { background: var(--color-primary); }
+.ui-mark__dot--turmeric { background: var(--color-warning); }
+.ui-mark__dot--brick { background: var(--color-danger); }
+.ui-mark__dot--mist { background: var(--gray-300); }
+.ui-mark__dot--ring { background: none; border: 2px solid var(--gray-300); }
+
+/* Who: avatar, name, detail line */
+.ui-who { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.ui-who__text { min-width: 0; }
+.ui-who__text .ui-cell__meta { overflow-wrap: anywhere; }
+
+/* Switch: takes effect at once. The off state carries a Mist outline so the control reads at 3:1 on Paper. */
+.ui-switchwrap { display: inline-flex; align-items: center; gap: var(--space-2); }
+.ui-switchwrap__state { color: var(--gray-500); font-size: var(--text-sm); }
+.ui-switch {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--gray-300);
+  box-shadow: inset 0 0 0 1px var(--gray-500);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.ui-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 0 0 1px var(--gray-500);
+  transition: transform 0.15s;
+}
+.ui-switch[aria-checked="true"] { background: var(--color-primary-solid); box-shadow: none; }
+.ui-switch[aria-checked="true"]::after { transform: translateX(16px); box-shadow: none; }
+.ui-switch:disabled { opacity: 0.45; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+  .ui-switch, .ui-switch::after { transition: none; }
+}
+@media (max-width: 640px) {
+  .ui-switch { width: 46px; height: 26px; }
+  .ui-switch::after { top: 3px; left: 3px; width: 20px; height: 20px; }
+  .ui-switch[aria-checked="true"]::after { transform: translateX(20px); }
+}
+
+/* Tabs: views of the same data, underlined */
+.ui-tabs { display: flex; gap: 22px; margin-bottom: var(--space-4); overflow-x: auto; border-bottom: 1px solid var(--gray-200); }
+.ui-tab {
+  flex: none;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--gray-500);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ui-tab:hover { color: var(--ink); }
+.ui-tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--color-primary); font-weight: 600; }
+.ui-tab:focus-visible { outline-offset: -2px; }
+@media (max-width: 640px) {
+  .ui-tab { min-height: 44px; }
+}
+
+/* DataTable footer row (a total) */
+.ui-table tfoot td { padding: 14px var(--space-3); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--gray-200); font-weight: 700; }
+@media (max-width: 640px) {
+  .ui-table tfoot { display: block; }
+  .ui-table tfoot tr { border-top: 2px solid var(--ink); }
+  .ui-table tfoot td { padding: 0; border: 0; }
+  .ui-form-row { grid-template-columns: minmax(0, 1fr); }
+}
