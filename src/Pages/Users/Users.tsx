@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { LuDownload } from "react-icons/lu";
 import "./customers.css";
 import { useUsers } from "../../hooks/useUsers";
@@ -28,9 +28,18 @@ export default function UsersPage() {
   const [dialog, setDialog] = useState<Dialog>(null);
   const [areaId, setAreaId] = useState("");
   const [reason, setReason] = useState("");
-  const close = () => setDialog(null);
+  // Set when a dialog was started from the profile drawer. The drawer closes first, so closing the dialog would otherwise drop focus on the page.
+  const returnTo = useRef<string | null>(null);
+  const close = () => {
+    setDialog(null);
+    const id = returnTo.current;
+    returnTo.current = null;
+    // The customer may have left this tab (Approve moves them), so fall back to the search box
+    if (id) requestAnimationFrame(() => (document.getElementById(`cust-view-${id}`) ?? document.getElementById("cust-search"))?.focus());
+  };
 
   const open = (d: NonNullable<Dialog>) => {
+    u.clearError(); // an error from an earlier action must not show inside this dialog
     setAreaId(String(d.user.area_id ?? ""));
     setReason("");
     setDialog(d);
@@ -60,7 +69,7 @@ export default function UsersPage() {
             {a.label}
           </Button>
         ))}
-      <Button size="sm" variant="ghost" aria-label={`View ${c.full_name}`} onClick={() => u.openProfile(c.id)}>
+      <Button id={`cust-view-${c.id}`} size="sm" variant="ghost" aria-label={`View ${c.full_name}`} onClick={() => u.openProfile(c.id)}>
         View
       </Button>
     </div>
@@ -119,7 +128,7 @@ export default function UsersPage() {
       </Chips>
 
       <div className="cust-tools">
-        <SearchField label="Search customers" placeholder="Search by name or email" value={u.query} onChange={(e) => u.setQuery(e.target.value)} />
+        <SearchField id="cust-search" label="Search customers" placeholder="Search by name or email" value={u.query} onChange={(e) => u.setQuery(e.target.value)} />
       </div>
 
       <DataTable
@@ -186,7 +195,10 @@ export default function UsersPage() {
         onClose={u.closeProfile}
         onAction={(kind) => {
           // close the drawer first so the profile is never stale behind the confirmation dialog
-          if (u.profile) open({ kind, user: u.profile });
+          if (u.profile) {
+            returnTo.current = u.profile.id;
+            open({ kind, user: u.profile });
+          }
           u.closeProfile();
         }}
       />

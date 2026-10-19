@@ -87,6 +87,7 @@ export const useUsers = () => {
 
     return {
         activeTab, setActiveTab, query, setQuery, counts, filtered, areaName, error, loaded,
+        clearError: () => setError(""),
         areaFilter, clearAreaFilter: () => setParams({}),
         // new approvals only go to active areas
         areas: areas.filter((a) => a.status === "active"),

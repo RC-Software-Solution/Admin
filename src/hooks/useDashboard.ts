@@ -1,5 +1,3 @@
-import { useState } from "react";
-import type { MealType } from "../types/dashboard";
 import { dashboardQueryString, getDashboard } from "../Pages/Dashboard/dashboard.service";
 import { usePolling } from "./usePolling";
 import { useRangeFilters } from "./useRangeFilters";
@@ -9,7 +7,6 @@ export type { Preset } from "./useRangeFilters";
 const POLL_MS = 30_000;
 
 export const useDashboard = () => {
-    const [activeTab, setActiveTab] = useState<MealType>("breakfast");
     const filters = useRangeFilters();
     const { query, areaId, session } = filters;
 
@@ -21,7 +18,6 @@ export const useDashboard = () => {
 
     return {
         data, error, updatedAt, refresh, loading,
-        activeTab, setActiveTab, tabs: ["breakfast", "lunch", "dinner"] as MealType[],
         ...filters,
     };
 };
