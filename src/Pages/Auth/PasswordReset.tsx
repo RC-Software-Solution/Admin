@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import "../../styles/login.css";
 import { forgotPassword, resetPassword } from "../../services/auth.service";
+import { Alert, Button, Field } from "../../components/ui";
+import AuthShell from "./AuthShell";
 
 // Shared shell: one input flow that ends in a message instead of a redirect
-function Form({ title, submitLabel, onSubmit, children }: {
+function Form({ headline, lede, title, intro, submitLabel, onSubmit, children }: {
+  headline: string;
+  lede: string;
   title: string;
+  intro: string;
   submitLabel: string;
   onSubmit: () => Promise<string>;
   children: React.ReactNode;
@@ -27,28 +31,41 @@ function Form({ title, submitLabel, onSubmit, children }: {
   };
 
   return (
-    <div className="loginPage">
-      <form className="loginForm" onSubmit={submit}>
-        <h2>{title}</h2>
-        {!done && children}
-        {error && <div className="error">{error}</div>}
-        {done && <p>{done}</p>}
-        {!done && (
-          <button type="submit" disabled={loading} className="loginBtn">
-            {loading ? "Please wait..." : submitLabel}
-          </button>
+    <AuthShell headline={headline} lede={lede} title={title} intro={intro}>
+      <form onSubmit={submit}>
+        {done ? (
+          <Alert tone="success">{done}</Alert>
+        ) : (
+          <>
+            {children}
+            {error && <Alert>{error}</Alert>}
+            <Button type="submit" variant="primary" className="auth__submit" loading={loading}>
+              {submitLabel}
+            </Button>
+          </>
         )}
-        <Link to="/login">Back to login</Link>
+        <Link className="ui-link auth__back" to="/login">
+          Back to sign in
+        </Link>
       </form>
-    </div>
+    </AuthShell>
   );
 }
 
 export function ForgotPassword() {
   const [email, setEmail] = useState("");
   return (
-    <Form title="Forgot password" submitLabel="Send reset link" onSubmit={async () => (await forgotPassword(email)).message}>
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+    <Form
+      headline="Locked out? It happens."
+      lede="We will email a reset link that works for one hour."
+      title="Reset your password"
+      intro="Enter your admin email and we will send you a reset link."
+      submitLabel="Send reset link"
+      onSubmit={async () => (await forgotPassword(email)).message}
+    >
+      <Field label="Email">
+        <input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      </Field>
     </Form>
   );
 }
@@ -60,7 +77,10 @@ export function ResetPassword() {
   const [confirm, setConfirm] = useState("");
   return (
     <Form
+      headline="Choose a new password."
+      lede="You will use it the next time you sign in."
       title="Set a new password"
+      intro="Use at least 6 characters."
       submitLabel="Reset password"
       onSubmit={async () => {
         if (!token) throw new Error("This reset link is missing its token");
@@ -68,8 +88,12 @@ export function ResetPassword() {
         return (await resetPassword(token, password)).message;
       }}
     >
-      <input type="password" placeholder="New password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
-      <input type="password" placeholder="Confirm password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
+      <Field label="New password">
+        <input type="password" autoComplete="new-password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
+      </Field>
+      <Field label="Confirm password">
+        <input type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
+      </Field>
     </Form>
   );
 }

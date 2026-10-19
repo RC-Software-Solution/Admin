@@ -1,0 +1,26 @@
+.auth { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; background: var(--paper); }
+.auth__art { display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-8); padding: 48px; background: var(--tea); color: var(--white); }
+.auth__art :focus-visible { outline-color: var(--mint); }
+.auth__brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-head); font-size: 21px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; }
+.auth__mark { position: relative; width: 22px; height: 22px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--mint), var(--color-primary)); }
+.auth__mark::after { content: ""; position: absolute; inset: 6px; border-radius: 2px; background: var(--tea); }
+.auth__bars { display: flex; gap: 6px; margin-bottom: var(--space-5); }
+.auth__bars i { width: 54px; height: 8px; border-radius: 4px; background: var(--mint); }
+.auth__bars i:last-child { background: var(--on-dark-active); }
+.auth__headline { max-width: 12ch; margin: 0; font-family: var(--font-head); font-size: 46px; font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+.auth__lede { max-width: 34ch; margin: var(--space-4) 0 0; color: var(--rail-text); font-size: var(--text-md); }
+.auth__foot { margin: 0; color: var(--rail-muted); font-size: var(--text-xs); }
+.auth__form { display: grid; place-items: center; padding: var(--space-8); }
+.auth__box { display: grid; gap: 18px; width: min(380px, 100%); }
+.auth__box h1 { margin: 0; font-size: 30px; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
+.auth__intro { margin: -10px 0 0; color: var(--gray-500); }
+.auth__box form { display: grid; gap: 18px; }
+.auth__box .ui-alert { margin-bottom: 0; }
+.auth__forgot { justify-self: end; margin-top: -10px; font-size: var(--text-sm); }
+.auth__submit { width: 100%; min-height: 44px; }
+.auth__back { justify-self: center; font-size: var(--text-sm); }
+@media (max-width: 900px) {
+  .auth { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .auth__art { min-height: 220px; padding: 28px; gap: var(--space-5); }
+  .auth__headline { font-size: 32px; }
+}
