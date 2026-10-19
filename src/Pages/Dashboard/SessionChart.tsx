@@ -14,7 +14,7 @@ export default function SessionChart({ days }: { days: DayBucket[] }) {
         <p className="ui-hint">No orders in this range</p>
       ) : (
         <>
-          <div className="dash-bars" aria-hidden="true">
+          <div className={`dash-bars${days.length > 10 ? " dash-dense" : ""}`} aria-hidden="true">
             {days.map((d, i) => (
               <div key={d.date} className="dash-col" title={`${d.date}: ${MEALS.map((m) => `${d.orders[m]} ${m}`).join(", ")}`}>
                 <div className="dash-col__plot">

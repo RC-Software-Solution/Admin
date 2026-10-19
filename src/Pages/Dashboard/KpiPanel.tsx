@@ -36,7 +36,7 @@ export default function KpiPanel({ stats, unit, days }: KpiPanelProps) {
         </div>
       </div>
       <p className="dash-caption">Orders per day</p>
-      <div className="dash-spark" role="img" aria-label={`Orders per day: ${summary}`}>
+      <div className={`dash-spark${days.length > 10 ? " dash-dense" : ""}`} role="img" aria-label={`Orders per day: ${summary}`}>
         {days.map((d, i) => (
           <div key={d.date} className="dash-col" title={`${d.date}: ${d.total} orders`}>
             <div className="dash-col__plot">
