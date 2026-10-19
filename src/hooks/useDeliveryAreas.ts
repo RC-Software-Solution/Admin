@@ -27,7 +27,7 @@ export const useDeliveryAreas = () => {
     const metricOf = (a: DeliveryArea) => metrics?.find((m) => String(m.area_id) === String(a.area_id));
 
     return {
-        areas, error, loaded, metricsAvailable: metrics !== null, metricOf,
+        areas, error, clearError: () => setError(""), loaded, metricsAvailable: metrics !== null, metricOf,
         onSave: (a: DeliveryArea | undefined, f: AreaForm) => run(() => (a ? updateArea(a.area_id, f) : createArea(f))),
         onDelete: (a: DeliveryArea) => run(() => deleteArea(a.area_id)),
     };

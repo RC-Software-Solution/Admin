@@ -12,7 +12,7 @@ import type { AreaForm, DeliveryArea } from "../../types/deliveryAreas";
 const EMPTY: AreaForm = { area_name: "", code: "", status: "active", notes: "" };
 
 export default function DeliveryAreasPage() {
-  const { areas, error, loaded, metricsAvailable, metricOf, onSave, onDelete } = useDeliveryAreas();
+  const { areas, error, clearError, loaded, metricsAvailable, metricOf, onSave, onDelete } = useDeliveryAreas();
   const navigate = useNavigate();
   // `form`: null = closed, {} = adding, {area} = editing
   const [form, setForm] = useState<{ area?: DeliveryArea } | null>(null);
@@ -20,6 +20,7 @@ export default function DeliveryAreasPage() {
   const [toDelete, setToDelete] = useState<DeliveryArea | null>(null);
 
   const openForm = (area?: DeliveryArea) => {
+    clearError();
     setValues(area ? { area_name: area.area_name, code: area.code ?? "", status: area.status, notes: area.notes ?? "" } : EMPTY);
     setForm({ area });
   };
@@ -71,7 +72,7 @@ export default function DeliveryAreasPage() {
           <Button size="sm" aria-label={`Edit ${a.area_name}`} onClick={() => openForm(a)}>
             Edit
           </Button>
-          <Button size="sm" variant="danger-ghost" aria-label={`Delete ${a.area_name}`} onClick={() => setToDelete(a)}>
+          <Button size="sm" variant="danger-ghost" aria-label={`Delete ${a.area_name}`} onClick={() => { clearError(); setToDelete(a); }}>
             Delete
           </Button>
         </div>
