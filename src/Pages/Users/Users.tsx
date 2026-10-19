@@ -1,23 +1,24 @@
 import { useState } from "react";
-import "./users.css";
+import { LuDownload } from "react-icons/lu";
+import "./users.css"; // still styles the profile modal below until Task 4 replaces it
+import "./customers.css";
 import { useUsers } from "../../hooks/useUsers";
-import { DownloadIcon, EyeIcon } from "../../components/common/Icons";
+import { Alert, Avatar, Button, Chip, Chips, DataTable, Field, PageHeader, SearchField } from "../../components/ui";
+import type { Column } from "../../components/ui";
 import Modal from "../../components/common/Modal";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import { getSession } from "../../services/apiClient";
 import { formatDate, formatDateTime } from "../../utils/formatDate";
 import { formatMoney } from "../../utils/formatMoney";
 import { statusOf, type Customer } from "../../types/users";
+import { ACTIONS, type CustomerAction } from "./customerActions";
 
-type Dialog =
-  | { kind: "approve" | "reject"; user: Customer }
-  | { kind: "disable" | "enable" | "unlock"; user: Customer }
-  | null;
+type Dialog = { kind: CustomerAction; user: Customer } | null;
 
 const CONFIRM_COPY = {
-  disable: { title: "Disable customer", verb: "Disable", text: "can no longer log in or order" },
-  enable: { title: "Enable customer", verb: "Enable", text: "regains access" },
-  unlock: { title: "Unlock customer", verb: "Unlock", text: "is unblocked and can order again" },
+  disable: { title: "Disable customer", verb: "Disable", text: "can no longer log in or order", tone: "danger" },
+  enable: { title: "Enable customer", verb: "Enable", text: "regains access", tone: "primary" },
+  unlock: { title: "Unlock customer", verb: "Unlock", text: "is unblocked and can order again", tone: "primary" },
 } as const;
 
 export default function UsersPage() {
@@ -54,156 +55,119 @@ export default function UsersPage() {
   const unpaid = p?.order_history.filter((o) => o.payment_status === "unpaid") ?? [];
   const confirmCopy = dialog && dialog.kind in CONFIRM_COPY ? CONFIRM_COPY[dialog.kind as keyof typeof CONFIRM_COPY] : null;
 
-  return (
-    <div className="users-page">
-      <div className="users-header">
-        <div>
-          <h1 className="title">Users</h1>
-          <p className="subtitle">Manage customer accounts</p>
-        </div>
+  const rowActions = (c: Customer) => (
+    <div className="ui-actions">
+      {isSuper &&
+        ACTIONS[statusOf(c)].map((a) => (
+          <Button key={a.kind} size="sm" variant={a.primary ? "primary" : "secondary"} aria-label={`${a.label} ${c.full_name}`} onClick={() => open({ kind: a.kind, user: c })}>
+            {a.label}
+          </Button>
+        ))}
+      <Button size="sm" variant="ghost" aria-label={`View ${c.full_name}`} onClick={() => u.openProfile(c.id)}>
+        View
+      </Button>
+    </div>
+  );
 
-        <button className="btn btn-export" onClick={u.exportCsv}>
-          <DownloadIcon className="icon" />
-          Export
-        </button>
+  const columns: Column<Customer>[] = [
+    {
+      key: "customer",
+      label: "Customer",
+      mobile: "title",
+      cell: (c) => (
+        <div className="cust">
+          <Avatar name={c.full_name} />
+          <div className="cust__text">
+            <b className="ui-cell__title">{c.full_name}</b>
+            <div className="ui-cell__meta">{c.email}</div>
+          </div>
+        </div>
+      ),
+    },
+    { key: "phone", label: "Phone", mobile: "hide", nowrap: true, cell: (c) => c.phone ?? "—" },
+    { key: "area", label: "Area", mobile: "hide", cell: (c) => u.areaName(c.area_id) },
+    { key: "registered", label: "Registered", mobile: "hide", nowrap: true, cell: (c) => <span className="ui-cell__meta">{formatDateTime(c.created_at)}</span> },
+    { key: "actions", label: "Actions", align: "right", mobile: "actions", cell: rowActions },
+  ];
+
+  const waiting = u.activeTab === "pending" ? " waiting" : "";
+
+  return (
+    <div>
+      <PageHeader
+        title="Users"
+        subtitle="Approve new customers and manage their accounts"
+        actions={
+          <Button onClick={u.exportCsv}>
+            <LuDownload aria-hidden="true" /> Export CSV
+          </Button>
+        }
+      />
+
+      {u.areaFilter && (
+        <Alert tone="info">
+          Showing customers in <strong>{u.areaName(u.areaFilter)}</strong>.{" "}
+          <Button size="sm" variant="ghost" onClick={u.clearAreaFilter}>
+            Clear filter
+          </Button>
+        </Alert>
+      )}
+
+      <Chips label="Customer status">
+        {u.tabs.map((t) => (
+          <Chip key={t.key} selected={u.activeTab === t.key} count={u.counts[t.key]} onClick={() => u.setActiveTab(t.key)}>
+            {t.label}
+          </Chip>
+        ))}
+      </Chips>
+
+      <div className="cust-tools">
+        <SearchField label="Search customers" placeholder="Search by name or email" value={u.query} onChange={(e) => u.setQuery(e.target.value)} />
       </div>
 
-      {u.error && <p role="alert">{u.error}</p>}
-      {u.areaFilter && (
-        <p>
-          Area: <strong>{u.areaName(u.areaFilter)}</strong>{" "}
-          <button type="button" className="modal__btn" onClick={u.clearAreaFilter}>Clear</button>
+      <DataTable
+        columns={columns}
+        rows={u.filtered}
+        rowKey={(c) => c.id}
+        loading={!u.loaded && !u.error}
+        error={dialog ? null : u.error}
+        emptyTitle="No customers found"
+        rowTone={(c) => (statusOf(c) === "pending" ? "attn" : undefined)}
+      />
+      {u.filtered.length > 0 && (
+        <p className="ui-hint">
+          {u.filtered.length} {u.filtered.length === 1 ? "customer" : "customers"}
+          {waiting}
         </p>
       )}
 
-      <div className="users-toolbar">
-        <div className="tabs">
-          {u.tabs.map((t) => {
-            const isActive = u.activeTab === t.key;
-            return (
-              <button key={t.key} className={`tab ${isActive ? "active" : ""}`} onClick={() => u.setActiveTab(t.key)}>
-                {t.label}
-                <span className={`count ${isActive ? "active" : ""}`}>{u.counts[t.key]}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="tools">
-          <div className="search-wrap">
-            <input
-              className="search"
-              placeholder="Search by name or email..."
-              value={u.query}
-              onChange={(e) => u.setQuery(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="table-card">
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th className="col-name">Name</th>
-              <th>Email</th>
-              <th>Area</th>
-              <th>Status</th>
-              <th>Registered</th>
-              <th className="col-actions">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {u.filtered.length === 0 ? (
-              <tr>
-                <td className="empty" colSpan={6}>
-                  No users found.
-                </td>
-              </tr>
-            ) : (
-              u.filtered.map((c) => {
-                const status = statusOf(c);
-                return (
-                  <tr key={c.id}>
-                    <td className="name">{c.full_name}</td>
-                    <td className="muted">{c.email}</td>
-                    <td className="muted">{u.areaName(c.area_id)}</td>
-                    <td>
-                      <span className={`status-pill ${status}`}>{status}</span>
-                    </td>
-                    <td className="muted">{formatDate(c.created_at)}</td>
-                    <td>
-                      <div className="actions">
-                        <button className="icon-btn" onClick={() => u.openProfile(c.id)} aria-label="View" title="View">
-                          <EyeIcon className="icon" />
-                        </button>
-
-                        {isSuper && status === "pending" && (
-                          <>
-                            <button className="pill-btn approve" onClick={() => open({ kind: "approve", user: c })}>
-                              Approve
-                            </button>
-                            <button className="pill-btn reject" onClick={() => open({ kind: "reject", user: c })}>
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        {isSuper && status === "accepted" && (
-                          <button className="pill-btn reject" onClick={() => open({ kind: "disable", user: c })}>
-                            Disable
-                          </button>
-                        )}
-                        {isSuper && status === "disabled" && (
-                          <button className="pill-btn approve" onClick={() => open({ kind: "enable", user: c })}>
-                            Enable
-                          </button>
-                        )}
-                        {isSuper && status === "blocked" && (
-                          <button className="pill-btn approve" onClick={() => open({ kind: "unlock", user: c })}>
-                            Unlock
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
       <Modal open={dialog?.kind === "approve"} title={`Approve ${dialog?.user.full_name}`} onClose={close}>
         <form className="modal__form" onSubmit={submitApprove}>
-          <label>
-            Delivery area (required)
+          <Field label="Delivery area (required)">
             <select value={areaId} onChange={(e) => setAreaId(e.target.value)} required>
               <option value="">Select an area…</option>
               {u.areas.map((a) => (
                 <option key={a.area_id} value={a.area_id}>{a.area_name}</option>
               ))}
             </select>
-          </label>
+          </Field>
+          {u.error && <Alert>{u.error}</Alert>}
           <div className="modal__actions">
-            <button type="button" className="modal__btn" onClick={close}>Cancel</button>
-            <button type="submit" className="modal__btn modal__btn--primary">Approve</button>
+            <Button onClick={close}>Cancel</Button>
+            <Button type="submit" variant="primary">Approve</Button>
           </div>
         </form>
       </Modal>
 
       <Modal open={dialog?.kind === "reject"} title={`Reject ${dialog?.user.full_name}`} onClose={close}>
         <form className="modal__form" onSubmit={submitReject}>
-          <textarea
-            placeholder="Reason (required)"
-            rows={3}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            required
-          />
+          <Field label="Reason (required)">
+            <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} required />
+          </Field>
+          {u.error && <Alert>{u.error}</Alert>}
           <div className="modal__actions">
-            <button type="button" className="modal__btn" onClick={close}>Cancel</button>
-            <button type="submit" className="modal__btn modal__btn--danger">Reject</button>
+            <Button onClick={close}>Cancel</Button>
+            <Button type="submit" variant="danger">Reject</Button>
           </div>
         </form>
       </Modal>
@@ -213,6 +177,7 @@ export default function UsersPage() {
         title={confirmCopy?.title ?? ""}
         message={`${dialog?.user.full_name} ${confirmCopy?.text}. Continue?`}
         confirmLabel={confirmCopy?.verb}
+        tone={confirmCopy?.tone}
         onCancel={close}
         onConfirm={confirm}
       />

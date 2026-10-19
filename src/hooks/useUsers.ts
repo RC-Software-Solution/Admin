@@ -33,9 +33,13 @@ export const useUsers = () => {
     const [areas, setAreas] = useState<DeliveryArea[]>([]);
     const [profile, setProfile] = useState<CustomerProfile | null>(null);
     const [error, setError] = useState("");
+    const [loaded, setLoaded] = useState(false); // false until the first customer list arrives
 
     // One fetch of every customer; tabs and counts are derived client-side
-    const load = useCallback(() => svc.listCustomers().then(setRows), []);
+    const load = useCallback(
+        () => svc.listCustomers().then((r) => { setRows(r); setLoaded(true); }),
+        [],
+    );
 
     useEffect(() => {
         load().catch((e: Error) => setError(e.message));
@@ -82,7 +86,7 @@ export const useUsers = () => {
         }, (e: Error) => setError(e.message));
 
     return {
-        activeTab, setActiveTab, query, setQuery, counts, filtered, areaName, error,
+        activeTab, setActiveTab, query, setQuery, counts, filtered, areaName, error, loaded,
         areaFilter, clearAreaFilter: () => setParams({}),
         // new approvals only go to active areas
         areas: areas.filter((a) => a.status === "active"),

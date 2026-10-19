@@ -1,0 +1,5 @@
+/* Customers list and profile. Tokens only; every class starts with cust-. */
+.cust-tools { margin-bottom: var(--space-3); }
+.cust { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.cust__text { min-width: 0; }
+.cust__text .ui-cell__meta { margin-top: 0; overflow-wrap: anywhere; }
