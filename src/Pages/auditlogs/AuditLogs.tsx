@@ -1,70 +1,87 @@
-import React from "react";
-import "../Dashboard/dashboard.css";
+import { Alert, Button, DataTable, FilterBar, PageHeader } from "../../components/ui";
+import type { Column } from "../../components/ui";
 import { useAuditLogs } from "../../hooks/useAuditLogs";
 import { formatDateTime } from "../../utils/formatDate";
 import { AUDIT_GROUPS } from "../../types/auditLogs";
+import type { AuditRow } from "../../types/auditLogs";
 
 const words = (s: string) => s.replace(/[._]/g, " ");
 // UUIDs are shortened; order ids (ORD-...) and numeric ids are shown whole because their first characters don't tell records apart
 const shortId = (id: string) => (id.length === 36 ? id.slice(0, 8) : id);
 const show = (v: unknown) => (typeof v === "object" ? JSON.stringify(v) : String(v));
 
-const AuditLogs: React.FC = () => {
+export default function AuditLogs() {
   const a = useAuditLogs();
   const { filters, data } = a;
   const pages = data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1;
 
-  return (
-    <div className="content">
-      <h1 className="pageTitle">Audit Logs</h1>
-      <div className="pageSub">Who changed what. Customer approvals and blocks are in each customer profile.</div>
+  const columns: Column<AuditRow>[] = [
+    { key: "when", label: "When", nowrap: true, mobile: "inline", cell: (r) => <span className="ui-cell__meta">{formatDateTime(r.created_at)}</span> },
+    {
+      key: "who",
+      label: "Who",
+      mobile: "title",
+      cell: (r) => (
+        <>
+          <b>{r.actor_name ?? "Unknown"}</b>
+          {r.actor_role && <span className="ui-cell__meta"> {words(r.actor_role)}</span>}
+        </>
+      ),
+    },
+    { key: "action", label: "Action", cell: (r) => words(r.action) },
+    { key: "target", label: "Target", cell: (r) => `${words(r.target_type)}${r.target_id ? ` ${shortId(r.target_id)}` : ""}` },
+    {
+      key: "details",
+      label: "Details",
+      cell: (r) => <span className="ui-cell__meta">{r.details ? Object.entries(r.details).map(([k, v]) => `${words(k)}: ${show(v)}`).join(", ") : "—"}</span>,
+    },
+  ];
 
-      <div className="filters">
-        <input type="date" aria-label="From" value={filters.from} max={filters.to} onChange={(e) => e.target.value && a.setFilter({ from: e.target.value })} />
-        <input type="date" aria-label="To" value={filters.to} min={filters.from} onChange={(e) => e.target.value && a.setFilter({ to: e.target.value })} />
+  return (
+    <div>
+      <PageHeader title="Audit Logs" subtitle="Who changed what. Customer approvals and blocks are in each customer profile." />
+
+      <FilterBar label="Audit log filters">
+        <label>
+          From <input type="date" value={filters.from} max={filters.to} onChange={(e) => e.target.value && a.setFilter({ from: e.target.value })} />
+        </label>
+        <label>
+          To <input type="date" value={filters.to} min={filters.from} onChange={(e) => e.target.value && a.setFilter({ to: e.target.value })} />
+        </label>
         <select aria-label="Type" value={filters.group} onChange={(e) => a.setFilter({ group: e.target.value })}>
           <option value="">All actions</option>
-          {AUDIT_GROUPS.map((g) => <option key={g.id} value={g.id}>{g.label}</option>)}
+          {AUDIT_GROUPS.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.label}
+            </option>
+          ))}
         </select>
-        {data && <span className="filters__range">{data.total} {data.total === 1 ? "entry" : "entries"}</span>}
+        {data && (
+          <span className="ui-filterbar__note ui-filterbar__note--end">
+            {data.total} {data.total === 1 ? "entry" : "entries"}
+          </span>
+        )}
+      </FilterBar>
+
+      {a.error && data && <Alert tone="warning">Showing the last loaded page (refresh failed: {a.error})</Alert>}
+
+      <div className={a.loading ? "ui-dim" : undefined}>
+        <DataTable columns={columns} rows={data?.rows ?? []} rowKey={(r) => String(r.id)} loading={!data && !a.error} error={!data && a.error ? `Couldn't load the audit log: ${a.error}` : null} emptyTitle="Nothing recorded in this range" />
       </div>
 
-      {a.error && <div className="sectionNote">{data ? `Showing the last loaded page (refresh failed: ${a.error})` : `Couldn't load the audit log: ${a.error}`}</div>}
-
-      <section className="card">
-        <div className={`tableWrap ${a.loading ? "dim" : ""}`}>
-          {!data && !a.error && <div className="sectionNote">Loading…</div>}
-          {data && (
-            <table className="table">
-              <thead>
-                <tr><th>When</th><th>Who</th><th>Action</th><th>Target</th><th>Details</th></tr>
-              </thead>
-              <tbody>
-                {data.rows.length === 0 && <tr><td colSpan={5} className="sectionNote">Nothing recorded in this range</td></tr>}
-                {data.rows.map((r) => (
-                  <tr key={r.id}>
-                    <td>{formatDateTime(r.created_at)}</td>
-                    <td>{r.actor_name ?? "Unknown"}{r.actor_role ? ` (${words(r.actor_role)})` : ""}</td>
-                    <td>{words(r.action)}</td>
-                    <td>{words(r.target_type)}{r.target_id ? ` ${shortId(r.target_id)}` : ""}</td>
-                    <td>{r.details ? Object.entries(r.details).map(([k, v]) => `${words(k)}: ${show(v)}`).join(", ") : "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
-
       {data && pages > 1 && (
-        <div className="filters">
-          <button disabled={a.page <= 1} onClick={() => a.setPage(a.page - 1)}>Previous</button>
-          <span className="filters__range">Page {a.page} of {pages}</span>
-          <button disabled={a.page >= pages} onClick={() => a.setPage(a.page + 1)}>Next</button>
+        <div className="ui-pager">
+          <span>
+            Page {a.page} of {pages}
+          </span>
+          <Button size="sm" disabled={a.page <= 1} onClick={() => a.setPage(a.page - 1)}>
+            Previous
+          </Button>
+          <Button size="sm" disabled={a.page >= pages} onClick={() => a.setPage(a.page + 1)}>
+            Next
+          </Button>
         </div>
       )}
     </div>
   );
-};
-
-export default AuditLogs;
+}

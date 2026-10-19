@@ -1,5 +1,3 @@
-// kept first only for CSS cascade order (admins.css .pill must win over dashboard.css); plan 4 deletes it
-import "./dashboard.css";
 import "./overview.css";
 import { useDashboard } from "../../hooks/useDashboard";
 import { Alert, Button, PageHeader, Spinner } from "../../components/ui";
