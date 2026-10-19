@@ -1,20 +1,11 @@
-.nt-page { padding: 18px 18px 24px; max-width: 760px; color: #0f172a; }
-.nt-title { margin: 0; font-size: 30px; font-weight: 700; }
-.nt-subtitle { margin: 4px 0 16px; font-size: 12px; color: #64748b; }
-.nt-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-.nt-row { display: flex; gap: 10px; }
-.nt-row .nt-input { flex: 1; }
-.nt-input { border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; font: inherit; font-size: 14px; background: #fff; }
-.nt-textarea { resize: vertical; }
-.nt-send { border: 0; border-radius: 10px; padding: 10px 16px; background: #0ea65a; color: #fff; font-weight: 700; cursor: pointer; }
-.nt-send:disabled { opacity: 0.5; cursor: not-allowed; }
-.nt-error { color: var(--danger-color); font-size: 13px; }
-.nt-result { color: #0ea65a; font-size: 13px; font-weight: 600; }
-.nt-h2 { font-size: 18px; margin: 0 0 10px; }
-.nt-empty { color: #64748b; font-size: 14px; }
-.nt-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.nt-item { display: flex; justify-content: space-between; gap: 16px; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; }
-.nt-itemTitle { font-weight: 700; }
-.nt-itemBody { margin: 4px 0; font-size: 14px; white-space: pre-wrap; }
-.nt-meta { font-size: 12px; color: #64748b; }
-.nt-delete { align-self: flex-start; border: 1px solid #fecaca; background: #fff; color: var(--danger-color); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+.nt-layout { display: grid; grid-template-columns: minmax(0, 480px) minmax(0, 1fr); gap: var(--space-8); align-items: start; }
+.nt-form { display: grid; gap: var(--space-4); }
+.nt-form__send { justify-self: end; }
+.nt-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--gray-300); }
+.nt-item { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); padding: var(--space-3); border-bottom: 1px solid var(--gray-200); }
+.nt-item__title { display: block; font-size: 14.5px; font-weight: 600; }
+.nt-item__body { margin: 2px 0 var(--space-2); font-size: var(--text-base); color: var(--gray-600); white-space: pre-wrap; overflow-wrap: anywhere; }
+.nt-item__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); color: var(--gray-500); font-size: var(--text-sm); }
+@media (max-width: 900px) {
+  .nt-layout { grid-template-columns: minmax(0, 1fr); }
+}

@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import "./notices.css";
 import { createNotice, deleteNotice, listAreas, listNotices } from "./notices.service";
 import type { Area, Notice } from "./notices.service";
-
-const fmt = (iso: string) => new Date(iso).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+import { Alert, Badge, Button, Card, EmptyState, Field, PageHeader, useToast } from "../../components/ui";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
+import { formatDateTime } from "../../utils/formatDate";
 
 export default function NoticesPage() {
+  const toast = useToast();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
   const [title, setTitle] = useState("");
@@ -13,7 +15,8 @@ export default function NoticesPage() {
   const [areaId, setAreaId] = useState(""); // "" = everyone
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState("");
+  const [confirmSend, setConfirmSend] = useState(false);
+  const [toDelete, setToDelete] = useState<Notice | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -32,18 +35,13 @@ export default function NoticesPage() {
   const areaName = (id: Notice["area_id"]) =>
     id === null ? "Everyone" : (areas.find((a) => a.area_id === Number(id))?.area_name ?? `Area ${id}`);
 
-  const send = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const target = areaId ? areaName(Number(areaId)) : "ALL customers";
-    // A push can't be recalled once sent, so make the admin confirm the audience
-    if (!window.confirm(`Send "${title.trim()}" to ${target}?`)) return;
-
+  const send = async () => {
+    setConfirmSend(false);
     setSending(true);
     setError("");
-    setResult("");
     try {
       const { push } = await createNotice({ title: title.trim(), body: body.trim(), area_id: areaId ? Number(areaId) : null });
-      setResult(`Sent to ${push.sent} device${push.sent === 1 ? "" : "s"}${push.failed ? `, ${push.failed} failed` : ""}.`);
+      toast.show(`Sent to ${push.sent} device${push.sent === 1 ? "" : "s"}${push.failed ? `, ${push.failed} failed` : ""}`);
       setTitle("");
       setBody("");
       setAreaId("");
@@ -55,10 +53,13 @@ export default function NoticesPage() {
     }
   };
 
-  const remove = async (n: Notice) => {
-    if (!window.confirm(`Delete "${n.title}"? Customers will no longer see it in the app.`)) return;
+  const remove = async () => {
+    const n = toDelete;
+    setToDelete(null);
+    if (!n) return;
     try {
       await deleteNotice(n.id);
+      toast.show("Notice deleted");
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not delete the notice");
@@ -66,65 +67,87 @@ export default function NoticesPage() {
   };
 
   return (
-    <div className="nt-page">
-      <h1 className="nt-title">Notices</h1>
-      <p className="nt-subtitle">Announcements are pushed to customers' phones and listed in the app.</p>
+    <div>
+      <PageHeader title="Notices" subtitle="Announcements go to customers' phones and appear in the app." />
+      {error && <Alert>{error}</Alert>}
 
-      <form className="nt-form" onSubmit={send}>
-        <input
-          className="nt-input"
-          placeholder="Title"
-          maxLength={150}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <textarea
-          className="nt-input nt-textarea"
-          placeholder="Message"
-          rows={4}
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          required
-        />
-        <div className="nt-row">
-          <select className="nt-input" value={areaId} onChange={(e) => setAreaId(e.target.value)} aria-label="Audience">
-            <option value="">Everyone</option>
-            {areas.map((a) => (
-              <option key={a.area_id} value={a.area_id}>
-                {a.area_name}
-              </option>
-            ))}
-          </select>
-          <button className="nt-send" type="submit" disabled={sending || !title.trim() || !body.trim()}>
-            {sending ? "Sending..." : "Send notice"}
-          </button>
-        </div>
-        {error && <div className="nt-error">{error}</div>}
-        {result && <div className="nt-result">{result}</div>}
-      </form>
+      <div className="nt-layout">
+        <Card title="New notice">
+          <form
+            className="nt-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              // A push can't be recalled once sent, so the admin confirms the audience first
+              setConfirmSend(true);
+            }}
+          >
+            <Field label="Title" hint="Up to 150 characters">
+              <input maxLength={150} value={title} onChange={(e) => setTitle(e.target.value)} required />
+            </Field>
+            <Field label="Message">
+              <textarea rows={4} value={body} onChange={(e) => setBody(e.target.value)} required />
+            </Field>
+            <Field label="Send to">
+              <select value={areaId} onChange={(e) => setAreaId(e.target.value)}>
+                <option value="">Everyone</option>
+                {areas.map((a) => (
+                  <option key={a.area_id} value={a.area_id}>
+                    {a.area_name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Button type="submit" variant="primary" className="nt-form__send" loading={sending} disabled={!title.trim() || !body.trim()}>
+              Send notice
+            </Button>
+          </form>
+        </Card>
 
-      <h2 className="nt-h2">Sent notices</h2>
-      {notices.length === 0 ? (
-        <p className="nt-empty">No notices yet.</p>
-      ) : (
-        <ul className="nt-list">
-          {notices.map((n) => (
-            <li className="nt-item" key={n.id}>
-              <div>
-                <div className="nt-itemTitle">{n.title}</div>
-                <div className="nt-itemBody">{n.body}</div>
-                <div className="nt-meta">
-                  {areaName(n.area_id)} · {fmt(n.createdAt)}
-                </div>
-              </div>
-              <button className="nt-delete" onClick={() => remove(n)}>
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+        <section aria-labelledby="nt-sent">
+          <h2 id="nt-sent" className="ui-section ui-section--first">
+            Sent notices
+          </h2>
+          {notices.length === 0 ? (
+            <EmptyState title="No notices yet" hint="Notices you send show up here." />
+          ) : (
+            <ul className="nt-list">
+              {notices.map((n) => (
+                <li className="nt-item" key={n.id}>
+                  <div>
+                    <b className="nt-item__title">{n.title}</b>
+                    <p className="nt-item__body">{n.body}</p>
+                    <div className="nt-item__meta">
+                      <Badge tone="outline">{areaName(n.area_id)}</Badge>
+                      <span>{formatDateTime(n.createdAt)}</span>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="danger-ghost" aria-label={`Delete ${n.title}`} onClick={() => setToDelete(n)}>
+                    Delete
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      <ConfirmDialog
+        open={confirmSend}
+        title="Send this notice?"
+        message={`Send "${title.trim()}" to ${areaId ? areaName(Number(areaId)) : "all customers"}? A push can't be recalled once it is sent.`}
+        confirmLabel="Send"
+        tone="primary"
+        onCancel={() => setConfirmSend(false)}
+        onConfirm={send}
+      />
+      <ConfirmDialog
+        open={!!toDelete}
+        title="Delete notice"
+        message={`Delete "${toDelete?.title}"? Customers will no longer see it in the app.`}
+        confirmLabel="Delete"
+        onCancel={() => setToDelete(null)}
+        onConfirm={remove}
+      />
     </div>
   );
 }
