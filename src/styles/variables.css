@@ -84,10 +84,4 @@
   --z-toast: 3000;
 
   /* Breakpoints (media queries cannot read custom properties, so write the literals): 640px phone, 1024px drawer */
-
-  /* Legacy names, still used by notices.css; remove when the Notices page migrates. */
-  --primary-color: var(--color-primary);
-  --danger-color: var(--color-danger);
-  --warning-color: var(--color-warning);
-  --neutral-color: var(--gray-500);
 }

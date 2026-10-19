@@ -20,21 +20,6 @@
 }
 .modal__actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
 
-/* Legacy button classes, still used by pages that have not moved to the ui kit */
-.modal__btn {
-  min-height: 38px;
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--gray-300);
-  background: var(--white);
-  color: var(--ink);
-  cursor: pointer;
-  font: inherit;
-  font-weight: 500;
-}
-.modal__btn--primary { background: var(--color-primary-solid); border-color: var(--color-primary-solid); color: var(--white); }
-.modal__btn--danger { background: var(--color-danger); border-color: var(--color-danger); color: var(--white); }
-
 /* Phones: modals become bottom sheets */
 @media (max-width: 640px) {
   .modal {
