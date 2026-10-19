@@ -1,15 +1,16 @@
-import React from "react";
-import "../Dashboard/dashboard.css";
+import { LuDownload } from "react-icons/lu";
 import RangeFilters from "../../components/common/RangeFilters";
+import { Alert, Button, DataTable, PageHeader, Tabs } from "../../components/ui";
+import type { Column } from "../../components/ui";
 import { useReports } from "../../hooks/useReports";
 import { formatMoney } from "../../utils/formatMoney";
 import { downloadCsv } from "./reports.service";
 import type { AreaRow, ItemRow, ReportType, SalesDayRow } from "../../types/reports";
 
-const TABS: { id: ReportType; label: string }[] = [
-  { id: "sales", label: "Sales by day" },
-  { id: "items", label: "Items" },
-  { id: "areas", label: "Areas" },
+const TABS: { value: ReportType; label: string }[] = [
+  { value: "sales", label: "Sales by day" },
+  { value: "items", label: "Items" },
+  { value: "areas", label: "Areas" },
 ];
 
 const avg = (revenue: number, orders: number) => (orders > 0 ? Math.round(revenue / orders) : 0);
@@ -45,63 +46,51 @@ function toTable(type: ReportType, data: unknown[]): Table {
   };
 }
 
-const Reports: React.FC = () => {
+export default function Reports() {
   const r = useReports();
   const table = r.report ? toTable(r.type, r.report.data) : null;
-  const show = (t: Table, row: (string | number)[], i: number) => (t.money.includes(i) ? formatMoney(row[i] as number) : r.type === "areas" && i === 3 ? `${row[i]}%` : row[i]);
+  const show = (t: Table, row: (string | number)[], i: number) =>
+    t.money.includes(i) ? formatMoney(row[i] as number) : r.type === "areas" && i === 3 ? `${row[i]}%` : row[i];
+
+  const columns: Column<(string | number)[]>[] = table
+    ? table.header.map((h, i): Column<(string | number)[]> => ({
+        key: h,
+        label: h,
+        align: i > 0 ? "right" : undefined,
+        mobile: i === 0 ? "title" : undefined,
+        cell: (row) => show(table, row, i),
+        footer: table.total ? show(table, table.total, i) : undefined,
+      }))
+    : [];
 
   return (
-    <div className="content">
-      <h1 className="pageTitle">Reports</h1>
-      <div className="pageSub">Revenue is the total value of orders in the range, whatever their payment status.</div>
+    <div>
+      <PageHeader
+        title="Reports"
+        subtitle="Revenue is the total value of orders in the range, whatever their payment status."
+        actions={
+          <Button disabled={!table || table.rows.length === 0} onClick={() => table && downloadCsv(`${r.type}-${r.range.from}_${r.range.to}.csv`, table.header, table.rows)}>
+            <LuDownload aria-hidden="true" /> Download CSV
+          </Button>
+        }
+      />
 
       <RangeFilters f={r} />
 
-      <section className="card">
-        <div className="card__header">
-          <div className="tabs">
-            {TABS.map((t) => (
-              <button key={t.id} className={`tab ${r.type === t.id ? "tab--active" : ""}`} onClick={() => r.setType(t.id)}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-          <button
-            disabled={!table || table.rows.length === 0}
-            onClick={() => table && downloadCsv(`${r.type}-${r.range.from}_${r.range.to}.csv`, table.header, table.rows)}
-          >
-            Download CSV
-          </button>
-        </div>
-
-        {r.error && (
-          <div className="sectionNote">
-            {table ? `Showing the last loaded data (refresh failed: ${r.error})` : `Couldn't load the report: ${r.error}`} <button onClick={r.refresh}>Retry</button>
-          </div>
+      <Tabs label="Report" value={r.type} tabs={TABS} onChange={r.setType}>
+        {r.error && table && (
+          <Alert tone="warning">
+            Showing the last loaded data (refresh failed: {r.error}){" "}
+            <Button size="sm" onClick={r.refresh}>
+              Retry
+            </Button>
+          </Alert>
         )}
-
-        <div className={`tableWrap ${r.loading ? "dim" : ""}`}>
-          {!table && !r.error && <div className="sectionNote">Loading…</div>}
-          {table && (
-            <table className="table">
-              <thead>
-                <tr>{table.header.map((h) => <th key={h}>{h}</th>)}</tr>
-              </thead>
-              <tbody>
-                {table.rows.length === 0 && <tr><td colSpan={table.header.length} className="sectionNote">No orders in this range</td></tr>}
-                {table.rows.map((row) => (
-                  <tr key={row[0]}>{row.map((_, i) => <td key={i}>{show(table, row, i)}</td>)}</tr>
-                ))}
-                {table.rows.length > 0 && table.total && (
-                  <tr><th>{table.total[0]}</th>{table.total.slice(1).map((_, i) => <th key={i}>{show(table, table.total!, i + 1)}</th>)}</tr>
-                )}
-              </tbody>
-            </table>
-          )}
+        <div className={r.loading ? "ui-dim" : undefined}>
+          <DataTable columns={columns} rows={table?.rows ?? []} rowKey={(row) => String(row[0])} loading={!table && !r.error} error={!table && r.error ? `Couldn't load the report: ${r.error}` : null} emptyTitle="No orders in this range" />
         </div>
-      </section>
+        {!table && r.error && <Button onClick={r.refresh}>Retry</Button>}
+      </Tabs>
     </div>
   );
-};
-
-export default Reports;
+}
