@@ -281,7 +281,7 @@ export default defineConfig(({ mode }) => {
 })
 ```
 
-`--mode local` (used in Task 6) skips the guard so a developer can still build against `http://localhost`.
+`--mode staging` (used in Task 6) skips the guard so a developer can still build against `http://localhost` (`local` is rejected by Vite: it clashes with the `.env.local` suffix).
 
 - [ ] **Step 4: Run it to verify the guard fires**
 
@@ -717,7 +717,7 @@ process.exit(bad.length ? 1 : 0);
 Run (with the local env block exported): `node scripts/check-headers.mjs http://localhost:4173/`
 Expected before preview is running: FAIL (`fetch failed`).
 
-Run: `npx tsc -b && npx vite build --mode local && npx vite preview --mode local --port 4173` in one terminal.
+Run: `npx tsc -b && npx vite build --mode staging && npx vite preview --mode staging --port 4173` in one terminal.
 Run in another: `node scripts/check-headers.mjs http://localhost:4173/`
 Expected: `all security headers present`, exit 0.
 

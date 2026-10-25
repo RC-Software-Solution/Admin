@@ -34,8 +34,10 @@ Hashed assets are immutable; everything else must revalidate. Upload assets firs
 ```bash
 aws s3 sync dist/assets "s3://$BUCKET/assets" --cache-control "public,max-age=31536000,immutable"
 aws s3 sync dist "s3://$BUCKET" --exclude "assets/*" --cache-control "no-cache"
-aws cloudfront create-invalidation --distribution-id "$DIST" --paths "/index.html" "/vite.svg"
+aws cloudfront create-invalidation --distribution-id "$DIST" --paths "/" "/index.html" "/vite.svg"
 ```
+
+`"/"` is purged too so a default-root-object request is not served stale.
 
 ## Verify the release
 
@@ -54,7 +56,7 @@ aws s3api list-object-versions --bucket "$BUCKET" --prefix index.html --max-item
 aws s3api copy-object --bucket "$BUCKET" --key index.html \
   --copy-source "$BUCKET/index.html?versionId=<previous-version-id>" \
   --cache-control "no-cache" --metadata-directive REPLACE --content-type text/html
-aws cloudfront create-invalidation --distribution-id "$DIST" --paths "/index.html"
+aws cloudfront create-invalidation --distribution-id "$DIST" --paths "/" "/index.html"
 ```
 
 Prune assets older than 30 days from the bucket occasionally (a lifecycle rule on the `assets/` prefix does it).
