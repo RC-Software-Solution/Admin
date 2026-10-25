@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Topbar from "../components/Header/Topbar";
+import { logout } from "../services/auth.service";
+import { useIdleLogout } from "../hooks/useIdleLogout";
 import "./layout.css";
 
 interface LayoutProps {
@@ -13,6 +15,12 @@ const Layout: React.FC<LayoutProps> = ({ children, setIsLoggedIn }) => {
   const [navOpen, setNavOpen] = useState(false);
 
   const menuButton = useRef<HTMLButtonElement>(null);
+
+  // Staff leave consoles open on shared machines; sign out after 30 idle minutes.
+  const signOut = useCallback(() => {
+    logout().finally(() => setIsLoggedIn(false));
+  }, [setIsLoggedIn]);
+  useIdleLogout(signOut);
 
   // Escape or a backdrop click hands focus back to the hamburger. A nav link click does not: it navigates.
   const dismiss = () => {

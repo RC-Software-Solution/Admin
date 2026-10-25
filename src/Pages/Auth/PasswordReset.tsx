@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { forgotPassword, resetPassword } from "../../services/auth.service";
 import { Alert, Button, Field } from "../../components/ui";
 import AuthShell from "./AuthShell";
@@ -78,7 +78,13 @@ export function ForgotPassword() {
 
 // Opened from the emailed link: /reset-password?token=...
 export function ResetPassword() {
-  const token = useSearchParams()[0].get("token") ?? "";
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const [token] = useState(() => params.get("token") ?? "");
+  // Drop the token from the address bar so it doesn't linger in history or the Referer header
+  useEffect(() => {
+    navigate("/reset-password", { replace: true });
+  }, [navigate]);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   return (
