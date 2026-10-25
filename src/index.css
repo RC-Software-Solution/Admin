@@ -1,8 +1,9 @@
+@import "./styles/fonts.css";
 @import "./styles/variables.css";
 @import "./styles/global.css";
+@import "./components/ui/ui.css";
 
 html, body {
   margin: 0;
   height: 100%;
-  overflow: hidden;
 }

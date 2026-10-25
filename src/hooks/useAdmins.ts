@@ -1,32 +1,32 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Admin } from "../types/admins";
-import { ADMINS } from "../data/adminsData";
+import { createAdmin, listAdmins, resetAdminPassword, setAdminActive, updateAdmin } from "../Pages/admins/admins.service";
+
+type NewAdmin = Parameters<typeof createAdmin>[0];
 
 export const useAdmins = () => {
-    const [rows, setRows] = useState<Admin[]>(ADMINS);
+    const [rows, setRows] = useState<Admin[]>([]);
+    const [error, setError] = useState("");
+    const [loaded, setLoaded] = useState(false); // false until the first list arrives
 
-    const toggleStatus = (id: string) => {
-        setRows((prev) =>
-            prev.map((a) =>
-                a.id === id
-                    ? { ...a, status: a.status === "active" ? "suspended" : "active" }
-                    : a
-            )
+    const load = useCallback(() => listAdmins().then((r) => { setRows(r); setLoaded(true); }), []);
+
+    useEffect(() => {
+        load().catch((e: Error) => { setError(e.message); setLoaded(true); });
+    }, [load]);
+
+    // Run a mutation, then reload. Resolves true on success so a modal knows to close; failures show in `error`
+    const run = (fn: () => Promise<unknown>) =>
+        fn().then(load).then(
+            () => { setError(""); return true; },
+            (e: Error) => { setError(e.message); return false; },
         );
-    };
-
-    const onEdit = (admin: Admin) => {
-        alert(`Edit: ${admin.name}`);
-    };
-
-    const onAddAdmin = () => {
-        alert("Add Admin");
-    };
 
     return {
-        rows,
-        toggleStatus,
-        onEdit,
-        onAddAdmin
+        rows, loaded, error, clearError: () => setError(""),
+        add: (a: NewAdmin) => run(() => createAdmin(a)),
+        edit: (id: string, a: Parameters<typeof updateAdmin>[1]) => run(() => updateAdmin(id, a)),
+        setActive: (id: string, active: boolean) => run(() => setAdminActive(id, active)),
+        resetPassword: (id: string, password: string) => run(() => resetAdminPassword(id, password)),
     };
 };

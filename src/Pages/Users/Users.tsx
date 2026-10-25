@@ -1,153 +1,207 @@
-
-import "./users.css"; // We can rename this later if needed, but keeping for now
+import { useRef, useState } from "react";
+import { LuDownload } from "react-icons/lu";
+import "./customers.css";
 import { useUsers } from "../../hooks/useUsers";
-import { DownloadIcon, FilterIcon, EyeIcon } from "../../components/common/Icons";
+import { Alert, Avatar, Button, Chip, Chips, DataTable, Field, PageHeader, SearchField } from "../../components/ui";
+import type { Column } from "../../components/ui";
+import Modal from "../../components/common/Modal";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
+import { getSession } from "../../services/apiClient";
+import { formatDateTime } from "../../utils/formatDate";
+import { statusOf, type Customer } from "../../types/users";
+import { ACTIONS, type CustomerAction } from "./customerActions";
+import CustomerDrawer from "./CustomerDrawer";
+
+type Dialog = { kind: CustomerAction; user: Customer } | null;
+
+const CONFIRM_COPY = {
+  disable: { title: "Disable customer", verb: "Disable", text: "can no longer log in or order", tone: "danger" },
+  enable: { title: "Enable customer", verb: "Enable", text: "regains access", tone: "primary" },
+  unlock: { title: "Unlock customer", verb: "Unlock", text: "is unblocked and can order again", tone: "primary" },
+} as const;
 
 export default function UsersPage() {
-  const {
-    activeTab,
-    setActiveTab,
-    query,
-    setQuery,
-    counts,
-    filtered,
-    onApprove,
-    onReject,
-    tabs
-  } = useUsers();
+  const u = useUsers();
+  // UI gating only; the backend checkRole is the enforcement
+  const isSuper = getSession()?.role === "super_admin";
 
-  const onView = (id: string) => {
-    // Replace with your modal / route
-    console.log("View user:", id);
+  const [dialog, setDialog] = useState<Dialog>(null);
+  const [areaId, setAreaId] = useState("");
+  const [reason, setReason] = useState("");
+  // Set when a dialog was started from the profile drawer. The drawer closes first, so closing the dialog would otherwise drop focus on the page.
+  const returnTo = useRef<string | null>(null);
+  const close = () => {
+    setDialog(null);
+    const id = returnTo.current;
+    returnTo.current = null;
+    // The customer may have left this tab (Approve moves them), so fall back to the search box
+    if (id) requestAnimationFrame(() => (document.getElementById(`cust-view-${id}`) ?? document.getElementById("cust-search"))?.focus());
   };
 
-  const onExport = () => {
-    // Replace with your export logic
-    console.log("Export clicked");
+  const open = (d: NonNullable<Dialog>) => {
+    u.clearError(); // an error from an earlier action must not show inside this dialog
+    setAreaId(String(d.user.area_id ?? ""));
+    setReason("");
+    setDialog(d);
   };
 
-  const onFilters = () => {
-    // Replace with opening a filter panel
-    console.log("Filters clicked");
+  const submitApprove = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (dialog?.kind === "approve" && (await u.approve(dialog.user, areaId))) close();
   };
+  const submitReject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (dialog?.kind === "reject" && reason.trim() && (await u.reject(dialog.user, reason.trim()))) close();
+  };
+  const confirm = async () => {
+    if (!dialog || dialog.kind === "approve" || dialog.kind === "reject") return;
+    await u[dialog.kind](dialog.user);
+    close();
+  };
+
+  const confirmCopy = dialog && dialog.kind in CONFIRM_COPY ? CONFIRM_COPY[dialog.kind as keyof typeof CONFIRM_COPY] : null;
+
+  const rowActions = (c: Customer) => (
+    <div className="ui-actions">
+      {isSuper &&
+        ACTIONS[statusOf(c)].map((a) => (
+          <Button key={a.kind} size="sm" variant={a.primary ? "primary" : "secondary"} aria-label={`${a.label} ${c.full_name}`} onClick={() => open({ kind: a.kind, user: c })}>
+            {a.label}
+          </Button>
+        ))}
+      <Button id={`cust-view-${c.id}`} size="sm" variant="ghost" aria-label={`View ${c.full_name}`} onClick={() => u.openProfile(c.id)}>
+        View
+      </Button>
+    </div>
+  );
+
+  const columns: Column<Customer>[] = [
+    {
+      key: "customer",
+      label: "Customer",
+      mobile: "title",
+      cell: (c) => (
+        <div className="cust">
+          <Avatar name={c.full_name} />
+          <div className="cust__text">
+            <b className="ui-cell__title">{c.full_name}</b>
+            <div className="ui-cell__meta">{c.email}</div>
+          </div>
+        </div>
+      ),
+    },
+    { key: "phone", label: "Phone", mobile: "hide", nowrap: true, cell: (c) => c.phone ?? "—" },
+    { key: "area", label: "Area", mobile: "hide", cell: (c) => u.areaName(c.area_id) },
+    { key: "registered", label: "Registered", mobile: "hide", nowrap: true, cell: (c) => <span className="ui-cell__meta">{formatDateTime(c.created_at)}</span> },
+    { key: "actions", label: "Actions", align: "right", mobile: "actions", cell: rowActions },
+  ];
+
+  const waiting = u.activeTab === "pending" ? " waiting" : "";
 
   return (
-    <div className="users-page">
-      <div className="users-header">
-        <div>
-          <h1 className="title">Users</h1>
-          <p className="subtitle">Manage customer accounts</p>
-        </div>
+    <div>
+      <PageHeader
+        title="Users"
+        subtitle="Approve new customers and manage their accounts"
+        actions={
+          <Button onClick={u.exportCsv}>
+            <LuDownload aria-hidden="true" /> Export CSV
+          </Button>
+        }
+      />
 
-        <button className="btn btn-export" onClick={onExport}>
-          <DownloadIcon className="icon" />
-          Export
-        </button>
+      {u.areaFilter && (
+        <Alert tone="info">
+          Showing customers in <strong>{u.areaName(u.areaFilter)}</strong>.{" "}
+          <Button size="sm" variant="ghost" onClick={u.clearAreaFilter}>
+            Clear filter
+          </Button>
+        </Alert>
+      )}
+
+      <Chips label="Customer status">
+        {u.tabs.map((t) => (
+          <Chip key={t.key} selected={u.activeTab === t.key} count={u.counts[t.key]} onClick={() => u.setActiveTab(t.key)}>
+            {t.label}
+          </Chip>
+        ))}
+      </Chips>
+
+      <div className="cust-tools">
+        <SearchField id="cust-search" label="Search customers" placeholder="Search by name or email" value={u.query} onChange={(e) => u.setQuery(e.target.value)} />
       </div>
 
-      <div className="users-toolbar">
-        <div className="tabs">
-          {tabs.map((t) => {
-            const isActive = activeTab === t.key;
-            return (
-              <button
-                key={t.key}
-                className={`tab ${isActive ? "active" : ""}`}
-                onClick={() => setActiveTab(t.key)}
-              >
-                {t.label}
-                <span className={`count ${isActive ? "active" : ""}`}>
-                  {counts[t.key]}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+      <DataTable
+        columns={columns}
+        rows={u.filtered}
+        rowKey={(c) => c.id}
+        loading={!u.loaded && !u.error}
+        error={dialog ? null : u.error}
+        emptyTitle="No customers found"
+        rowTone={(c) => (statusOf(c) === "pending" ? "attn" : undefined)}
+      />
+      {u.filtered.length > 0 && (
+        <p className="ui-hint">
+          {u.filtered.length} {u.filtered.length === 1 ? "customer" : "customers"}
+          {waiting}
+        </p>
+      )}
 
-        <div className="tools">
-          <div className="search-wrap">
-            <input
-              className="search"
-              placeholder="Search by name or email..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
+      <Modal open={dialog?.kind === "approve"} title={`Approve ${dialog?.user.full_name}`} onClose={close}>
+        <form className="modal__form" onSubmit={submitApprove}>
+          <Field label="Delivery area (required)">
+            <select value={areaId} onChange={(e) => setAreaId(e.target.value)} required>
+              <option value="">Select an area…</option>
+              {u.areas.map((a) => (
+                <option key={a.area_id} value={a.area_id}>{a.area_name}</option>
+              ))}
+            </select>
+          </Field>
+          {u.error && <Alert>{u.error}</Alert>}
+          <div className="modal__actions">
+            <Button onClick={close}>Cancel</Button>
+            <Button type="submit" variant="primary">Approve</Button>
           </div>
+        </form>
+      </Modal>
 
-          <button className="btn btn-filters" onClick={onFilters}>
-            <FilterIcon className="icon" />
-            Filters
-          </button>
-        </div>
-      </div>
+      <Modal open={dialog?.kind === "reject"} title={`Reject ${dialog?.user.full_name}`} onClose={close}>
+        <form className="modal__form" onSubmit={submitReject}>
+          <Field label="Reason (required)">
+            <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} required />
+          </Field>
+          {u.error && <Alert>{u.error}</Alert>}
+          <div className="modal__actions">
+            <Button onClick={close}>Cancel</Button>
+            <Button type="submit" variant="danger">Reject</Button>
+          </div>
+        </form>
+      </Modal>
 
-      <div className="table-card">
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th className="col-name">Name</th>
-              <th>Email</th>
-              <th>Area</th>
-              <th>Status</th>
-              <th>Registered</th>
-              <th className="col-actions">Actions</th>
-            </tr>
-          </thead>
+      <ConfirmDialog
+        open={!!confirmCopy}
+        title={confirmCopy?.title ?? ""}
+        message={`${dialog?.user.full_name} ${confirmCopy?.text}. Continue?`}
+        confirmLabel={confirmCopy?.verb}
+        tone={confirmCopy?.tone}
+        onCancel={close}
+        onConfirm={confirm}
+      />
 
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr>
-                <td className="empty" colSpan={6}>
-                  No users found.
-                </td>
-              </tr>
-            ) : (
-              filtered.map((u) => (
-                <tr key={u.id}>
-                  <td className="name">{u.name}</td>
-                  <td className="muted">{u.email}</td>
-                  <td className="muted">{u.area}</td>
-                  <td>
-                    <span className={`status-pill ${u.status}`}>
-                      {u.status}
-                    </span>
-                  </td>
-                  <td className="muted">{u.registered}</td>
-                  <td>
-                    <div className="actions">
-                      <button
-                        className="icon-btn"
-                        onClick={() => onView(u.id)}
-                        aria-label="View"
-                        title="View"
-                      >
-                        <EyeIcon className="icon" />
-                      </button>
-
-                      {u.status === "pending" && (
-                        <>
-                          <button
-                            className="pill-btn approve"
-                            onClick={() => onApprove(u.id)}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            className="pill-btn reject"
-                            onClick={() => onReject(u.id)}
-                          >
-                            Reject
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <CustomerDrawer
+        profile={u.profile}
+        areaName={u.areaName(u.profile?.area_id ?? null)}
+        canAct={isSuper}
+        onClose={u.closeProfile}
+        onAction={(kind) => {
+          // close the drawer first so the profile is never stale behind the confirmation dialog
+          if (u.profile) {
+            returnTo.current = u.profile.id;
+            open({ kind, user: u.profile });
+          }
+          u.closeProfile();
+        }}
+      />
     </div>
   );
 }

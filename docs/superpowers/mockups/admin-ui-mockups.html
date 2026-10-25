@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Panel: UI mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Tokens ===== */
+:root {
+  --tea: #123524;
+  --tea-2: #1c4a33;
+  --mint: #8fd0a8;
+  --leaf: #16803c;
+  --leaf-hover: #116332;
+  --leaf-tint: #e2f0e6;
+  --leaf-line: #b9d9c3;
+  --paper: #f3f5f0;
+  --white: #ffffff;
+  --ink: #18241d;
+  --mist: #5c6b61;
+  --line: #dde3db;
+  --line-strong: #c3ccc1;
+  --turmeric: #e0a100;
+  --turmeric-tint: #fbefc9;
+  --turmeric-ink: #6b4b00;
+  --brick: #b3362a;
+  --brick-tint: #f8dfdb;
+  --brick-ink: #8a261c;
+  --sky-tint: #e6edf3;
+  --font-head: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, "Segoe UI", "Nirmala UI", sans-serif;
+  --r-ctl: 6px;
+  --r-float: 10px;
+  --focus: 0 0 0 3px rgba(22, 128, 60, 0.28);
+  --shadow-float: 0 12px 32px rgba(18, 53, 36, 0.16), 0 2px 6px rgba(18, 53, 36, 0.08);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 400 14px/1.45 var(--font-body); font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--leaf); text-decoration: none; }
+:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
+svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ===== Mockup picker (hidden with ?bare) ===== */
+#picker { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; padding: 8px 14px; background: #0b2016; color: #b7cdbd; font-size: 12px; position: sticky; top: 0; z-index: 5000; }
+#picker b { color: #fff; margin-right: 6px; font-family: var(--font-head); font-size: 13px; }
+#picker a { color: #b7cdbd; padding: 3px 8px; border-radius: 4px; }
+#picker a:hover { background: rgba(255,255,255,.1); }
+#picker a.on { background: var(--leaf); color: #fff; }
+body.bare #picker { display: none; }
+
+/* ===== Shell ===== */
+.app { display: grid; grid-template-columns: 244px minmax(0, 1fr); min-height: 100vh; background: linear-gradient(to right, var(--tea) 244px, var(--paper) 244px); }
+body:not(.bare) .app { min-height: calc(100vh - 44px); }
+.rail { background: var(--tea); color: #c9dccf; padding: 20px 12px; display: flex; flex-direction: column; gap: 22px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+body:not(.bare) .rail { top: 44px; height: calc(100vh - 44px); }
+.brand { display: flex; align-items: center; gap: 10px; padding: 0 10px; font: 700 21px/1 var(--font-head); letter-spacing: -0.01em; color: #fff; }
+.brand i { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, var(--mint), var(--leaf)); display: block; position: relative; }
+.brand i::after { content: ""; position: absolute; inset: 6px; border-radius: 2px; background: var(--tea); }
+.navgroup { display: flex; flex-direction: column; gap: 2px; }
+.navgroup > span { padding: 0 10px 6px; font-size: 12px; font-weight: 500; color: #86a893; }
+.navitem { display: flex; align-items: center; gap: 11px; padding: 9px 10px; border-radius: var(--r-ctl); color: #c9dccf; font-size: 14px; position: relative; }
+.navitem:hover { background: rgba(255,255,255,.06); color: #fff; }
+.navitem.on { background: rgba(255,255,255,.1); color: #fff; font-weight: 600; }
+.navitem.on::before { content: ""; position: absolute; left: -12px; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: var(--mint); }
+
+.stage { min-width: 0; padding: 0 32px 56px; }
+.topbar { display: flex; align-items: center; gap: 14px; height: 72px; }
+.iconbtn.menu-btn { display: none; }
+.search { position: relative; flex: 1; max-width: 440px; }
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--mist); }
+.search input { width: 100%; height: 40px; padding: 0 12px 0 38px; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--white); }
+.search input::placeholder { color: #7b897f; }
+.topbar .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.iconbtn { position: relative; width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--white); cursor: pointer; }
+.iconbtn .n { position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px; background: var(--brick); color: #fff; font-size: 11px; font-weight: 600; display: grid; place-items: center; }
+.me { display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 12px 0 5px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); font-weight: 500; }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--tea); color: #fff; display: grid; place-items: center; font: 600 13px var(--font-head); flex: none; }
+.avatar.soft { background: #dfe9e2; color: var(--tea); }
+.avatar.lg { width: 56px; height: 56px; font-size: 20px; }
+
+.pagehead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px; padding: 8px 0 22px; }
+.pagehead h1 { font: 700 32px/1.1 var(--font-head); letter-spacing: -0.02em; }
+.pagehead p { margin-top: 6px; color: var(--mist); font-size: 14px; }
+.pagehead .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ===== Buttons ===== */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 38px; padding: 0 16px; border: 1px solid transparent; border-radius: var(--r-ctl); font-weight: 500; cursor: pointer; white-space: nowrap; background: none; }
+.btn.sm { height: 31px; padding: 0 12px; font-size: 13px; }
+.btn.primary { background: var(--leaf); color: #fff; }
+.btn.primary:hover { background: var(--leaf-hover); }
+.btn.secondary { background: var(--white); border-color: var(--line-strong); color: var(--ink); }
+.btn.secondary:hover { background: #f6f8f4; }
+.btn.ghost { color: var(--ink); }
+.btn.ghost:hover { background: rgba(18,53,36,.07); }
+.btn.danger { background: var(--brick); color: #fff; }
+.btn.danger-ghost { color: var(--brick-ink); }
+.btn.danger-ghost:hover { background: var(--brick-tint); }
+.btn:disabled, .btn.disabled { opacity: .45; cursor: not-allowed; }
+.btn.icon { width: 31px; padding: 0; }
+.spin { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Controls ===== */
+.ctl { height: 38px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-ctl); background: var(--white); min-width: 0; }
+textarea.ctl { height: auto; padding: 10px 12px; line-height: 1.45; resize: vertical; }
+.ctl:focus-visible, .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { outline: none; border-color: var(--leaf); box-shadow: var(--focus); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; }
+.field input, .field select, .field textarea { height: 40px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-ctl); background: var(--white); width: 100%; }
+.field textarea { height: auto; padding: 10px 12px; }
+.field .hint { font-size: 12.5px; color: var(--mist); }
+.field.bad input { border-color: var(--brick); }
+.field .err { font-size: 12.5px; color: var(--brick-ink); font-weight: 500; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+.filters label { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mist); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip { height: 34px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--white); cursor: pointer; font-weight: 500; font-size: 13.5px; display: inline-flex; align-items: center; gap: 8px; }
+.chip .c { font-size: 12px; color: var(--mist); font-weight: 600; }
+.chip.on { background: var(--tea); border-color: var(--tea); color: #fff; }
+.chip.on .c { color: #b3cfbc; }
+.chip.attn.on { background: var(--turmeric-tint); border-color: var(--turmeric); color: var(--turmeric-ink); }
+.tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); margin-bottom: 16px; overflow-x: auto; }
+.tab { padding: 10px 0; border: 0; background: none; cursor: pointer; font-weight: 500; color: var(--mist); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tab.on { color: var(--ink); border-bottom-color: var(--leaf); font-weight: 600; }
+.seg { display: inline-flex; max-width: 100%; overflow-x: auto; padding: 3px; background: #e6ebe3; border-radius: 8px; gap: 2px; }
+.seg button { white-space: nowrap; height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: none; cursor: pointer; font-weight: 500; color: var(--mist); }
+.seg button.on { background: var(--white); color: var(--ink); box-shadow: 0 1px 2px rgba(18,53,36,.15); }
+.switch { width: 38px; height: 22px; border-radius: 999px; background: var(--line-strong); position: relative; flex: none; border: 0; cursor: pointer; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch.on { background: var(--leaf); }
+.switch.on::after { transform: translateX(16px); }
+input[type=checkbox].cb { width: 18px; height: 18px; accent-color: var(--leaf); }
+
+/* ===== Badges, markers ===== */
+.badge { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.badge.neutral { background: #e8ece6; color: #3a4a40; }
+.badge.leaf { background: var(--leaf-tint); color: var(--leaf-hover); }
+.badge.turmeric { background: var(--turmeric-tint); color: var(--turmeric-ink); }
+.badge.brick { background: var(--brick-tint); color: var(--brick-ink); }
+.badge.tea { background: var(--tea); color: #fff; }
+.badge.outline { border: 1px solid var(--line-strong); color: var(--mist); background: none; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+.dot.leaf { background: var(--leaf); } .dot.turmeric { background: var(--turmeric); } .dot.brick { background: var(--brick); } .dot.mist { background: var(--line-strong); } .dot.ring { background: none; border: 2px solid var(--line-strong); }
+.mark { display: inline-flex; align-items: center; gap: 7px; font-weight: 500; font-size: 13.5px; white-space: nowrap; }
+.mark.unpaid { font-weight: 600; }
+.muted { color: var(--mist); }
+.small { font-size: 13px; }
+.xs { font-size: 12px; }
+.strong { font-weight: 600; }
+
+/* Order lifecycle track */
+.track { display: flex; flex-direction: column; gap: 5px; }
+.track .bars { display: flex; gap: 3px; }
+.track .bars i { width: 26px; height: 6px; border-radius: 3px; background: #dfe5dd; }
+.track .bars i.wait { background: var(--turmeric); }
+.track .bars i.on { background: var(--leaf); }
+.track .bars i.done { background: var(--tea); }
+.track .bars i.x { background: repeating-linear-gradient(135deg, #e7c3be 0 3px, #f3dcd8 3px 6px); }
+.track .bars i.bad { background: var(--brick); }
+.track .lbl { font-size: 12.5px; font-weight: 600; }
+.track.s-pending .lbl { color: var(--turmeric-ink); }
+.track.s-cancelled .lbl, .track.s-delivery_failed .lbl { color: var(--brick-ink); }
+.track.lg .bars i { width: 54px; height: 9px; }
+
+/* ===== Lists (ruled rows on paper) ===== */
+.list { border-top: 1px solid var(--line-strong); }
+.lhead, .lrow { display: grid; grid-template-columns: var(--cols); gap: 16px; align-items: center; padding: 0 12px; }
+.lhead { height: 40px; font-size: 12.5px; font-weight: 600; color: var(--mist); border-bottom: 1px solid var(--line); }
+.lrow { min-height: 66px; padding-top: 11px; padding-bottom: 11px; border-bottom: 1px solid var(--line); position: relative; }
+.lrow:hover { background: var(--white); }
+.lrow.attn { box-shadow: inset 4px 0 0 var(--turmeric); }
+.lrow.bad { box-shadow: inset 4px 0 0 var(--brick); }
+.lrow .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.lrow .who > div > b, .lrow .who > b { display: block; font-weight: 600; font-size: 14.5px; }
+.lrow .who > div > span { display: block; color: var(--mist); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lrow .num, .lhead .num { text-align: right; }
+.lrow .num { font-weight: 600; }
+.lrow .acts, .lhead .acts { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; align-items: center; }
+.lfoot { display: flex; align-items: center; justify-content: space-between; padding: 14px 12px; color: var(--mist); font-size: 13px; }
+.thumb { width: 44px; height: 44px; border-radius: 8px; background: var(--leaf-tint); display: grid; place-items: center; font: 700 15px var(--font-head); color: var(--tea); flex: none; }
+.thumb.t2 { background: var(--turmeric-tint); color: var(--turmeric-ink); }
+.thumb.t3 { background: #e6edf3; color: #2c4c68; }
+.thumb.t4 { background: var(--brick-tint); color: var(--brick-ink); }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #e8ece6; color: #3a4a40; font-size: 12px; margin: 2px 4px 2px 0; }
+
+/* panels used sparingly: forms, floating things */
+.panel { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-float); padding: 22px; }
+.panel h2 { font: 700 18px/1.2 var(--font-head); letter-spacing: -0.01em; margin-bottom: 4px; }
+.sectionhead { font: 700 19px/1.2 var(--font-head); letter-spacing: -0.01em; margin: 30px 0 12px; }
+.sectionhead.first { margin-top: 0; }
+.stack { display: grid; gap: 16px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.two.dash2 { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+.setpanel { max-width: 760px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+
+/* ===== Dashboard pieces ===== */
+.attention { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--white); border: 1px solid var(--line); border-radius: var(--r-float); margin-bottom: 26px; }
+.attention > div { padding: 20px 24px; display: flex; flex-direction: column; gap: 4px; }
+.attention > div + div { border-left: 1px solid var(--line); }
+.attention .big { font: 700 46px/1 var(--font-head); letter-spacing: -0.03em; }
+.attention .big.hot { box-shadow: inset 0 -10px 0 var(--turmeric-tint); display: inline-block; align-self: flex-start; }
+.attention .big.bad { box-shadow: inset 0 -10px 0 var(--brick-tint); display: inline-block; align-self: flex-start; }
+.attention p { color: var(--mist); }
+.attention .btn { align-self: flex-start; margin-top: 10px; }
+.kpis { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 8px; }
+.kpi { padding: 4px 0; }
+.kpi .lab { color: var(--mist); font-size: 13px; font-weight: 500; }
+.kpi .val { font: 700 38px/1.1 var(--font-head); letter-spacing: -0.025em; margin: 4px 0 2px; }
+.kpi .delta { font-weight: 600; font-size: 13px; }
+.delta.up { color: var(--leaf-hover); } .delta.down { color: var(--brick-ink); }
+.chartbars { display: flex; align-items: flex-end; gap: 10px; height: 140px; padding-top: 8px; }
+.chartbars .col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; height: 100%; }
+.chartbars .col i { display: block; border-radius: 3px 3px 0 0; }
+.chartbars.spark .col i { width: 100%; max-width: 40px; align-self: center; }
+.chartbars .col span { margin-top: 6px; font-size: 12px; color: var(--mist); text-align: center; }
+.legend { display: flex; gap: 16px; font-size: 12.5px; color: var(--mist); margin-top: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.meter { height: 6px; border-radius: 3px; background: #e3e8e1; overflow: hidden; margin-top: 6px; }
+.meter i { display: block; height: 100%; background: var(--leaf); }
+
+/* ===== Floating: modal, drawer, toast, bar ===== */
+.scrim { position: fixed; inset: 0; background: rgba(18,53,36,.45); z-index: 3000; display: grid; place-items: center; padding: 16px; }
+body:not(.bare) .scrim { top: 44px; }
+.dialog { width: min(480px, 100%); background: var(--white); border-radius: var(--r-float); box-shadow: var(--shadow-float); padding: 26px; display: grid; gap: 16px; max-height: 92vh; overflow: auto; }
+.dialog h2 { font: 700 21px/1.2 var(--font-head); letter-spacing: -0.015em; }
+.dialog .foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.dialog p { color: var(--mist); }
+.drawer-wrap { position: fixed; inset: 0; z-index: 3000; background: rgba(18,53,36,.45); display: flex; justify-content: flex-end; }
+body:not(.bare) .drawer-wrap { top: 44px; }
+.drawer { width: min(520px, 100%); background: var(--white); height: 100%; overflow: auto; box-shadow: var(--shadow-float); padding: 26px; display: grid; gap: 22px; align-content: start; }
+.timeline { display: grid; gap: 0; }
+.timeline > div { display: grid; grid-template-columns: 14px 1fr; gap: 14px; padding-bottom: 18px; position: relative; }
+.timeline > div::before { content: ""; position: absolute; left: 6px; top: 14px; bottom: 0; width: 2px; background: var(--line); }
+.timeline > div:last-child::before { display: none; }
+.timeline .pt { width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--leaf); background: var(--white); margin-top: 3px; }
+.timeline .pt.bad { border-color: var(--brick); }
+.timeline .pt.warn { border-color: var(--turmeric); }
+.toast { display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 16px; border-radius: var(--r-float); background: var(--tea); color: #fff; box-shadow: var(--shadow-float); font-weight: 500; width: fit-content; max-width: 100%; }
+.toast.err { background: var(--brick); }
+.toast button { background: none; border: 0; color: inherit; opacity: .8; cursor: pointer; font-size: 18px; line-height: 1; }
+.selbar { position: fixed; left: calc(50% + 122px); transform: translateX(-50%); bottom: 22px; z-index: 2500; display: flex; align-items: center; gap: 16px; padding: 10px 10px 10px 20px; background: var(--tea); color: #fff; border-radius: 999px; box-shadow: var(--shadow-float); }
+.selbar .btn { border-radius: 999px; }
+.alert { padding: 12px 16px; border-radius: var(--r-ctl); border: 1px solid; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; }
+.alert.err { background: var(--brick-tint); border-color: #e8b5ae; color: var(--brick-ink); }
+.alert.warn { background: var(--turmeric-tint); border-color: #ecd185; color: var(--turmeric-ink); }
+.alert.ok { background: var(--leaf-tint); border-color: var(--leaf-line); color: var(--leaf-hover); }
+.empty { text-align: center; padding: 56px 16px; display: grid; gap: 8px; justify-items: center; color: var(--mist); }
+.empty h3 { font: 700 19px var(--font-head); color: var(--ink); }
+.skel { height: 14px; border-radius: 4px; background: linear-gradient(90deg, #e6ebe3, #f1f4ee, #e6ebe3); background-size: 200% 100%; animation: sh 1.4s linear infinite; }
+@keyframes sh { to { background-position: -200% 0; } }
+
+/* ===== Login ===== */
+.login { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+.login .art { background: var(--tea); color: #fff; padding: 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.login .art h2 { font: 700 46px/1.05 var(--font-head); letter-spacing: -0.03em; max-width: 12ch; }
+.login .art p { color: #a9c4b3; max-width: 34ch; margin-top: 16px; font-size: 16px; }
+.login .form { display: grid; place-items: center; padding: 32px; }
+.login .box { width: min(380px, 100%); display: grid; gap: 18px; }
+.login .box h1 { font: 700 30px/1.1 var(--font-head); letter-spacing: -0.02em; }
+body.bare .login, .login { }
+
+/* ===== Mockup-only helpers ===== */
+.sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.sw > div { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--white); }
+.sw > div > i { display: block; height: 64px; }
+.sw > div > span { display: block; padding: 8px 10px; font-size: 12.5px; }
+.cs { margin-bottom: 44px; }
+.cs > h2 { font: 700 24px var(--font-head); letter-spacing: -0.02em; margin-bottom: 4px; }
+.cs > .d { color: var(--mist); margin-bottom: 18px; }
+.demo { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-float); padding: 22px; display: grid; gap: 18px; }
+.demo.paper { background: var(--paper); }
+.row-flex { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.tscale > div { display: flex; align-items: baseline; gap: 18px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.tscale small { width: 160px; color: var(--mist); font-size: 12.5px; flex: none; }
+.phone { width: 390px; border: 1px solid var(--line-strong); border-radius: 22px; overflow: hidden; background: var(--paper); box-shadow: var(--shadow-float); }
+.sheet { background: var(--white); border-radius: 16px 16px 0 0; padding: 22px; display: grid; gap: 14px; box-shadow: 0 -8px 24px rgba(18,53,36,.18); }
+.sheet::before { content: ""; width: 38px; height: 4px; border-radius: 2px; background: var(--line-strong); margin: -10px auto 4px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+  .app { grid-template-columns: 1fr; background: var(--paper); }
+  .rail { display: none; }
+  .stage { padding: 0 20px 56px; }
+  .iconbtn.menu-btn { display: grid; }
+  .two, .two.dash2, .kpis, .setpanel { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .stage { padding: 0 14px 90px; }
+  .topbar { height: 64px; gap: 10px; }
+  .me .nm, .me .chev { display: none; }
+  .me { padding: 0 5px; }
+  .pagehead h1 { font-size: 26px; }
+  .attention { grid-template-columns: 1fr; }
+  .attention > div + div { border-left: 0; border-top: 1px solid var(--line); }
+  .attention > div { padding: 16px 18px; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 16px; }
+  .attention .big { font-size: 36px; }
+  .attention .btn { margin: 0 0 0 auto; }
+  .lhead { display: none; }
+  .lrow { grid-template-columns: 1fr auto !important; gap: 8px 12px; padding: 14px 12px; }
+  .lrow > * { grid-column: 1 / -1; }
+  .lrow > .m-title { grid-column: 1; }
+  .lrow > .m-amt { grid-column: 2; grid-row: 1; text-align: right; }
+  .lrow .acts { justify-content: flex-start; }
+  .lrow .num { text-align: left; }
+  .lrow .m-hide { display: none; }
+  .btn { height: 44px; } .btn.sm { height: 38px; }
+  .ctl, .field input, .field select, .field textarea, .search input { height: 44px; font-size: 16px; }
+  .filters > * { flex: 1 1 140px; }
+  .filters label { flex: 1 1 100%; }
+  .filters label .ctl { flex: 1; }
+  .selbar { left: 12px; }
+  .dialog { align-self: end; width: 100%; border-radius: 16px 16px 0 0; }
+  .scrim { padding: 0; place-items: end stretch; }
+  .selbar { left: 12px; right: 12px; transform: none; border-radius: 16px; justify-content: space-between; }
+  .login { grid-template-columns: 1fr; }
+  .login .art { padding: 28px; min-height: 220px; }
+  .login .art h2 { font-size: 32px; }
+  .tscale small { width: 100px; }
+  .phone { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .spin, .skel { animation: none; } }
+</style>
+</head>
+<body>
+<div id="picker"></div>
+<div id="root"></div>
+
+<script>
+/* ===== helpers ===== */
+const I = {
+  dash: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.4c2 .8 3.5 2.7 3.5 5.6"/>',
+  orders: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+  notice: '<path d="M3 10v4l11 4V6z"/><path d="M14 8.5h2.5a3.5 3.5 0 010 7H14M6 15v4"/>',
+  pin: '<path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  food: '<path d="M7 3v8M4 3v5a3 3 0 006 0V3M7 11v10M17 3c-2 2-3 5-3 8h3v10"/>',
+  truck: '<path d="M2 6h11v10H2zM13 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  chart: '<path d="M5 20V10M12 20V4M19 20v-7"/>',
+  sliders: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  history: '<path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  bell: '<path d="M6 17V11a6 6 0 1112 0v6l1.5 2h-15zM10 21h4"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  more: '<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>',
+  chev: '<path d="M6 9l6 6 6-6"/>',
+  down: '<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+};
+const ic = (n, s) => `<svg class="i" viewBox="0 0 24 24" ${s ? `style="width:${s}px;height:${s}px"` : ""} aria-hidden="true">${I[n]}</svg>`;
+const money = (n) => "LKR " + Number(n).toLocaleString("en-LK");
+const initials = (n) => n.split(" ").map((w) => w[0]).slice(0, 2).join("");
+const btn = (t, c = "secondary", extra = "") => `<button class="btn ${c} ${extra}">${t}</button>`;
+const more = `<button class="btn ghost sm icon" aria-label="More actions">${ic("more")}</button>`;
+
+const NAV = [
+  ["Overview", [["dashboard", "Dashboard", "dash"]]],
+  ["Customers", [["users", "Users", "users"], ["orders", "Orders", "orders"], ["notices", "Notices", "notice"]]],
+  ["Operations", [["areas", "Delivery Areas", "pin"], ["sessions", "Sessions", "cal"], ["food", "Food Items", "food"], ["persons", "Delivery Persons", "truck"]]],
+  ["Insights", [["reports", "Reports", "chart"]]],
+  ["Admin", [["admins", "Admins", "shield"], ["settings", "Settings", "sliders"], ["audit", "Audit Logs", "history"]]],
+];
+
+function shell(active, title, sub, acts, body) {
+  const nav = NAV.map(([g, items]) => `<div class="navgroup"><span>${g}</span>${items.map(([id, name, icon]) => `<a class="navitem ${id === active ? "on" : ""}" href="#${id}">${ic(icon)}${name}</a>`).join("")}</div>`).join("");
+  return `<div class="app">
+    <aside class="rail"><div class="brand"><i></i>Admin Panel</div>${nav}</aside>
+    <main class="stage">
+      <div class="topbar">
+        <button class="iconbtn menu-btn" aria-label="Menu">${ic("menu", 20)}</button>
+        <div class="search">${ic("search")}<input placeholder="Customers or orders" aria-label="Search customers and orders"></div>
+        <div class="right"><button class="iconbtn" aria-label="9 items need attention">${ic("bell", 20)}<span class="n">9</span></button>
+          <div class="me"><span class="avatar">B</span><span class="nm">Buddhi Gayan</span><span class="chev">${ic("chev", 16)}</span></div></div>
+      </div>
+      <div class="pagehead"><div><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div>${acts ? `<div class="acts">${acts}</div>` : ""}</div>
+      ${body}
+    </main></div>`;
+}
+
+const STATE = { pending: [["wait", "", "", ""], "Pending"], preparing: [["on", "on", "", ""], "Preparing"], delivering: [["on", "on", "on", ""], "Delivering"], delivered: [["done", "done", "done", "done"], "Delivered"], completed: [["done", "done", "done", "done"], "Completed"], cancelled: [["x", "x", "x", "x"], "Cancelled"], delivery_failed: [["on", "on", "on", "bad"], "Delivery failed"] };
+const track = (s, lg) => `<div class="track s-${s} ${lg ? "lg" : ""}" role="img" aria-label="${STATE[s][1]}"><div class="bars">${STATE[s][0].map((c) => `<i class="${c}"></i>`).join("")}</div><span class="lbl">${STATE[s][1]}</span></div>`;
+const pay = (p) => ({ paid: '<span class="mark"><i class="dot leaf"></i>Paid</span>', unpaid: '<span class="mark unpaid"><i class="dot turmeric"></i>Unpaid</span>', pending: '<span class="mark muted"><i class="dot ring"></i>Pending</span>', ignored: '<span class="mark muted"><i class="dot mist"></i>Ignored</span>' }[p]);
+
+/* ===== data ===== */
+const ORDERS = [
+  ["Nimal Perera", "ORD-20261018-0042", "Colombo 03", 2, 970, "pending", "pending", "8:42 AM", "Move to preparing"],
+  ["Kumari Silva", "ORD-20261018-0041", "Nugegoda", 1, 485, "preparing", "paid", "8:31 AM", "Move to delivering"],
+  ["Ruwan Fernando", "ORD-20261018-0040", "Dehiwala", 3, 1560, "delivering", "paid", "8:12 AM", "Mark delivered"],
+  ["Dilani Jayasinghe", "ORD-20261018-0039", "Colombo 03", 1, 555, "delivered", "unpaid", "7:58 AM", "Mark paid"],
+  ["Chaminda Wickramasinghe", "ORD-20261018-0038", "Nugegoda", 2, 1180, "delivery_failed", "unpaid", "7:40 AM", "Mark paid"],
+  ["Sanduni Rajapaksa", "ORD-20261018-0037", "Dehiwala", 1, 625, "completed", "paid", "7:31 AM", ""],
+  ["Tharindu Bandara", "ORD-20261018-0036", "Colombo 03", 2, 1320, "cancelled", "ignored", "7:12 AM", ""],
+  ["Anjali Gunawardena", "ORD-20261018-0035", "Nugegoda", 4, 2240, "completed", "paid", "6:55 AM", ""],
+  ["Pradeep Kumar", "ORD-20261018-0034", "Dehiwala", 1, 485, "delivered", "unpaid", "6:48 AM", "Mark paid"],
+  ["Shanika de Silva", "ORD-20261018-0033", "Colombo 03", 2, 1040, "completed", "paid", "6:30 AM", ""],
+];
+
+/* ===== screens ===== */
+const S = {};
+
+S.login = () => `<div class="login"><section class="art"><div class="brand"><i></i>Admin Panel</div>
+  <div><div class="track lg" style="margin-bottom:28px"><div class="bars"><i class="done" style="background:var(--mint)"></i><i class="done" style="background:var(--mint)"></i><i class="done" style="background:var(--mint)"></i><i style="background:rgba(255,255,255,.18)"></i></div></div>
+  <h2>Every lunch order, in one place.</h2><p>Approve customers, move orders along and chase payments without leaving the page.</p></div>
+  <span class="xs" style="color:#86a893">Staff access only</span></section>
+  <section class="form"><form class="box" onsubmit="return false">
+    <div><h1>Sign in</h1><p class="muted" style="margin-top:6px">Use your admin email and password.</p></div>
+    <div class="field"><label for="e">Email</label><input id="e" type="email" value="buddhi.gayan@ifs.com"></div>
+    <div class="field"><label for="p">Password</label><input id="p" type="password" value="••••••••••"><a class="small" href="#login-forgot" style="align-self:flex-end">Forgot password?</a></div>
+    <button class="btn primary" style="height:44px">Sign in</button>
+  </form></section></div>`;
+
+S["login-forgot"] = () => `<div class="login"><section class="art"><div class="brand"><i></i>Admin Panel</div><div><h2>Locked out? It happens.</h2><p>We will email a reset link that works for one hour.</p></div><span class="xs" style="color:#86a893">Staff access only</span></section>
+  <section class="form"><form class="box" onsubmit="return false">
+    <div><h1>Reset your password</h1><p class="muted" style="margin-top:6px">Enter your admin email and we will send you a reset link.</p></div>
+    <div class="alert ok" style="margin:0">${ic("check")}<span>If that email belongs to an admin, a reset link is on its way.</span></div>
+    <div class="field"><label for="e2">Email</label><input id="e2" type="email" value="buddhi.gayan@ifs.com"></div>
+    <button class="btn primary" style="height:44px">Send reset link</button>
+    <a class="small" href="#login" style="text-align:center">Back to sign in</a>
+  </form></section></div>`;
+
+S.dashboard = () => {
+  const days = [["Mon", 120, 190, 80], ["Tue", 140, 210, 95], ["Wed", 100, 230, 110], ["Thu", 160, 250, 90], ["Fri", 190, 280, 130], ["Sat", 90, 150, 60], ["Sun", 70, 120, 40]];
+  const max = 480;
+  const bars = days.map(([d, b, l, di]) => `<div class="col" title="${d}"><i style="height:${(di / max) * 100}%;background:var(--tea)"></i><i style="height:${(l / max) * 100}%;background:var(--leaf)"></i><i style="height:${(b / max) * 100}%;background:var(--turmeric)"></i><span>${d}</span></div>`).join("");
+  const items = [["Chicken fried rice", 412, 247200, "t1", 100], ["Vegetable kottu", 356, 160200, "t2", 86], ["Rice and curry (veg)", 301, 150500, "t1", 73], ["Egg hoppers (3)", 244, 73200, "t3", 59], ["Fish ambul thiyal", 198, 138600, "t4", 48]];
+  return shell("dashboard", "Dashboard", "Sales and orders for Oct 12 to Oct 18, compared with the 7 days before",
+    `<div class="seg" role="group" aria-label="Range"><button>Today</button><button class="on">Last 7 days</button><button>Last 30 days</button><button>Custom</button></div><select class="ctl" aria-label="Area"><option>All areas</option></select><select class="ctl" aria-label="Session"><option>All sessions</option></select>`,
+    `<div class="attention">
+      <div><span class="big hot">3</span><p>customers waiting for approval</p>${btn("Review customers", "secondary", "sm")}</div>
+      <div><span class="big hot">5</span><p>unpaid orders, LKR 4,150 outstanding</p>${btn("Chase payments", "secondary", "sm")}</div>
+      <div><span class="big bad">1</span><p>failed delivery to follow up</p>${btn("Open order", "secondary", "sm")}</div>
+    </div>
+    <div class="two dash2">
+      <div class="panel"><div class="kpis"><div class="kpi"><div class="lab">Sales</div><div class="val">LKR 1,284,500</div><div class="delta up">Up 12.4% on the previous 7 days</div></div>
+        <div class="kpi"><div class="lab">Orders</div><div class="val">1,142</div><div class="delta up">Up 6.1% · 1,096 completed</div></div></div>
+        <div class="chartbars spark" style="height:96px;margin-top:18px;gap:14px">${[161, 190, 119, 197, 215, 215, 186].map((v, i) => `<div class="col"><i style="height:${(v / 215) * 100}%;background:${i === 6 ? "var(--leaf)" : "#bcd6c4"}"></i><span>${days[i][0]}</span></div>`).join("")}</div></div>
+      <div class="panel"><h2>Orders by session</h2><div class="chartbars">${bars}</div><div class="legend"><span><i class="dot" style="background:var(--turmeric)"></i>Breakfast</span><span><i class="dot leaf"></i>Lunch</span><span><i class="dot" style="background:var(--tea)"></i>Dinner</span></div></div>
+    </div>
+    <div class="sectionhead">Top items</div>
+    <div class="list"><div class="lhead" style="--cols:minmax(0,1fr) 90px 150px 180px"><span>Item</span><span class="num">Sold</span><span class="num">Revenue</span><span></span></div>
+    ${items.map(([n, q, r, t, p]) => `<div class="lrow" style="--cols:minmax(0,1fr) 90px 150px 180px"><div class="who m-title"><span class="thumb ${t === "t1" ? "" : t}">${initials(n)}</span><b>${n}</b></div><span class="num m-hide">${q}</span><span class="num m-amt">${money(r)}</span><div class="meter m-hide"><i style="width:${p}%"></i></div></div>`).join("")}</div>
+    <div class="sectionhead">Areas</div>
+    <div class="list"><div class="lhead" style="--cols:minmax(0,1fr) 100px 150px 120px"><span>Area</span><span class="num">Orders</span><span class="num">Revenue</span><span class="num">Completed</span></div>
+    ${[["Colombo 03", 512, 612300, 97], ["Nugegoda", 388, 441800, 94], ["Dehiwala", 242, 230400, 91]].map(([a, o, r, c]) => `<div class="lrow" style="--cols:minmax(0,1fr) 100px 150px 120px"><b class="m-title">${a}</b><span class="num m-hide">${o}</span><span class="num m-amt">${money(r)}</span><span class="num m-hide">${c}%</span></div>`).join("")}</div>`);
+};
+
+S.users = (profile) => {
+  const rows = [["Amaya Rathnayake", "amaya.r@mail.lk", "077 412 8890", "Colombo 03", "Oct 18, 8:12 AM"], ["Kasun Madushanka", "kasun.m@mail.lk", "071 220 5513", "Nugegoda", "Oct 18, 7:40 AM"], ["Fathima Rizna", "rizna.f@mail.lk", "076 901 2244", "Dehiwala", "Oct 17, 6:15 PM"]];
+  const body = `<div class="chips" role="group" aria-label="Customer status"><button class="chip on">Pending <span class="c">3</span></button><button class="chip">Accepted <span class="c">128</span></button><button class="chip">Rejected <span class="c">4</span></button><button class="chip">Disabled <span class="c">2</span></button><button class="chip">Blocked <span class="c">2</span></button></div>
+    <div class="filters"><div class="search" style="max-width:360px">${ic("search")}<input placeholder="Search by name or email" aria-label="Search"></div></div>
+    <div class="list"><div class="lhead" style="--cols:minmax(0,1.6fr) 150px 130px 150px 260px"><span>Customer</span><span>Phone</span><span>Area</span><span>Registered</span><span class="acts">Actions</span></div>
+    ${rows.map(([n, e, p, a, d]) => `<div class="lrow attn" style="--cols:minmax(0,1.6fr) 150px 130px 150px 260px"><div class="who m-title"><span class="avatar soft">${initials(n)}</span><div style="min-width:0"><b>${n}</b><span>${e}</span></div></div><span class="m-hide">${p}</span><span class="m-hide">${a}</span><span class="muted small m-hide">${d}</span><div class="acts">${btn("Approve", "primary", "sm")}${btn("Reject", "secondary", "sm")}<button class="btn ghost sm">View</button></div></div>`).join("")}</div>
+    <div class="lfoot"><span>3 customers waiting</span></div>`;
+  const drawer = profile ? `<div class="drawer-wrap"><aside class="drawer" aria-label="Customer profile">
+    <div style="display:flex;gap:16px;align-items:center"><span class="avatar soft lg">AR</span><div style="flex:1"><h2 style="font:700 24px var(--font-head);letter-spacing:-.02em">Amaya Rathnayake</h2><div style="margin-top:6px;display:flex;gap:8px;align-items:center"><span class="badge turmeric">Pending approval</span><span class="muted small">Registered Oct 18, 8:12 AM</span></div></div><button class="btn ghost icon" aria-label="Close">${ic("x")}</button></div>
+    <div style="display:flex;gap:8px">${btn("Approve", "primary")}${btn("Reject", "secondary")}</div>
+    <div class="two" style="gap:20px"><div class="field"><label>Email</label><span>amaya.r@mail.lk</span></div><div class="field"><label>Phone</label><span>077 412 8890</span></div><div class="field" style="grid-column:1/-1"><label>Address</label><span>14/2, Galle Road, Colombo 03</span></div></div>
+    <div><div class="alert warn" style="margin:0">${ic("info")}<span><b>2 unpaid orders</b>, LKR 1,150 outstanding. Customers are blocked automatically at 3.</span></div></div>
+    <div><h3 class="sectionhead first" style="font-size:16px">Recent orders</h3>
+      ${[["ORD-20261012-0188", "completed", "paid", 485], ["ORD-20261014-0211", "delivered", "unpaid", 555], ["ORD-20261016-0302", "delivered", "unpaid", 595]].map(([i, s, p, t]) => `<div style="display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line)"><b>${i}</b><span class="num strong">${money(t)}</span>${track(s)}<span style="justify-self:end">${pay(p)}</span></div>`).join("")}</div>
+    <div><h3 class="sectionhead first" style="font-size:16px">Status history</h3><div class="timeline">
+      <div><i class="pt warn"></i><div><b>Pending approval</b><div class="muted small">Registered from the app · Oct 18, 8:12 AM</div></div></div>
+      <div><i class="pt"></i><div><b>Account created</b><div class="muted small">Email verified · Oct 18, 8:10 AM</div></div></div></div></div>
+  </aside></div>` : "";
+  return shell("users", "Users", "Approve new customers and manage their accounts", `${btn(ic("down") + " Export CSV", "secondary")}`, body) + drawer;
+};
+
+S["users-profile"] = () => S.users(true);
+
+S.admins = (modal) => {
+  const rows = [["Buddhi Gayan", "buddhi.gayan@ifs.com", "super_admin", "active", "Sep 02, 2026"], ["Nadeesha Perera", "nadeesha.p@rc.lk", "admin", "active", "Sep 14, 2026"], ["Lakmal Jayawardena", "lakmal.j@rc.lk", "admin", "inactive", "Sep 20, 2026"]];
+  const dlg = modal ? `<div class="scrim"><form class="dialog" role="dialog" aria-modal="true" aria-labelledby="t" onsubmit="return false"><h2 id="t">Add admin</h2>
+    <div class="field"><label>Full name</label><input value="Nadeesha Perera"></div><div class="field"><label>Email</label><input value="nadeesha.p@rc.lk"></div>
+    <div class="two" style="gap:12px"><div class="field"><label>Phone</label><input value="077 300 1122"></div><div class="field"><label>Role</label><select><option>Admin</option><option>Super admin</option></select></div></div>
+    <div class="field bad"><label>Temporary password</label><input type="password" value="abc"><span class="err">Use at least 8 characters.</span></div>
+    <div class="foot">${btn("Cancel")}${btn("Add admin", "primary")}</div></form></div>` : "";
+  return shell("admins", "Admins", "Who can sign in to this panel", btn(ic("plus") + " Add admin", "primary"),
+    `<div class="list"><div class="lhead" style="--cols:minmax(0,1.5fr) 130px 110px 130px 300px"><span>Admin</span><span>Role</span><span>Status</span><span>Added</span><span class="acts">Actions</span></div>
+    ${rows.map(([n, e, r, s, d]) => `<div class="lrow" style="--cols:minmax(0,1.5fr) 130px 110px 130px 300px"><div class="who m-title"><span class="avatar soft">${initials(n)}</span><div style="min-width:0"><b>${n}</b><span>${e}</span></div></div><span>${r === "super_admin" ? '<span class="badge tea">Super admin</span>' : '<span class="badge neutral">Admin</span>'}</span><span class="mark m-hide"><i class="dot ${s === "active" ? "leaf" : "mist"}"></i>${s === "active" ? "Active" : "Suspended"}</span><span class="muted small m-hide">${d}</span><div class="acts">${btn("Edit", "secondary", "sm")}${btn("Reset password", "secondary", "sm")}${s === "active" ? btn("Suspend", "danger-ghost", "sm") : btn("Enable", "secondary", "sm")}</div></div>`).join("")}</div>`) + dlg;
+};
+S["admins-add"] = () => S.admins(true);
+
+S.areas = (del) => {
+  const rows = [["Colombo 03", "COL-03", "active", 118, 512, 612300, "Lunch cut-off 10:30"], ["Nugegoda", "NUG", "active", 41, 388, 441800, "Deliveries by 1:00 PM"], ["Dehiwala", "DEH", "active", 36, 242, 230400, ""], ["Mount Lavinia", "MTL", "inactive", 0, 0, 0, "Not serving yet"]];
+  const dlg = del ? `<div class="scrim"><div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="t"><h2 id="t">Nugegoda can't be deleted yet</h2><p>41 customers are still assigned to this area. Move them to another area first, then delete it.</p><div class="foot">${btn("Close")}${btn("View the 41 customers", "primary")}</div></div></div>` : "";
+  return shell("areas", "Delivery Areas", "Where you deliver, and how each area is doing", btn(ic("plus") + " Add area", "primary"),
+    `<div class="list"><div class="lhead" style="--cols:minmax(0,1.4fr) 110px 100px 90px 150px 220px"><span>Area</span><span>Status</span><span class="num">Customers</span><span class="num">Orders</span><span class="num">Revenue</span><span class="acts">Actions</span></div>
+    ${rows.map(([n, c, s, u, o, r, note]) => `<div class="lrow" style="--cols:minmax(0,1.4fr) 110px 100px 90px 150px 220px"><div class="m-title"><b style="font-weight:600;font-size:14.5px">${n}</b> <span class="muted small">${c}</span>${note ? `<div class="muted small">${note}</div>` : ""}</div><span class="mark m-hide"><i class="dot ${s === "active" ? "leaf" : "mist"}"></i>${s === "active" ? "Active" : "Inactive"}</span><span class="num m-hide">${u}</span><span class="num m-hide">${o}</span><span class="num m-amt">${money(r)}</span><div class="acts">${btn("Edit", "secondary", "sm")}${btn("Delete", "danger-ghost", "sm")}</div></div>`).join("")}</div>
+    <p class="muted small" style="margin-top:12px">Orders and revenue cover all time.</p>`) + dlg;
+};
+S["areas-delete"] = () => S.areas(true);
+
+S.notices = () => shell("notices", "Notices", "Announcements go to customers' phones and appear in the app.", "",
+  `<div class="two" style="grid-template-columns:minmax(0,480px) minmax(0,1fr);align-items:start">
+    <form class="panel stack" onsubmit="return false"><h2>New notice</h2>
+      <div class="field"><label>Title</label><input value="Lunch delayed in Nugegoda"><span class="hint">Up to 150 characters</span></div>
+      <div class="field"><label>Message</label><textarea rows="4">Heavy rain is slowing deliveries. Expect lunch about 30 minutes late.</textarea></div>
+      <div class="field"><label>Send to</label><select><option>Nugegoda</option><option>Everyone</option></select></div>
+      <div style="display:flex;justify-content:flex-end">${btn("Send notice", "primary")}</div></form>
+    <div><div class="sectionhead first">Sent notices</div><div class="list">
+      ${[["Lunch delayed in Nugegoda", "Heavy rain is slowing deliveries. Expect lunch about 30 minutes late.", "Nugegoda", "Today, 10:42 AM"], ["Poya day schedule", "No deliveries on Monday. Orders reopen on Tuesday at 6:00 AM.", "Everyone", "Oct 14, 4:10 PM"], ["New: egg hoppers at breakfast", "Order three hoppers with sambol from 6:00 AM, Colombo 03 and Dehiwala.", "Colombo 03", "Oct 09, 5:30 PM"]].map(([t, b, a, d]) => `<div class="lrow" style="--cols:minmax(0,1fr) auto;align-items:start"><div class="m-title"><b>${t}</b><div class="muted" style="margin:2px 0 6px">${b}</div><span class="badge outline">${a}</span> <span class="muted small">${d}</span></div>${btn("Delete", "danger-ghost", "sm")}</div>`).join("")}</div></div></div>`);
+
+S.orders = (mode) => {
+  const unpaid = mode === "unpaid";
+  const list = unpaid ? ORDERS.filter((o) => o[6] === "unpaid" || o[6] === "pending").slice(0, 4) : ORDERS;
+  const cols = unpaid ? "28px minmax(0,1.5fr) 110px 150px 100px 240px" : "minmax(0,1.5fr) 110px 150px 100px 240px";
+  const chips = ["All", "Pending", "Preparing", "Delivering", "Delivered", "Completed", "Cancelled", "Failed"].map((c, i) => `<button class="chip ${i === 0 ? "on" : ""}">${c}</button>`).join("");
+  const rowHtml = list.map((o, idx) => {
+    const [n, id, area, items, total, st, p, t, act] = o;
+    const cls = st === "delivery_failed" ? "bad" : (p === "unpaid" || st === "pending") ? "attn" : "";
+    const primary = act ? btn(act, /paid/.test(act) ? "primary" : "secondary", "sm") : "";
+    return `<div class="lrow ${cls}" style="--cols:${cols}">${unpaid ? `<input class="cb m-hide" type="checkbox" ${idx < 3 ? "checked" : ""} aria-label="Select ${n}">` : ""}
+      <div class="m-title"><b style="font-weight:600;font-size:14.5px">${n}</b><div class="muted small" style="overflow:hidden;text-overflow:ellipsis">${id} · ${area} · ${items} ${items === 1 ? "item" : "items"} · ${t}</div></div>
+      <span class="num m-amt">${money(total)}</span><div class="m-hide" style="min-width:0">${track(st)}</div><div class="m-hide">${pay(p)}</div>
+      <div class="acts"><span class="m-only">${track(st)}</span>${primary}${more}</div></div>`;
+  }).join("");
+  const body = `<div class="chips" role="group" aria-label="Order status">${chips}</div>
+    <div class="filters"><select class="ctl" aria-label="Area"><option>All areas</option></select><input class="ctl" type="search" placeholder="Order id" aria-label="Order id" style="width:170px"><label>From <input class="ctl" type="date"></label><label>To <input class="ctl" type="date"></label>
+      <button class="chip attn ${unpaid ? "on" : ""}" aria-pressed="${unpaid}">Unpaid only</button></div>
+    <div class="list"><div class="lhead" style="--cols:${cols}">${unpaid ? "<span></span>" : ""}<span>Customer</span><span class="num">Total</span><span>Progress</span><span>Payment</span><span class="acts">Next step</span></div>${rowHtml}</div>
+    <div class="lfoot"><span>Showing 1 to ${list.length}</span><span style="display:flex;gap:8px">${btn("Previous", "secondary", "sm", "disabled")}${btn("Next", "secondary", "sm")}</span></div>`;
+  const bar = unpaid ? `<div class="selbar"><span><b>3 customers</b> selected</span>${btn("Send payment reminder", "primary")}</div>` : "";
+  return shell("orders", "Orders", "Refreshes every 30 seconds · updated 8:44 AM", "", body) + bar;
+};
+S["orders-unpaid"] = () => S.orders("unpaid");
+
+S["orders-modal"] = () => S.orders() + `<div class="scrim"><form class="dialog" role="dialog" aria-modal="true" aria-labelledby="t" onsubmit="return false"><h2 id="t">Update ORD-20261018-0038</h2>
+  <div>${track("delivering")}<div class="muted small" style="margin-top:6px">Chaminda Wickramasinghe · Nugegoda · LKR 1,180</div></div>
+  <fieldset style="border:0;padding:0;margin:0;display:grid;gap:8px"><legend class="strong small" style="padding:0 0 6px">Move to</legend>
+    <label style="display:flex;gap:10px;align-items:center;padding:12px;border:1px solid var(--line-strong);border-radius:8px"><input type="radio" name="s" style="accent-color:var(--leaf)"> Delivered</label>
+    <label style="display:flex;gap:10px;align-items:center;padding:12px;border:2px solid var(--brick);border-radius:8px;background:#fdf4f2"><input type="radio" name="s" checked style="accent-color:var(--brick)"> Delivery failed</label></fieldset>
+  <div class="field"><label>What went wrong? <span class="muted" style="font-weight:400">(required)</span></label><textarea rows="3">Customer not at the address, phone switched off.</textarea></div>
+  <div class="foot">${btn("Cancel")}${btn("Mark delivery failed", "danger")}</div></form></div>`;
+
+S.sessions = () => {
+  const items = [["Chicken fried rice", 450, "Unlimited"], ["Vegetable kottu", 450, "60 left"], ["Rice and curry (veg)", 500, "40 left"]];
+  const block = (name, time, badge, rows, orders) => `<section class="panel" style="margin-bottom:16px"><div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="display:flex;align-items:center;gap:12px"><h2 style="margin:0">${name}</h2><span class="muted">${time}</span>${badge}</div><div class="acts" style="display:flex;gap:6px;flex-wrap:wrap">${btn("View orders (" + orders + ")", "secondary", "sm")}${btn("Assign deliveries", "secondary", "sm")}${btn("Edit", "ghost", "sm")}${btn("Delete", "danger-ghost", "sm")}</div></div>
+    <div class="muted small" style="margin-bottom:8px">Note for drivers: use the side gate on Galle Road.</div>
+    ${rows.length ? `<div class="list"><div class="lhead" style="--cols:minmax(0,1fr) 120px 140px 230px"><span>Item</span><span class="num">Price</span><span class="num">Available</span><span class="acts"></span></div>${rows.map(([n, p, q]) => `<div class="lrow" style="--cols:minmax(0,1fr) 120px 140px 230px;min-height:56px"><div class="who m-title"><span class="thumb" style="width:36px;height:36px;font-size:13px">${initials(n)}</span><b>${n}</b></div><span class="num m-amt">${money(p)}</span><span class="num m-hide">${q}</span><div class="acts">${btn("Change quantity", "secondary", "sm")}<button class="btn ghost sm icon" aria-label="Remove item">${ic("x", 16)}</button></div></div>`).join("")}</div>${btn(ic("plus") + " Add items", "secondary", "sm", "")}` : ""}</section>`;
+  return shell("sessions", "Sessions", "What customers can order, and when", btn(ic("plus") + " New session", "primary"),
+    `<div class="filters"><button class="btn secondary icon" aria-label="Previous day">${ic("chev", 16)}</button><input class="ctl" type="date" value="2026-10-18" aria-label="Date"><button class="btn secondary icon" aria-label="Next day">${ic("chev", 16)}</button></div>
+    <section class="panel" style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><div><h2 style="margin:0">Breakfast</h2><span class="muted">No session for this date yet</span></div>${btn("Add breakfast session", "secondary")}</section>
+    ${block("Lunch", "11:00 to 14:00", '<span class="badge leaf">Open now</span>', items, 42)}
+    ${block("Dinner", "18:00 to 21:00", '<span class="badge outline">Upcoming</span>', items.slice(0, 2), 0)}`);
+};
+
+S.food = (add) => {
+  const rows = [["Chicken fried rice", "Wok-fried rice with egg and leeks", 450, "non-veg", "Rice", "", true], ["Vegetable kottu", "Chopped roti with seasonal vegetables", 450, "veg", "Kottu", "vegan option", true], ["Egg hoppers (3)", "Three hoppers with seeni sambol", 300, "veg", "Breakfast", "", true], ["Fish ambul thiyal", "Sour fish curry with rice", 700, "non-veg", "Rice", "gluten-free", false]];
+  const dlg = add ? `<div class="scrim"><form class="dialog" role="dialog" aria-modal="true" aria-labelledby="t" onsubmit="return false"><h2 id="t">Add food item</h2>
+    <div class="field"><label>Name</label><input value="Dhal curry"></div><div class="field"><label>Description <span class="muted" style="font-weight:400">(optional)</span></label><textarea rows="2"></textarea></div>
+    <div class="two" style="gap:12px"><div class="field"><label>Price (LKR)</label><input value="180.00"></div><div class="field"><label>Type</label><select><option>Veg</option><option>Non-veg</option><option>Other</option></select></div></div>
+    <div class="field"><label>Category <span class="muted" style="font-weight:400">(optional)</span></label><input placeholder="Rice, Snacks…"></div>
+    <div class="field"><label>Dietary tags <span class="muted" style="font-weight:400">(optional)</span></label><input placeholder="vegan, gluten-free"><span class="hint">Separate with commas</span></div>
+    <div class="foot">${btn("Cancel")}${btn("Save item", "primary")}</div></form></div>` : "";
+  return shell("food", "Food Items", "The catalogue that sessions pick from", btn(ic("plus") + " Add item", "primary"),
+    `<div class="filters"><div class="search" style="max-width:300px">${ic("search")}<input placeholder="Search by name" aria-label="Search"></div><select class="ctl" aria-label="Type"><option>All types</option></select><select class="ctl" aria-label="Category"><option>All categories</option></select><span style="margin-left:auto">${btn(ic("down") + " Export CSV", "secondary")}</span></div>
+    <div class="list"><div class="lhead" style="--cols:minmax(0,1.6fr) 110px 100px 130px 110px 220px"><span>Item</span><span class="num">Price</span><span>Type</span><span>Category</span><span>Available</span><span class="acts">Actions</span></div>
+    ${rows.map(([n, d, p, t, c, tag, on], i) => `<div class="lrow" style="--cols:minmax(0,1.6fr) 110px 100px 130px 110px 220px"><div class="who m-title"><span class="thumb t${(i % 4) + 1}">${initials(n)}</span><div style="min-width:0"><b>${n}</b><span>${d}</span></div></div><span class="num m-amt">${money(p)}</span><span class="mark m-hide"><i class="dot ${t === "veg" ? "leaf" : "brick"}"></i>${t === "veg" ? "Veg" : "Non-veg"}</span><span class="m-hide">${c}${tag ? `<br><span class="tag">${tag}</span>` : ""}</span><span class="m-hide" style="display:flex;align-items:center;gap:8px"><button class="switch ${on ? "on" : ""}" role="switch" aria-checked="${on}" aria-label="Available to customers"></button><span class="small muted">${on ? "On" : "Off"}</span></span><div class="acts">${btn("Edit", "secondary", "sm")}${btn("Price history", "ghost", "sm")}<button class="btn danger-ghost sm icon" aria-label="Delete">${ic("x", 16)}</button></div></div>`).join("")}</div>`) + dlg;
+};
+S["food-add"] = () => S.food(true);
+
+S.persons = () => shell("persons", "Delivery Persons", "Drivers who take orders to customers", btn(ic("plus") + " Add delivery person", "primary"),
+  `<div class="list"><div class="lhead" style="--cols:minmax(0,1.4fr) 140px 150px 120px 110px 280px"><span>Driver</span><span>Phone</span><span>NIC</span><span>Vehicle</span><span>Status</span><span class="acts">Actions</span></div>
+  ${[["Sampath Kumara", "sampath.k@rc.lk", "077 650 1180", "881234567V", "Motorbike", "active"], ["Rohan Dias", "rohan.d@rc.lk", "071 340 7722", "902345678V", "Three-wheeler", "active"], ["Mahesh Wijesekara", "mahesh.w@rc.lk", "076 118 4409", "—", "Motorbike", "inactive"]].map(([n, e, p, nic, v, s]) => `<div class="lrow" style="--cols:minmax(0,1.4fr) 140px 150px 120px 110px 280px"><div class="who m-title"><span class="avatar soft">${initials(n)}</span><div style="min-width:0"><b>${n}</b><span>${e}</span></div></div><span class="m-hide">${p}</span><span class="m-hide">${nic}</span><span class="m-hide">${v}</span><span class="mark m-hide"><i class="dot ${s === "active" ? "leaf" : "mist"}"></i>${s === "active" ? "Active" : "Inactive"}</span><div class="acts">${btn("Edit", "secondary", "sm")}${btn("Reset password", "secondary", "sm")}${s === "active" ? btn("Disable", "danger-ghost", "sm") : btn("Enable", "secondary", "sm")}</div></div>`).join("")}</div>`);
+
+S.reports = () => shell("reports", "Reports", "Revenue is the total value of orders in the range, whatever their payment status.", btn(ic("down") + " Download CSV", "secondary"),
+  `<div class="filters"><div class="seg"><button>Today</button><button class="on">Last 7 days</button><button>Last 30 days</button><button>Custom</button></div><select class="ctl" aria-label="Area"><option>All areas</option></select><select class="ctl" aria-label="Session"><option>All sessions</option></select></div>
+  <div class="tabs" role="tablist"><button class="tab on" role="tab" aria-selected="true">Sales by day</button><button class="tab" role="tab">Items</button><button class="tab" role="tab">Areas</button></div>
+  <div class="list"><div class="lhead" style="--cols:minmax(0,1fr) 110px 170px 150px"><span>Date</span><span class="num">Orders</span><span class="num">Revenue</span><span class="num">Average order</span></div>
+  ${[["Oct 12", 148, 161200], ["Oct 13", 171, 190500], ["Oct 14", 109, 118900], ["Oct 15", 176, 197300], ["Oct 16", 188, 215400], ["Oct 17", 190, 214800], ["Oct 18", 160, 186400]].map(([d, o, r]) => `<div class="lrow" style="--cols:minmax(0,1fr) 110px 170px 150px;min-height:52px"><span class="m-title">${d}</span><span class="num m-hide">${o}</span><span class="num m-amt">${money(r)}</span><span class="num m-hide">${money(Math.round(r / o))}</span></div>`).join("")}
+  <div class="lrow" style="--cols:minmax(0,1fr) 110px 170px 150px;min-height:56px;border-top:2px solid var(--ink);font-weight:700"><span class="m-title">Total</span><span class="num m-hide">1,142</span><span class="num m-amt">${money(1284500)}</span><span class="num m-hide">${money(1125)}</span></div></div>`);
+
+S.settings = () => shell("settings", "Settings", "Rules that apply to every customer", "",
+  `<div class="panel setpanel"><div><h2>Block customers who don't pay</h2><p class="muted" style="margin-top:6px">When an order is marked unpaid and the customer has this many unpaid orders, their account is blocked. You can unlock them from Users.</p></div>
+    <form class="stack" onsubmit="return false"><div class="field"><label for="n">Block at this many unpaid orders</label><input id="n" type="number" value="3" style="max-width:120px"><span class="hint">Whole number from 0 to 20. Use 0 to turn blocking off.</span></div>
+    <div class="alert warn" style="margin:0">${ic("info")}<span>Saving a stricter limit also blocks customers who are already over it.</span></div>
+    <div style="display:flex;gap:8px;align-items:center">${btn("Save changes", "primary")}<span class="muted small">Currently 3</span></div></form></div>`);
+
+S.audit = () => shell("audit", "Audit Logs", "Who changed what. Customer approvals and blocks are in each customer profile.", "",
+  `<div class="filters"><label>From <input class="ctl" type="date" value="2026-10-12"></label><label>To <input class="ctl" type="date" value="2026-10-18"></label><select class="ctl" aria-label="Type"><option>All actions</option></select><span class="muted small" style="margin-left:auto">86 entries</span></div>
+  <div class="list"><div class="lhead" style="--cols:150px minmax(0,1fr) 150px 190px minmax(0,1.3fr)"><span>When</span><span>Who</span><span>Action</span><span>Target</span><span>Details</span></div>
+  ${[["Oct 18, 8:42 AM", "Buddhi Gayan", "super admin", "order payment", "order ORD-20261018-0034", "payment status: paid"], ["Oct 18, 8:15 AM", "Nadeesha Perera", "admin", "order status", "order ORD-20261018-0038", "status: delivery failed, reason: customer not at address"], ["Oct 17, 5:02 PM", "Buddhi Gayan", "super admin", "settings update", "settings", "auto block unpaid threshold: 3"], ["Oct 17, 11:20 AM", "Buddhi Gayan", "super admin", "admin suspend", "admin Lakmal Jayawardena", "—"], ["Oct 16, 9:48 AM", "Nadeesha Perera", "admin", "notice create", "notice Poya day schedule", "area: everyone"]].map(([w, who, r, a, t, d]) => `<div class="lrow" style="--cols:150px minmax(0,1fr) 150px 190px minmax(0,1.3fr);min-height:56px"><span class="muted small m-title">${w}</span><span class="m-hide"><b style="font-weight:600">${who}</b> <span class="muted small">${r}</span></span><span class="m-hide">${a}</span><span class="m-hide">${t}</span><span class="muted small m-hide">${d}</span><span class="m-only small"><b style="font-weight:600">${who}</b>: ${a}, ${t}</span></div>`).join("")}</div>
+  <div class="lfoot"><span>Page 1 of 4</span><span style="display:flex;gap:8px">${btn("Previous", "secondary", "sm", "disabled")}${btn("Next", "secondary", "sm")}</span></div>`);
+
+S.components = () => `<div class="stage" style="max-width:1100px;margin:0 auto;padding-top:32px">
+  <div class="pagehead"><div><h1>Components</h1><p>Everything the pages are built from. Names match the ui kit.</p></div></div>
+
+  <section class="cs"><h2>Colour</h2><p class="d">Tea, leaf and paper carry the brand. Turmeric means "needs a human", brick means "went wrong". Text pairs are all 4.5:1 or better.</p>
+    <div class="sw">${[["Tea", "#123524", "sidebar, headings"], ["Leaf", "#16803c", "brand accents, focus"], ["Leaf solid", "#15803d", "filled buttons"], ["Paper", "#f3f5f0", "page ground"], ["Ink", "#18241d", "text"], ["Mist", "#5c6b61", "secondary text"], ["Turmeric", "#e0a100", "pending, unpaid"], ["Brick", "#b3362a", "failed, danger"], ["Mint", "#8fd0a8", "marker on tea"], ["Line", "#dde3db", "dividers"]].map(([n, h, u]) => `<div><i style="background:${h}"></i><span><b>${n}</b> ${h}<br><span class="muted">${u}</span></span></div>`).join("")}</div></section>
+
+  <section class="cs"><h2>Type</h2><p class="d">Bricolage Grotesque for headings and big numbers. IBM Plex Sans for everything else, with tabular figures so amounts line up. Sentence case everywhere.</p>
+    <div class="demo tscale"><div><small>Page title · 32/700</small><span style="font:700 32px/1.1 var(--font-head);letter-spacing:-.02em">Orders</span></div><div><small>Big number · 46/700</small><span style="font:700 46px/1 var(--font-head);letter-spacing:-.03em">LKR 1,284,500</span></div><div><small>Section · 19/700</small><span style="font:700 19px var(--font-head)">Top items</span></div><div><small>Body · 14/400</small><span>Move the order to preparing once the kitchen has the ticket.</span></div><div><small>Row title · 14.5/600</small><b style="font-weight:600;font-size:14.5px">Nimal Perera</b></div><div><small>Secondary · 13/400 mist</small><span class="muted small">ORD-20261018-0042 · Colombo 03 · 2 items</span></div><div><small>Numbers · tabular</small><span>1,111 · 8,888 · LKR 1,180.00</span></div></div></section>
+
+  <section class="cs"><h2>Order lifecycle track</h2><p class="d">The signature element. Filled segments show how far an order has come. Turmeric asks for action, brick means it failed.</p>
+    <div class="demo"><div class="row-flex" style="gap:36px">${["pending", "preparing", "delivering", "delivered", "completed", "cancelled", "delivery_failed"].map((s) => track(s)).join("")}</div></div></section>
+
+  <section class="cs"><h2>Buttons</h2><p class="d">One primary action per area. Destructive actions are quiet until confirmed.</p>
+    <div class="demo"><div class="row-flex">${btn("Primary", "primary")}${btn("Secondary")}${btn("Ghost", "ghost")}${btn("Danger", "danger")}${btn("Delete", "danger-ghost")}${btn('<i class="spin"></i> Saving', "primary", "disabled")}${btn("Disabled", "secondary", "disabled")}</div>
+    <div class="row-flex">${btn("Small primary", "primary", "sm")}${btn("Small secondary", "secondary", "sm")}${btn("Small ghost", "ghost", "sm")}${more}<button class="iconbtn" aria-label="Notifications">${ic("bell", 20)}<span class="n">9</span></button></div></div></section>
+
+  <section class="cs"><h2>Chips, tabs and segmented control</h2><p class="d">Chips filter a list. Tabs switch between views of the same data. The segmented control picks a range.</p>
+    <div class="demo"><div class="chips" style="margin:0"><button class="chip on">All</button><button class="chip">Pending <span class="c">3</span></button><button class="chip">Preparing <span class="c">6</span></button><button class="chip attn on">Unpaid only</button></div>
+    <div class="tabs" style="margin:0"><button class="tab on">Sales by day</button><button class="tab">Items</button><button class="tab">Areas</button></div>
+    <div><div class="seg"><button>Today</button><button class="on">Last 7 days</button><button>Last 30 days</button><button>Custom</button></div></div></div></section>
+
+  <section class="cs"><h2>Badges and markers</h2><p class="d">Badges label what something is. Markers show a state with a dot.</p>
+    <div class="demo"><div class="row-flex"><span class="badge tea">Super admin</span><span class="badge neutral">Admin</span><span class="badge leaf">Open now</span><span class="badge turmeric">Pending approval</span><span class="badge brick">Blocked</span><span class="badge outline">Upcoming</span></div>
+    <div class="row-flex" style="gap:22px">${pay("paid")}${pay("unpaid")}${pay("pending")}${pay("ignored")}<span class="mark"><i class="dot leaf"></i>Active</span><span class="mark"><i class="dot mist"></i>Suspended</span><span class="mark"><i class="dot leaf"></i>Veg</span><span class="mark"><i class="dot brick"></i>Non-veg</span></div></div></section>
+
+  <section class="cs"><h2>Form fields</h2><p class="d">Labels sit above fields, never replaced by placeholders. Errors say how to fix it.</p>
+    <div class="demo"><div class="two" style="gap:18px"><div class="field"><label>Full name</label><input value="Nadeesha Perera"><span class="hint">As shown in the audit log</span></div>
+    <div class="field bad"><label>Temporary password</label><input type="password" value="abc"><span class="err">Use at least 8 characters.</span></div>
+    <div class="field"><label>Role</label><select><option>Admin</option></select></div><div class="field"><label>Message</label><textarea rows="2"></textarea></div></div>
+    <div class="row-flex" style="gap:24px"><label class="row-flex" style="gap:8px"><input class="cb" type="checkbox" checked> Select all on this page</label><label class="row-flex" style="gap:8px"><button class="switch on" role="switch" aria-checked="true"></button> Available to customers</label><label class="row-flex" style="gap:8px"><button class="switch" role="switch" aria-checked="false"></button> Off</label></div></div></section>
+
+  <section class="cs"><h2>List rows</h2><p class="d">Rows are ruled lines on the paper, not cards. A coloured edge marks rows that need a human: turmeric for attention, brick for failure.</p>
+    <div class="demo paper" style="padding:0 0 8px"><div class="list" style="border-top:0">${ORDERS.slice(0, 5).filter((_, i) => i !== 1 && i !== 2).map((o) => { const [n, id, area, items, total, st, p, t, act] = o; return `<div class="lrow ${st === "delivery_failed" ? "bad" : p === "unpaid" || st === "pending" ? "attn" : ""}" style="--cols:minmax(0,1.5fr) 110px 150px 100px 240px"><div class="m-title"><b style="font-weight:600;font-size:14.5px">${n}</b><div class="muted small">${id} · ${area} · ${items} items · ${t}</div></div><span class="num m-amt">${money(total)}</span><div class="m-hide">${track(st)}</div><div class="m-hide">${pay(p)}</div><div class="acts">${act ? btn(act, /paid/.test(act) ? "primary" : "secondary", "sm") : ""}${more}</div></div>`; }).join("")}</div></div></section>
+
+  <section class="cs"><h2>Dialogs, sheets and toasts</h2><p class="d">Dialogs are centred on desktop and slide up as bottom sheets on phones. Toasts repeat the action's name.</p>
+    <div class="demo" style="background:#d4dbd1"><div class="two" style="align-items:start"><div class="dialog" style="width:100%;box-shadow:var(--shadow-float)"><h2>Send payment reminders</h2><p>Send a reminder to 3 customers? Each gets one push with their unpaid total. Customers without the app won't receive it.</p><div class="foot">${btn("Cancel")}${btn("Send reminders", "primary")}</div></div>
+    <div class="phone" style="align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;min-height:300px;background:rgba(18,53,36,.45)"><div class="sheet"><h2 style="font:700 20px var(--font-head)">Delete Nugegoda?</h2><p class="muted">This area has no customers, so it can be removed.</p>${btn("Delete area", "danger", "")}${btn("Cancel", "secondary", "")}</div></div></div>
+    <div class="row-flex"><div class="toast">${ic("check")} Marked paid <button aria-label="Dismiss">×</button></div><div class="toast">Reminder sent to 3 customers <button aria-label="Dismiss">×</button></div><div class="toast err">Couldn't mark paid: Request failed (500) <button aria-label="Dismiss">×</button></div></div></div></section>
+
+  <section class="cs"><h2>Alerts, empty and loading states</h2><p class="d">Say what happened and what to do next. An empty list invites an action.</p>
+    <div class="demo"><div class="alert err" style="margin:0">${ic("info")}<span><b>Couldn't load orders.</b> Request failed (500). Showing the last loaded orders.</span></div><div class="alert warn" style="margin:0"><span>Pick both dates to filter by date.</span></div>
+    <div class="two"><div class="empty" style="border:1px dashed var(--line-strong);border-radius:10px"><h3>No orders found</h3><p>Nothing matches these filters.</p>${btn("Clear filters")}</div>
+    <div style="display:grid;gap:14px;padding:6px 0">${[70, 90, 55, 80].map((w) => `<div style="display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center"><div class="skel" style="height:44px;border-radius:8px"></div><div style="display:grid;gap:8px"><div class="skel" style="width:${w}%"></div><div class="skel" style="width:${w - 25}%"></div></div></div>`).join("")}</div></div></div></section>
+  </div>`;
+
+/* ===== router ===== */
+const ORDER = [["login", "Sign in"], ["login-forgot", "Forgot password"], ["dashboard", "Dashboard"], ["users", "Users"], ["users-profile", "Customer profile"], ["orders", "Orders"], ["orders-unpaid", "Orders: unpaid"], ["orders-modal", "Update status"], ["notices", "Notices"], ["areas", "Delivery areas"], ["areas-delete", "Area in use"], ["sessions", "Sessions"], ["food", "Food items"], ["food-add", "Add item"], ["persons", "Delivery persons"], ["admins", "Admins"], ["admins-add", "Add admin"], ["reports", "Reports"], ["settings", "Settings"], ["audit", "Audit logs"], ["components", "Components"]];
+const bare = /[?&]bare\b/.test(location.search);
+document.body.classList.toggle("bare", bare);
+function render() {
+  const id = location.hash.slice(1) || "orders";
+  const fn = S[id] || S.orders;
+  document.getElementById("root").innerHTML = fn();
+  document.getElementById("picker").innerHTML = "<b>Admin Panel mockups</b>" + ORDER.map(([k, n]) => `<a href="#${k}" class="${k === id ? "on" : ""}">${n}</a>`).join("");
+  document.title = "Mockup: " + id;
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", render);
+render();
+</script>
+<style>.m-only{display:none}@media (max-width:640px){.m-only{display:block}}</style>
+</body>
+</html>

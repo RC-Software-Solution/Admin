@@ -1,87 +1,82 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import type { ReactNode } from "react";
+import { NavLink } from "react-router-dom";
+import { LuCalendarDays, LuChartColumn, LuHistory, LuLayoutDashboard, LuMapPin, LuMegaphone, LuReceiptText, LuShieldCheck, LuSlidersHorizontal, LuTruck, LuUsers, LuUtensils } from "react-icons/lu";
+import { getSession } from "../../services/apiClient";
 import "./sidebar.css";
 
-import {
-  MdDashboard,
-  MdLocationOn,
-  MdTimer,
-  MdFastfood,
-  MdAccountBalanceWallet,
-  MdHistory,
-} from "react-icons/md";
+interface NavItem {
+  name: string;
+  icon: ReactNode;
+  path: string;
+  superOnly?: boolean; // UI gating only; the backend enforces roles
+}
 
-import {
-  FaUsers,
-  FaUserShield,
-  FaClipboardList,
-  FaTruck,
-  FaChartBar,
-  FaCog,
-} from "react-icons/fa";
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
 
-const SidebarLayout = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+const GROUPS: NavGroup[] = [
+  { title: "Overview", items: [{ name: "Dashboard", icon: <LuLayoutDashboard />, path: "/dashboard" }] },
+  {
+    title: "Customers",
+    items: [
+      { name: "Users", icon: <LuUsers />, path: "/users" },
+      { name: "Orders", icon: <LuReceiptText />, path: "/orders" },
+      { name: "Notices", icon: <LuMegaphone />, path: "/notices" },
+    ],
+  },
+  {
+    title: "Operations",
+    items: [
+      { name: "Delivery Areas", icon: <LuMapPin />, path: "/delivery-areas" },
+      { name: "Sessions", icon: <LuCalendarDays />, path: "/sessions" },
+      { name: "Food Items", icon: <LuUtensils />, path: "/food-items" },
+      { name: "Delivery Persons", icon: <LuTruck />, path: "/delivery-persons" },
+    ],
+  },
+  { title: "Insights", items: [{ name: "Reports", icon: <LuChartColumn />, path: "/reports" }] },
+  {
+    title: "Admin",
+    items: [
+      { name: "Admins", icon: <LuShieldCheck />, path: "/admins", superOnly: true },
+      { name: "Settings", icon: <LuSlidersHorizontal />, path: "/settings", superOnly: true },
+      { name: "Audit Logs", icon: <LuHistory />, path: "/audit-logs", superOnly: true },
+    ],
+  },
+];
 
-  const navItems = [
-    { name: "Dashboard", icon: <MdDashboard />, path: "/dashboard" },
-    { name: "Users", icon: <FaUsers />, path: "/users" },
-    { name: "Admins", icon: <FaUserShield />, path: "/admins" },
-    { name: "Delivery Areas", icon: <MdLocationOn />, path: "/delivery-areas" },
-    { name: "Sessions", icon: <MdTimer />, path: "/sessions" },
-    { name: "Food Items", icon: <MdFastfood />, path: "/food-items" },
-    { name: "Orders", icon: <FaClipboardList />, path: "/orders" },
-    { name: "Delivery Persons", icon: <FaTruck />, path: "/delivery-persons" },
-    { name: "Deposits", icon: <MdAccountBalanceWallet />, path: "/deposits" },
-    { name: "Reports", icon: <FaChartBar />, path: "/reports" },
-    { name: "Settings", icon: <FaCog />, path: "/settings" },
-    { name: "Audit Logs", icon: <MdHistory />, path: "/audit-logs" },
-  ];
+interface SidebarProps {
+  open: boolean; // drawer state below 1024px
+  onNavigate: () => void; // called after a link is chosen so the drawer can close
+}
 
-  const [activeItem, setActiveItem] = useState("Dashboard");
-
-  // Set active item based on current path
-  useEffect(() => {
-    const currentItem = navItems.find((item) => item.path === location.pathname);
-    if (currentItem) {
-      setActiveItem(currentItem.name);
-    } else {
-      // If path doesn't match any, go to Dashboard
-      setActiveItem("Dashboard");
-      navigate("/dashboard");
-    }
-  }, [location.pathname]);
-
-  const handleClick = (name: string, path: string) => {
-    setActiveItem(name); // highlight active item
-    navigate(path); // navigate to the route
-  };
+export default function Sidebar({ open, onNavigate }: SidebarProps) {
+  const isSuper = getSession()?.role === "super_admin";
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar__title">Admin Panel</div>
-
-      <nav className="nav">
-        {navItems.map((item) => (
-          <a
-            key={item.name}
-            href="#"
-            className={`nav__item ${item.name === activeItem ? "nav__item--active" : ""}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleClick(item.name, item.path);
-            }}
-          >
-            <span className="nav__icon">{item.icon}</span>
-            <span className="nav__text">{item.name}</span>
-          </a>
-        ))}
+    <aside id="app-sidebar" className={`sidebar ${open ? "sidebar--open" : ""}`}>
+      <div className="sidebar__brand">
+        <i className="sidebar__mark" aria-hidden="true" />
+        Admin Panel
+      </div>
+      <nav className="nav" aria-label="Main">
+        {GROUPS.map((g) => {
+          const items = g.items.filter((i) => isSuper || !i.superOnly);
+          if (items.length === 0) return null;
+          return (
+            <div key={g.title} className="nav__group">
+              <div className="nav__group-title">{g.title}</div>
+              {items.map((item) => (
+                <NavLink key={item.path} to={item.path} onClick={onNavigate} className={({ isActive }) => `nav__item ${isActive ? "nav__item--active" : ""}`}>
+                  <span className="nav__icon" aria-hidden="true">{item.icon}</span>
+                  <span className="nav__text">{item.name}</span>
+                </NavLink>
+              ))}
+            </div>
+          );
+        })}
       </nav>
-
-      <div className="sidebar__footer">v1.0.0 · Production</div>
     </aside>
   );
-};
-
-export default SidebarLayout;
+}

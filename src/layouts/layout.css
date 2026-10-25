@@ -1,0 +1,43 @@
+.appContainer {
+  display: flex;
+  height: 100vh; /* fallback */
+  height: 100dvh;
+  background: var(--paper);
+}
+
+.contentWrapper {
+  flex: 1;
+  min-width: 0; /* lets wide tables scroll inside .main instead of stretching the page */
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  padding: 0 var(--space-6) var(--space-8);
+  overflow-y: auto;
+}
+
+.drawerBackdrop {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .drawerBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-drawer) - 1);
+    background: var(--overlay);
+  }
+
+  .main {
+    padding: 0 var(--space-5) var(--space-6);
+  }
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding: 0 14px 96px; /* room for the selection bar */
+  }
+}

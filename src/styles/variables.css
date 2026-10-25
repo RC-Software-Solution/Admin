@@ -1,7 +1,87 @@
-/* Optional CSS variables */
 :root {
-  --primary-color: #16a34a;
-  --danger-color: #ef4444;
-  --warning-color: #f59e0b;
-  --neutral-color: #6b7280;
+  /* Palette: see docs/superpowers/specs/2026-10-18-admin-visual-identity-design.md */
+  --tea: #123524; /* sidebar, selected chips, toasts */
+  --mint: #8fd0a8; /* marker on Tea */
+  --paper: #f3f5f0; /* page ground */
+  --ink: #18241d; /* text */
+
+  /* Semantic colours. Each has a solid colour plus bg / border / text for soft surfaces. */
+  --color-primary: #16803c; /* Leaf: accents, active states, focus */
+  --color-primary-solid: #16803c; /* filled buttons; white text on it is 5.0:1 */
+  --color-primary-solid-hover: #116332;
+  --color-primary-bg: #e2f0e6;
+  --color-primary-border: #b9d9c3;
+  --color-primary-text: #116332;
+
+  --color-danger: #b3362a; /* Brick: failed, cancelled, destructive */
+  --color-danger-hover: #8a261c;
+  --color-danger-bg: #f8dfdb;
+  --color-danger-border: #e8b5ae;
+  --color-danger-text: #8a261c;
+
+  --color-warning: #e0a100; /* Turmeric: needs a human (use as a fill; text on it is --color-warning-text) */
+  --color-warning-bg: #fbefc9;
+  --color-warning-border: #ecd185;
+  --color-warning-text: #6b4b00;
+
+  --color-info: #2c4c68;
+  --color-info-bg: #e6edf3;
+  --color-info-border: #c6d4e0;
+  --color-info-text: #1f3a52;
+
+  --white: #ffffff;
+  --gray-50: #f6f8f4;
+  --gray-100: #eef1ec;
+  --gray-200: #dde3db; /* hairlines */
+  --gray-300: #c3ccc1; /* control borders */
+  --gray-400: #98a69c;
+  --gray-500: #5c6b61; /* Mist: secondary text (5.5:1 on white) */
+  --gray-600: #4a5a50;
+  --gray-700: #36463c;
+  --gray-800: #25352b;
+  --gray-900: #18241d;
+
+  /* On the dark rail and on dark pills */
+  --rail-text: #c9dccf;
+  --rail-muted: #86a893;
+  --on-dark-hover: rgba(255, 255, 255, 0.06);
+  --on-dark-active: rgba(255, 255, 255, 0.1);
+  --on-dark-soft: rgba(255, 255, 255, 0.72);
+  --hover-wash: rgba(18, 53, 36, 0.07);
+
+  --font-head: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", "Nirmala UI", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --radius-sm: 4px; /* badges */
+  --radius-md: 6px; /* controls */
+  --radius-lg: 10px; /* floating things and panels */
+  --radius-full: 999px; /* chips, user pill */
+
+  --shadow-sm: 0 1px 2px rgba(18, 53, 36, 0.08);
+  --shadow-md: 0 8px 16px rgba(18, 53, 36, 0.12);
+  --shadow-lg: 0 12px 32px rgba(18, 53, 36, 0.16), 0 2px 6px rgba(18, 53, 36, 0.08); /* menus, dialogs, toasts */
+  --overlay: rgba(18, 53, 36, 0.45);
+  --focus-ring: 0 0 0 3px rgba(22, 128, 60, 0.28);
+
+  --z-drawer: 100;
+  --z-dropdown: 1000;
+  --z-toast: 3000;
+
+  /* Breakpoints (media queries cannot read custom properties, so write the literals): 640px phone, 1024px drawer */
 }
